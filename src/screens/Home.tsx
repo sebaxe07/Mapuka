@@ -8,32 +8,21 @@ import Mapbox from "@rnmapbox/maps";
 
 interface HomeProps {}
 
+Mapbox.setAccessToken(
+  "pk.eyJ1IjoiY29kZWthdGFiYXR0bGUiLCJhIjoiY201NDUwazd5MTdlNDJvc2VvMjU1Z2dnMSJ9.H5y4T1mhK2AngJnnBYN_Bg"
+);
+
 const Home: React.FC<HomeProps> = ({}) => {
   const navigation = useNavigation();
 
   return (
     <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-      <Mapbox.MapView style={{ flex: 1 }} />
       <Logo width={120} height={40} fill={"green"} />
-      <Text>Home </Text>
+      <Text>Home Screen</Text>
       <Button onPress={() => navigation.navigate("Details")}>
         Go to Details
       </Button>
-      <MapView
-        style={{ width: 200, height: 200 }}
-        initialRegion={{
-          latitude: 37.78825,
-          longitude: -122.4324,
-          latitudeDelta: 0.0922,
-          longitudeDelta: 0.0421,
-        }}
-      >
-        <UrlTile
-          urlTemplate="http://c.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          maximumZ={11} // Adjust zoom level as needed
-          flipY={true} // Ensure correct tile orientation
-        />
-      </MapView>
+      <Button onPress={() => navigation.navigate("Map")}>Go to Map</Button>
     </View>
   );
 };

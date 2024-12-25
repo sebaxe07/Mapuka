@@ -6,6 +6,7 @@ import {
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import HomeScreen from "./src/screens/Home";
 import DetailsScreen from "./src/screens/Details";
+import MapScreen from "./src/screens/Map";
 
 const RootStack = createNativeStackNavigator({
   initialRouteName: "Home",
@@ -20,6 +21,7 @@ const RootStack = createNativeStackNavigator({
       },
     },
     Details: DetailsScreen,
+    Map: MapScreen,
   },
 });
 
