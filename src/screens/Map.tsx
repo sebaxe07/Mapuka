@@ -1,28 +1,11 @@
 import React, { Component, useEffect, useRef, useState } from "react";
 import { Alert, StyleSheet, View } from "react-native";
-import MapboxGL from "@rnmapbox/maps";
-import HeadingIndicator from "@rnmapbox/maps";
+import MapboxGL, { UserLocation } from "@rnmapbox/maps";
+import LocationPuck from "@rnmapbox/maps";
 import * as Location from "expo-location";
 import { MAPBOX_ACCESS_TOKEN } from "@env";
 
 MapboxGL.setAccessToken(MAPBOX_ACCESS_TOKEN);
-
-const styles = StyleSheet.create({
-  page: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#F5FCFF",
-  },
-  container: {
-    height: 300,
-    width: 300,
-    backgroundColor: "tomato",
-  },
-  map: {
-    flex: 1,
-  },
-});
 
 interface MapProps {}
 
@@ -65,7 +48,7 @@ const Map: React.FC<MapProps> = ({}) => {
           if (cameraRef.current) {
             cameraRef.current.setCamera({
               centerCoordinate: coordinates,
-              zoomLevel: 14,
+              zoomLevel: 16,
               animationDuration: 1000, // Smooth transition
             });
           }
@@ -77,25 +60,19 @@ const Map: React.FC<MapProps> = ({}) => {
   };
 
   return (
-    <View style={styles.page}>
-      <View style={styles.container}>
-        <MapboxGL.MapView style={styles.map}>
+    <View className="size-full flex-1 bg-blue-600 justify-center items-center">
+      <View className="size-full bg-fuchsia-400">
+        <MapboxGL.MapView
+          style={{ flex: 1 }}
+          styleURL="mapbox://styles/mapbox/dark-v11"
+          compassEnabled={true}
+        >
           <MapboxGL.Camera ref={cameraRef} />
-
-          {userLocation && (
-            <MapboxGL.PointAnnotation
-              id="userLocation"
-              coordinate={userLocation}
-            >
-              <View
-                style={{
-                  height: 30,
-                  width: 30,
-                  backgroundColor: "blue",
-                  borderRadius: 15,
-                }}
-              />
-            </MapboxGL.PointAnnotation>
+          {UserLocation && (
+            <MapboxGL.LocationPuck
+              puckBearing={"course"}
+              pulsing={{ isEnabled: true, color: "blue", radius: "accuracy" }}
+            />
           )}
         </MapboxGL.MapView>
       </View>
