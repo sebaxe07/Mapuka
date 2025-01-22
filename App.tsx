@@ -41,10 +41,7 @@ const RootStack = createNativeStackNavigator({
           color: "#ffffff",
         },
         headerLeft: () => (
-          <BackArrow
-            color="#ffffff"
-            onPress={() => navigation.goBack()} // Correct navigation back function
-          />
+          <BackArrow color="#ffffff" onPress={() => navigation.goBack()} />
         ),
       }),
       screen: Profile,
