@@ -25,6 +25,9 @@ const Home: React.FC<HomeProps> = ({}) => {
           Go to Details
         </Button>
         <Button onPress={() => navigation.navigate("Map")}>Go to Map</Button>
+        <Button onPress={() => navigation.navigate("MapFog")}>
+          Go to MapFog
+        </Button>
         <BlurView
           intensity={10}
           tint="light"

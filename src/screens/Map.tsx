@@ -1,14 +1,23 @@
 import React, { Component, useEffect, useRef, useState } from "react";
-import { Alert, StyleSheet, View, Text } from "react-native";
+import { Alert, StyleSheet, View, Text, Image } from "react-native";
 import MapboxGL, { UserLocation } from "@rnmapbox/maps";
 import * as Location from "expo-location";
 import { MAPBOX_ACCESS_TOKEN } from "@env";
 import { BlurView } from "expo-blur";
 import { Button, Input } from "react-native-elements";
+import * as turf from "@turf/turf";
+import { Point, Feature, GeoJsonProperties, Polygon, Geometry } from "geojson";
+import { Units } from "@turf/turf";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { searchLocation } from "../utils/DirectionsHelper";
 
 MapboxGL.setAccessToken(MAPBOX_ACCESS_TOKEN);
 
 interface MapProps {}
+
+const fogImageURI = Image.resolveAssetSource(
+  require("../../assets/images/fog.png")
+).uri;
 
 const Map: React.FC<MapProps> = ({}) => {
   const [locationPermissionGranted, setLocationPermissionGranted] =
@@ -17,6 +26,21 @@ const Map: React.FC<MapProps> = ({}) => {
     null
   );
   const cameraRef = useRef<MapboxGL.Camera>(null);
+  const [markerLocation, setMarkerLocation] = useState<[number, number] | null>(
+    null
+  );
+  const [text, setText] = useState("");
+  const [routeCoords, setRouteCoords] = useState<number[][] | null>(null);
+
+  const useSearch = () => {
+    searchLocation({
+      text,
+      setMarkerLocation,
+      cameraRef,
+      userLocation,
+      setRouteCoords,
+    });
+  };
 
   useEffect(() => {
     requestUserLocation();
@@ -45,6 +69,10 @@ const Map: React.FC<MapProps> = ({}) => {
           const coordinates: [number, number] = [longitude, latitude];
           setUserLocation(coordinates);
 
+          // Generate discovery circle and save to storage
+          const newDiscovery = generateDiscoveryCircle(coordinates, 150);
+          saveDiscoveredArea(newDiscovery);
+
           // Focus camera on the user's location
           if (cameraRef.current) {
             cameraRef.current.setCamera({
@@ -60,74 +88,52 @@ const Map: React.FC<MapProps> = ({}) => {
     }
   };
 
-  const [text, setText] = useState("");
+  const [discoveredAreas, setDiscoveredAreas] = useState<
+    { longitude: number; latitude: number; radius: number }[]
+  >([]);
 
-  useEffect(() => {
-    console.log("text", text);
-  }, [text]);
+  const [discoveryCircle, setDiscoveryCircle] = useState<Feature<
+    Geometry,
+    GeoJsonProperties
+  > | null>(null);
 
-  const [markerLocation, setMarkerLocation] = useState<[number, number] | null>(
-    null
-  );
-  const [routeCoords, setRouteCoords] = useState<number[][] | null>(null);
+  /*   useEffect(() => {
+    loadDiscoveredAreas();
+  }, []); */
 
-  const searchLocation = async () => {
-    console.log("Button pressed");
-    if (!text) return;
-
-    try {
-      const response = await fetch(
-        `https://api.mapbox.com/search/geocode/v6/forward?q=${encodeURIComponent(
-          text
-        )}&proximity=ip&access_token=${MAPBOX_ACCESS_TOKEN}`
-      );
-
-      const data = await response.json();
-
-      if (data.features && data.features.length > 0) {
-        const [longitude, latitude] = data.features[0].geometry.coordinates;
-
-        // Update the map camera to focus on the searched location
-        setMarkerLocation([longitude, latitude]);
-        if (cameraRef.current) {
-          cameraRef.current.setCamera({
-            centerCoordinate: [longitude, latitude],
-            zoomLevel: 14,
-            animationDuration: 1000,
-          });
-        }
-        traceRouteToMarker([longitude, latitude]);
-      } else {
-        Alert.alert("No results found", "Please try a different search term.");
-      }
-    } catch (error) {
-      console.error("Error searching location: ", error);
-      Alert.alert("Error", "Failed to fetch location. Please try again.");
-    }
+  const generateDiscoveryCircle = (
+    center: number[] | Point | Feature<Point, GeoJsonProperties>,
+    radiusInMeters = 1000
+  ) => {
+    const options = { steps: 64, units: "meters" as Units };
+    const circle = turf.circle(center, radiusInMeters, options);
+    console.log("Generated circle: ", JSON.stringify(circle, null, 2));
+    return circle;
   };
 
-  const traceRouteToMarker = async (destination: [number, number]) => {
-    if (!userLocation) {
-      Alert.alert("User location not found", "Cannot trace a route.");
-      return;
-    }
+  const saveDiscoveredArea = async (
+    area: Feature<Geometry, GeoJsonProperties>
+  ) => {
+    setDiscoveryCircle(area);
+    /*     let existing = await AsyncStorage.getItem("discoveredAreas");
+    let areas = existing ? JSON.parse(existing) : [];
+    areas.push(area);
+    await AsyncStorage.setItem("discoveredAreas", JSON.stringify(areas));
+    setDiscoveredAreas(areas); */
+  };
 
-    try {
-      const response = await fetch(
-        `https://api.mapbox.com/directions/v5/mapbox/walking/${userLocation[0]},${userLocation[1]};${destination[0]},${destination[1]}?alternatives=false&continue_straight=true&geometries=geojson&overview=full&steps=false&access_token=${MAPBOX_ACCESS_TOKEN}`
-      );
+  /*   useEffect(() => {
+    console.log("Discovered areas: ", JSON.stringify(discoveredAreas));
+  }, [discoveredAreas]); */
 
-      const data = await response.json();
+  useEffect(() => {
+    // console.log("Discovery circle: ", JSON.stringify(discoveryCircle, null, 2));
+  }, [discoveryCircle]);
 
-      if (data.routes && data.routes.length > 0) {
-        const route = data.routes[0].geometry.coordinates;
-        setRouteCoords(route);
-      } else {
-        Alert.alert("No route found", "Could not trace a route.");
-      }
-    } catch (error) {
-      console.error("Error tracing route: ", error);
-      Alert.alert("Error", "Failed to trace route. Please try again.");
+  const loadDiscoveredAreas = async () => {
+    let storedAreas = await AsyncStorage.getItem("discoveredAreas");
+    if (storedAreas) {
+      setDiscoveredAreas(JSON.parse(storedAreas));
     }
   };
 
@@ -138,7 +144,19 @@ const Map: React.FC<MapProps> = ({}) => {
         styleURL="mapbox://styles/codekatabattle/cm55m9p3i003b01po2yh31h59/draft"
         compassEnabled={true}
       >
-        <MapboxGL.Camera ref={cameraRef} />
+        <MapboxGL.Camera ref={cameraRef} zoomLevel={15} />
+        {/* Raster layer for fog effect */}
+        <MapboxGL.RasterSource
+          id="fogSource"
+          tileUrlTemplates={[fogImageURI]}
+          tileSize={256}
+        >
+          <MapboxGL.RasterLayer
+            id="fogLayer"
+            sourceID="fogSource"
+            style={{ rasterOpacity: 0.8, rasterFadeDuration: 500 }}
+          />
+        </MapboxGL.RasterSource>
         {UserLocation && (
           <MapboxGL.LocationPuck
             puckBearing={"course"}
@@ -171,6 +189,38 @@ const Map: React.FC<MapProps> = ({}) => {
             />
           </MapboxGL.ShapeSource>
         )}
+
+        <MapboxGL.ShapeSource
+          id="circleSource"
+          shape={{
+            type: "Feature",
+            geometry: {
+              type: "Point",
+              coordinates: [9.145071529409883, 45.51373373651311], // Replace with your coordinates
+            },
+            properties: {},
+          }}
+        >
+          <MapboxGL.CircleLayer
+            id="circleLayer"
+            style={{
+              circleRadius: 100,
+              circleColor: "rgba(0, 0, 0, 0)",
+            }}
+          />
+        </MapboxGL.ShapeSource>
+
+        {discoveryCircle && (
+          <MapboxGL.ShapeSource id="discoverySource" shape={discoveryCircle}>
+            <MapboxGL.FillLayer
+              id="discoveryLayer"
+              style={{
+                fillColor: "rgba(0, 0, 0, 0)",
+                fillOutlineColor: "rgba(255, 0, 0, 1)",
+              }}
+            />
+          </MapboxGL.ShapeSource>
+        )}
       </MapboxGL.MapView>
 
       <View className="size-full relative items-center ">
@@ -179,7 +229,11 @@ const Map: React.FC<MapProps> = ({}) => {
           onChangeText={(value) => setText(value)}
           value={text}
         />
-        <Button title="Press me" onPress={searchLocation} />
+        <Button title="Press me" onPress={useSearch} />
+        <Button
+          title="Clear discovered areas"
+          onPress={() => setDiscoveredAreas([])}
+        />
       </View>
     </View>
   );
