@@ -3,6 +3,7 @@ import {
   createStaticNavigation,
   StaticParamList,
 } from "@react-navigation/native";
+import { supabase } from "./src/utils/supabase";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import HomeScreen from "./src/screens/Home";
 import DetailsScreen from "./src/screens/Details";
@@ -12,6 +13,10 @@ import Bookmarks from "./src/screens/Bookmarks";
 import Leaderboard from "./src/screens/Leaderboard";
 import Profile from "./src/screens/Profile";
 import { BackArrow } from "./assets/icons/profile";
+import MapFog from "./src/screens/MapFog";
+import { Provider } from "react-redux";
+import { PersistGate } from "redux-persist/integration/react";
+import { store, persistor } from "./src/contexts/store";
 
 const RootStack = createNativeStackNavigator({
   initialRouteName: "Home",
@@ -46,6 +51,7 @@ const RootStack = createNativeStackNavigator({
       }),
       screen: Profile,
     },
+    MapFog: MapFog,
   },
 });
 
@@ -60,5 +66,11 @@ declare global {
 const Navigation = createStaticNavigation(RootStack);
 
 export default function App() {
-  return <Navigation />;
+  return (
+    <Provider store={store}>
+      <PersistGate loading={null} persistor={persistor}>
+        <Navigation />
+      </PersistGate>
+    </Provider>
+  );
 }
