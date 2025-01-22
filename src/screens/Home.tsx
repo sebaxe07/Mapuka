@@ -1,41 +1,108 @@
-import { Button } from "@react-navigation/elements";
-import { useNavigation } from "@react-navigation/native";
-import React from "react";
-import { View, Text, ImageBackground } from "react-native";
-import Logo from "../../assets/images/ISOTIPO (2).svg";
-import MapView, { UrlTile } from "react-native-maps";
+import React, { useEffect, useRef, useState } from "react";
+import { View, TextInput, TouchableOpacity, Alert } from "react-native";
+import MapboxGL from "@rnmapbox/maps";
+import * as Icons from "../../assets/icons/home";
+import FloatingNavbar from "../components/FloatingNavbar";
+import * as Location from "expo-location";
+import { MAPBOX_ACCESS_TOKEN } from "@env";
+import SearchBar from "../components/SearchBar";
 
-import { BlurView } from "expo-blur";
+MapboxGL.setAccessToken(MAPBOX_ACCESS_TOKEN);
 
-interface HomeProps {}
+const Home: React.FC = () => {
+  const [locationPermissionGranted, setLocationPermissionGranted] =
+    useState(false);
+  const [userLocation, setUserLocation] = useState<[number, number] | null>(
+    null
+  );
+  const [markerLocation, setMarkerLocation] = useState<[number, number] | null>(
+    null
+  );
+  const [menuExpanded, setMenuExpanded] = useState(false);
+  const cameraRef = useRef<MapboxGL.Camera>(null);
 
-const Home: React.FC<HomeProps> = ({}) => {
-  const navigation = useNavigation();
+  useEffect(() => {
+    requestUserLocation();
+  }, []);
 
-  const image = require("../../assets/images/mapBgDark.png");
+  const requestUserLocation = async () => {
+    try {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        Alert.alert(
+          "Permission Denied",
+          "Location permission is required to show your location on the map."
+        );
+        return;
+      }
+
+      Location.watchPositionAsync(
+        {
+          accuracy: Location.Accuracy.High,
+          timeInterval: 1000,
+          distanceInterval: 1,
+        },
+        (location) => {
+          const { latitude, longitude } = location.coords;
+          const coordinates: [number, number] = [longitude, latitude];
+          setUserLocation(coordinates);
+          if (cameraRef.current) {
+            cameraRef.current.setCamera({
+              centerCoordinate: coordinates,
+              zoomLevel: 16,
+              animationDuration: 1000,
+            });
+          }
+        }
+      );
+    } catch (error) {
+      console.error("Error fetching location: ", error);
+    }
+  };
+
+  const handleOptionSelect = (option: string) => {
+    console.log("Selected Option:", option);
+  };
+
   return (
-    <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-      <ImageBackground
-        source={image}
-        className="size-full flex-1 justify-center items-center"
-      >
-        <Logo width={120} height={40} fill={"green"} />
-        <Text>Home Screen</Text>
-        <Button onPress={() => navigation.navigate("Details")}>
-          Go to Details
-        </Button>
-        <Button onPress={() => navigation.navigate("Map")}>Go to Map</Button>
-        <BlurView
-          intensity={10}
-          tint="light"
-          className="h-20 w-4/5 rounded-2xl overflow-hidden justify-center items-center border border-white"
-          experimentalBlurMethod="dimezisBlurView"
-        >
-          <View>
-            <Text className="text-center text-white">Soy borroso</Text>
-          </View>
-        </BlurView>
-      </ImageBackground>
+    <View className="flex-1">
+      {/* Full-screen Map */}
+      <MapboxGL.MapView style={{ flex: 1 }} styleURL={MapboxGL.StyleURL.Dark}>
+        <MapboxGL.Camera ref={cameraRef} zoomLevel={12} />
+        {userLocation && (
+          <MapboxGL.PointAnnotation id="userLocation" coordinate={userLocation}>
+            <View className="w-3 h-3 bg-blue-500 rounded-full" />
+          </MapboxGL.PointAnnotation>
+        )}
+        {markerLocation && (
+          <MapboxGL.PointAnnotation id="marker" coordinate={markerLocation}>
+            <View className="w-3 h-3 bg-red-500 rounded-full" />
+          </MapboxGL.PointAnnotation>
+        )}
+      </MapboxGL.MapView>
+
+      {/* Search Bar */}
+      <SearchBar />
+
+      {/* Top Right Buttons */}
+      <View className="absolute top-20 right-5 space-y-3">
+        <TouchableOpacity className="p-3 rounded-full items-center justify-center">
+          <Icons.Layers color="white" />
+        </TouchableOpacity>
+      </View>
+
+      {/* Bottom Floating Menu */}
+      <FloatingNavbar onOptionSelect={handleOptionSelect} />
+
+      {/* Bottom Right Buttons*/}
+      <View className="absolute bottom-28 right-5 space-y-3">
+        <TouchableOpacity className="bg-black/50 p-3 rounded-full items-center justify-center">
+          <Icons.Focus color="white" />
+        </TouchableOpacity>
+        <TouchableOpacity className="bg-black/50 p-3 rounded-full items-center justify-center">
+          <Icons.Compass color="white" />
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
