@@ -20,8 +20,6 @@ import {
   Geometry,
   MultiPolygon,
 } from "geojson";
-import { Units } from "@turf/turf";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { searchLocation } from "../utils/DirectionsHelper";
 import { debounce } from "lodash";
 import { useAppDispatch, useAppSelector } from "../contexts/hooks";
@@ -37,12 +35,17 @@ const debouncedSaveDiscoveredAreas = debounce(
     try {
       console.log("\x1b[34m Saving discovered areas: ", discoveredPolygons);
       const discoveredPolygonsJson = JSON.stringify(discoveredPolygons);
-
+      const areadiscovered = turf.convertArea(
+        turf.area(discoveredPolygons),
+        "meters",
+        "kilometers"
+      );
       console.log("\x1b[31m", "saving on user " + profileId);
       const { data, error } = await supabase
         .from("profiles")
         .update({
           discovered_polygon: discoveredPolygonsJson,
+          discovered_area: areadiscovered,
         })
         .eq("profile_id", profileId);
 
@@ -61,8 +64,6 @@ const debouncedSaveDiscoveredAreas = debounce(
 );
 
 const Map: React.FC<MapProps> = ({}) => {
-  const [locationPermissionGranted, setLocationPermissionGranted] =
-    useState(false);
   const [userLocation, setUserLocation] = useState<[number, number] | null>(
     null
   );
@@ -179,6 +180,7 @@ const Map: React.FC<MapProps> = ({}) => {
         .from("profiles")
         .update({
           discovered_polygon: null,
+          discovered_area: 0,
         })
         .eq("profile_id", userData.profile_id);
 
@@ -186,7 +188,7 @@ const Map: React.FC<MapProps> = ({}) => {
         console.error("Error clearing discovered areas: ", error.message);
         return;
       }
-
+      dispatch(setDiscStorage(null));
       console.log("Cleared discovered areas: ", data);
     } catch (error) {
       console.error("Error clearing discovered areas: ", error);
