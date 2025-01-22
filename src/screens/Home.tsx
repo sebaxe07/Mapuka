@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { View, TextInput, TouchableOpacity, Alert } from "react-native";
+import { View, TouchableOpacity, Alert } from "react-native";
 import MapboxGL from "@rnmapbox/maps";
 import * as Icons from "../../assets/icons/home";
 import FloatingNavbar from "../components/FloatingNavbar";
@@ -18,7 +18,7 @@ const Home: React.FC = () => {
   const [markerLocation, setMarkerLocation] = useState<[number, number] | null>(
     null
   );
-  const [menuExpanded, setMenuExpanded] = useState(false);
+  const [text, setText] = useState("");
   const cameraRef = useRef<MapboxGL.Camera>(null);
 
   useEffect(() => {
@@ -60,8 +60,35 @@ const Home: React.FC = () => {
     }
   };
 
-  const handleOptionSelect = (option: string) => {
-    console.log("Selected Option:", option);
+  const searchLocation = async () => {
+    console.log("Search location");
+    if (!text) return;
+
+    try {
+      const response = await fetch(
+        `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(text)}.json?proximity=ip&access_token=${MAPBOX_ACCESS_TOKEN}`
+      );
+
+      const data = await response.json();
+
+      if (data.features && data.features.length > 0) {
+        const [longitude, latitude] = data.features[0].geometry.coordinates;
+
+        setMarkerLocation([longitude, latitude]);
+        if (cameraRef.current) {
+          cameraRef.current.setCamera({
+            centerCoordinate: [longitude, latitude],
+            zoomLevel: 14,
+            animationDuration: 1000,
+          });
+        }
+      } else {
+        Alert.alert("No results found", "Please try a different search term.");
+      }
+    } catch (error) {
+      console.error("Error searching location: ", error);
+      Alert.alert("Error", "Failed to fetch location. Please try again.");
+    }
   };
 
   return (
@@ -82,24 +109,34 @@ const Home: React.FC = () => {
       </MapboxGL.MapView>
 
       {/* Search Bar */}
-      <SearchBar />
+      <SearchBar
+        value={text}
+        onChangeText={(value) => setText(value)}
+        placeholder="Search for a location"
+        onPress={searchLocation}
+      />
 
       {/* Top Right Buttons */}
       <View className="absolute top-20 right-5 space-y-3">
-        <TouchableOpacity className="p-3 rounded-full items-center justify-center">
+        <TouchableOpacity className="bg-[#9C65E8] p-3 rounded-full items-center justify-center">
           <Icons.Layers color="white" />
         </TouchableOpacity>
       </View>
 
       {/* Bottom Floating Menu */}
-      <FloatingNavbar onOptionSelect={handleOptionSelect} />
+      <FloatingNavbar
+        onOptionSelect={(option) => console.log("Selected Option:", option)}
+      />
 
-      {/* Bottom Right Buttons*/}
-      <View className="absolute bottom-28 right-5 space-y-3">
-        <TouchableOpacity className="bg-black/50 p-3 rounded-full items-center justify-center">
+      {/* Bottom Right Buttons */}
+      <View className="absolute bottom-32 right-5 space-y-10">
+        <TouchableOpacity className="bg-[#5FB5C9] p-3 rounded-full items-center justify-center">
           <Icons.Focus color="white" />
         </TouchableOpacity>
-        <TouchableOpacity className="bg-black/50 p-3 rounded-full items-center justify-center">
+        <TouchableOpacity
+          className="bg-[#668DEF] p-3 rounded-full items-center justify-center"
+          onPress={searchLocation}
+        >
           <Icons.Compass color="white" />
         </TouchableOpacity>
       </View>

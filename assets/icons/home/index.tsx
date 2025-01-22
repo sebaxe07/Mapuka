@@ -1,8 +1,8 @@
 /* Bottom Menu */
 export { default as Achivements } from "./achivements.svg";
-export { default as Library } from "./library.svg";
+export { default as Leaderboard } from "./leaderboard.svg";
 export { default as Profile } from "./profile.svg";
-export { default as Saves } from "./saves.svg";
+export { default as Favorites } from "./saves.svg";
 
 /* Map Buttons */
 export { default as Compass } from "./compass.svg";

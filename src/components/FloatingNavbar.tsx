@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { View, TouchableOpacity } from "react-native";
 import * as Icons from "../../assets/icons/home"; // Adjust the path based on your project structure
+import { useNavigation } from "@react-navigation/native";
 
 interface FloatingNavbarProps {
   onOptionSelect?: (option: string) => void;
@@ -8,6 +9,7 @@ interface FloatingNavbarProps {
 
 const FloatingNavbar: React.FC<FloatingNavbarProps> = ({ onOptionSelect }) => {
   const [menuExpanded, setMenuExpanded] = useState(false);
+  const navigation = useNavigation();
 
   const handleOptionSelect = (option: string) => {
     onOptionSelect?.(option);
@@ -19,11 +21,17 @@ const FloatingNavbar: React.FC<FloatingNavbarProps> = ({ onOptionSelect }) => {
       {/* Main Navbar */}
       <View className="absolute bottom-11 self-center w-10/12 h-16 bg-white rounded-3xl shadow-lg flex-row items-center justify-around px-4">
         {/* Left Buttons */}
-        <TouchableOpacity className="flex-1 items-center justify-center">
+        <TouchableOpacity
+          className="flex-1 items-center justify-center"
+          onPress={() => navigation.navigate("Achivements")}
+        >
           <Icons.Achivements color="black" />
         </TouchableOpacity>
-        <TouchableOpacity className="flex-1 items-center justify-center">
-          <Icons.Library color="black" />
+        <TouchableOpacity
+          className="flex-1 items-center justify-center"
+          onPress={() => navigation.navigate("Leaderboard")}
+        >
+          <Icons.Leaderboard color="black" />
         </TouchableOpacity>
 
         {/* Middle Button */}
@@ -39,10 +47,16 @@ const FloatingNavbar: React.FC<FloatingNavbarProps> = ({ onOptionSelect }) => {
         </TouchableOpacity>
 
         {/* Right Buttons */}
-        <TouchableOpacity className="flex-1 items-center justify-center">
-          <Icons.Saves color="black" />
+        <TouchableOpacity
+          className="flex-1 items-center justify-center"
+          onPress={() => navigation.navigate("Bookmarks")}
+        >
+          <Icons.Favorites color="black" />
         </TouchableOpacity>
-        <TouchableOpacity className="flex-1 items-center justify-center">
+        <TouchableOpacity
+          className="flex-1 items-center justify-center"
+          onPress={() => navigation.navigate("Profile")}
+        >
           <Icons.Profile color="black" />
         </TouchableOpacity>
       </View>
