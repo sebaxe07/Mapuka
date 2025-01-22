@@ -24,14 +24,41 @@ import { Units } from "@turf/turf";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { searchLocation } from "../utils/DirectionsHelper";
 import { debounce } from "lodash";
+import { useAppDispatch, useAppSelector } from "../contexts/hooks";
+import { setDiscoveredPolygon as setDiscStorage } from "../contexts/slices/userDataSlice";
+import { supabase } from "../utils/supabase";
 
 MapboxGL.setAccessToken(MAPBOX_ACCESS_TOKEN);
 
 interface MapProps {}
 
-const fogImageURI = Image.resolveAssetSource(
-  require("../../assets/images/fog.png")
-).uri;
+const debouncedSaveDiscoveredAreas = debounce(
+  async (discoveredPolygons, profileId, dispatch) => {
+    try {
+      console.log("\x1b[34m Saving discovered areas: ", discoveredPolygons);
+      const discoveredPolygonsJson = JSON.stringify(discoveredPolygons);
+
+      console.log("\x1b[31m", "saving on user " + profileId);
+      const { data, error } = await supabase
+        .from("profiles")
+        .update({
+          discovered_polygon: discoveredPolygonsJson,
+        })
+        .eq("profile_id", profileId);
+
+      if (error) {
+        console.error("Error saving discovered areas: ", error.message);
+        return;
+      }
+
+      dispatch(setDiscStorage(discoveredPolygons));
+      console.log("\x1b[33m Saved discovered areas: ", data);
+    } catch (error) {
+      console.error("Error saving discovered areas: ", error);
+    }
+  },
+  1000
+);
 
 const Map: React.FC<MapProps> = ({}) => {
   const [locationPermissionGranted, setLocationPermissionGranted] =
@@ -41,8 +68,10 @@ const Map: React.FC<MapProps> = ({}) => {
   );
   const cameraRef = useRef<MapboxGL.Camera>(null);
 
+  const dispatch = useAppDispatch();
+  const userData = useAppSelector((state) => state.userData);
+
   useEffect(() => {
-    loadDiscoveredAreas();
     requestUserLocation();
   }, []);
 
@@ -90,7 +119,7 @@ const Map: React.FC<MapProps> = ({}) => {
   const fullMaskPolygon = turf.bboxPolygon(worldBounds);
 
   // Initial empty discovery area
-  const initialDiscovery = turf.polygon([]);
+  const initialDiscovery = userData.discovered_polygon ?? turf.polygon([]);
 
   const [discoveredPolygons, setDiscoveredPolygons] = useState<Feature<
     Polygon | MultiPolygon,
@@ -99,9 +128,7 @@ const Map: React.FC<MapProps> = ({}) => {
 
   const discoverArea = (center: [number, number], radius: number) => {
     const newDiscovery = turf.circle(center, radius, { units: "kilometers" });
-    console.log("\x1b[34m newDiscovery", newDiscovery);
     setDiscoveredPolygons((prevPolygons) => {
-      console.log("\x1b[33m prevPolygons", prevPolygons);
       if (!prevPolygons || turf.coordAll(prevPolygons).length === 0) {
         console.log("No discovered area yet");
         return newDiscovery;
@@ -129,33 +156,41 @@ const Map: React.FC<MapProps> = ({}) => {
     } else setFogMask(fullMaskPolygon);
   }, [discoveredPolygons]);
 
-  const saveDiscoveredAreas = useCallback(
-    debounce(async () => {
-      try {
-        await AsyncStorage.setItem(
-          "discoveredAreas",
-          JSON.stringify(discoveredPolygons)
-        );
-      } catch (error) {
-        console.error("Error saving discovered areas: ", error);
-      }
-    }, 300), // Adjust the debounce delay as needed
-    [discoveredPolygons]
-  );
+  useEffect(() => {
+    console.log(
+      "\x1b[32m",
+      "Discovered areas changed: ",
+      userData.discovered_polygon
+    );
+  }, [userData.discovered_polygon]);
 
-  const loadDiscoveredAreas = async () => {
-    try {
-      const data = await AsyncStorage.getItem("discoveredAreas");
-      if (data) {
-        setDiscoveredPolygons(JSON.parse(data));
-      }
-    } catch (error) {
-      console.error("Error loading discovered areas: ", error);
-    }
-  };
+  const saveDiscoveredAreas = useCallback(() => {
+    debouncedSaveDiscoveredAreas(
+      discoveredPolygons,
+      userData.profile_id,
+      dispatch
+    );
+  }, [discoveredPolygons, userData.profile_id, dispatch]);
 
-  const clearDiscoveredAreas = () => {
+  const clearDiscoveredAreas = async () => {
     setDiscoveredPolygons(initialDiscovery);
+    try {
+      const { data, error } = await supabase
+        .from("profiles")
+        .update({
+          discovered_polygon: null,
+        })
+        .eq("profile_id", userData.profile_id);
+
+      if (error) {
+        console.error("Error clearing discovered areas: ", error.message);
+        return;
+      }
+
+      console.log("Cleared discovered areas: ", data);
+    } catch (error) {
+      console.error("Error clearing discovered areas: ", error);
+    }
   };
 
   return (
@@ -182,7 +217,7 @@ const Map: React.FC<MapProps> = ({}) => {
           />
         </MapboxGL.ShapeSource>
 
-        {/*         <MapboxGL.ShapeSource
+        {/* <MapboxGL.ShapeSource
           id="discoverLayer"
           shape={discoveredPolygons || initialDiscovery}
         >

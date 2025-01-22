@@ -9,6 +9,9 @@ import HomeScreen from "./src/screens/Home";
 import DetailsScreen from "./src/screens/Details";
 import MapScreen from "./src/screens/Map";
 import MapFog from "./src/screens/MapFog";
+import { Provider } from "react-redux";
+import { PersistGate } from "redux-persist/integration/react";
+import { store, persistor } from "./src/contexts/store";
 
 const RootStack = createNativeStackNavigator({
   initialRouteName: "Home",
@@ -39,5 +42,11 @@ declare global {
 const Navigation = createStaticNavigation(RootStack);
 
 export default function App() {
-  return <Navigation />;
+  return (
+    <Provider store={store}>
+      <PersistGate loading={null} persistor={persistor}>
+        <Navigation />
+      </PersistGate>
+    </Provider>
+  );
 }
