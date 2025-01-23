@@ -7,7 +7,7 @@ import * as Location from "expo-location";
 import { MAPBOX_ACCESS_TOKEN } from "@env";
 import SearchBar from "../components/SearchBar";
 import Map from "./MapFog";
-import { MotiView } from "moti";
+import { MotiView, MotiTransitionProp } from "moti";
 import Compass from "../components/Compass";
 
 MapboxGL.setAccessToken(MAPBOX_ACCESS_TOKEN);
@@ -53,6 +53,7 @@ const Home: React.FC = () => {
       />
 
       {/* Bottom Right Buttons */}
+
       <View className="absolute bottom-32 right-5 space-y-10">
         <TouchableOpacity
           className="bg-[#5FB5C9] p-3 rounded-full items-center justify-center"
