@@ -1,4 +1,6 @@
 import "./global.css";
+import "react-native-reanimated";
+import "react-native-gesture-handler";
 import {
   createStaticNavigation,
   StaticParamList,
@@ -21,6 +23,7 @@ import { themes } from "./themes";
 import { colors } from "./colors";
 import { useColorScheme } from "nativewind";
 import { View } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 const RootStack = createNativeStackNavigator({
   initialRouteName: "Home",
@@ -75,12 +78,14 @@ export default function App() {
   return (
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
-        <View
-          style={themes[colorScheme as unknown as keyof typeof themes]}
-          className="size-full"
-        >
-          <Navigation />
-        </View>
+        <GestureHandlerRootView>
+          <View
+            style={themes[colorScheme as unknown as keyof typeof themes]}
+            className="size-full"
+          >
+            <Navigation />
+          </View>
+        </GestureHandlerRootView>
       </PersistGate>
     </Provider>
   );

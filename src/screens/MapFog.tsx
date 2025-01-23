@@ -8,6 +8,7 @@ import React, {
 import { Alert, StyleSheet, View, Text, Image } from "react-native";
 import MapboxGL, { UserLocation } from "@rnmapbox/maps";
 import * as Location from "expo-location";
+import HeadingIndicator from "@rnmapbox/maps";
 import { MAPBOX_ACCESS_TOKEN } from "@env";
 import { BlurView } from "expo-blur";
 import { Button, Input } from "react-native-elements";
@@ -28,7 +29,12 @@ import { supabase } from "../utils/supabase";
 
 MapboxGL.setAccessToken(MAPBOX_ACCESS_TOKEN);
 
-interface MapProps {}
+interface MapProps {
+  searchText: string;
+  triggerAction: string;
+  setTriggerAction: (action: string) => void;
+  onBearingChange: (bearing: number) => void;
+}
 
 const debouncedSaveDiscoveredAreas = debounce(
   async (discoveredPolygons, profileId, dispatch) => {
@@ -62,8 +68,12 @@ const debouncedSaveDiscoveredAreas = debounce(
   },
   1000
 );
-
-const Map: React.FC<MapProps> = ({}) => {
+const Map: React.FC<MapProps> = ({
+  searchText,
+  triggerAction,
+  setTriggerAction,
+  onBearingChange,
+}) => {
   const [userLocation, setUserLocation] = useState<[number, number] | null>(
     null
   );
@@ -71,6 +81,16 @@ const Map: React.FC<MapProps> = ({}) => {
 
   const dispatch = useAppDispatch();
   const userData = useAppSelector((state) => state.userData);
+
+  const handleRegionChange = async () => {
+    try {
+      if (cameraRef.current) {
+        const cameraState = await cameraRef.current;
+      }
+    } catch (error) {
+      console.error("Error getting camera state:", error);
+    }
+  };
 
   useEffect(() => {
     requestUserLocation();
@@ -157,14 +177,6 @@ const Map: React.FC<MapProps> = ({}) => {
     } else setFogMask(fullMaskPolygon);
   }, [discoveredPolygons]);
 
-  useEffect(() => {
-    console.log(
-      "\x1b[32m",
-      "Discovered areas changed: ",
-      userData.discovered_polygon
-    );
-  }, [userData.discovered_polygon]);
-
   const saveDiscoveredAreas = useCallback(() => {
     debouncedSaveDiscoveredAreas(
       discoveredPolygons,
@@ -195,12 +207,72 @@ const Map: React.FC<MapProps> = ({}) => {
     }
   };
 
+  const [markerLocation, setMarkerLocation] = useState<[number, number] | null>(
+    null
+  );
+  const [text, setText] = useState("");
+  const [routeCoords, setRouteCoords] = useState<number[][] | null>(null);
+
+  const useSearch = () => {
+    searchLocation({
+      text,
+      setMarkerLocation,
+      cameraRef,
+      userLocation,
+      setRouteCoords,
+    });
+  };
+
+  useEffect(() => {
+    if (searchText) {
+      console.log("Setting text: ", searchText);
+      setText(searchText);
+    } else {
+      console.log("Clearing text");
+      setText("");
+    }
+  }, [searchText]);
+
+  useEffect(() => {
+    if (text) {
+      useSearch();
+    } else {
+      setMarkerLocation(null);
+      setRouteCoords(null);
+    }
+  }, [text]);
+
+  useEffect(() => {
+    if (triggerAction === "gps") {
+      // Focus the map on the user's location
+      if (cameraRef.current && userLocation) {
+        cameraRef.current.setCamera({
+          centerCoordinate: userLocation,
+          zoomLevel: 16,
+          animationDuration: 1000,
+        });
+      }
+    } else if (triggerAction === "north") {
+      // Rotate the map to face north
+      if (cameraRef.current) {
+        cameraRef.current.setCamera({
+          heading: 0,
+          animationDuration: 1000,
+        });
+      }
+    }
+    setTriggerAction("");
+  }, [triggerAction]);
+
   return (
     <View className="size-full flex-1 bg-blue-600 justify-center items-center">
       <MapboxGL.MapView
         style={styles.map}
         styleURL="mapbox://styles/codekatabattle/cm55m9p3i003b01po2yh31h59/draft"
         compassEnabled={true}
+        onCameraChanged={(e) => {
+          onBearingChange(e.properties.heading);
+        }}
       >
         <MapboxGL.Camera ref={cameraRef} zoomLevel={15} />
         {UserLocation && (
@@ -208,6 +280,32 @@ const Map: React.FC<MapProps> = ({}) => {
             puckBearing={"course"}
             pulsing={{ isEnabled: true, color: "blue", radius: "accuracy" }}
           />
+        )}
+        {markerLocation && (
+          <MapboxGL.PointAnnotation id="marker" coordinate={markerLocation}>
+            <View className="size-4 bg-red-500" />
+          </MapboxGL.PointAnnotation>
+        )}
+        {routeCoords && (
+          <MapboxGL.ShapeSource
+            id="routeSource"
+            shape={{
+              type: "Feature",
+              geometry: {
+                type: "LineString",
+                coordinates: routeCoords,
+              },
+              properties: {},
+            }}
+          >
+            <MapboxGL.LineLayer
+              id="routeLine"
+              style={{
+                lineWidth: 5,
+                lineColor: "#007AFF",
+              }}
+            />
+          </MapboxGL.ShapeSource>
         )}
         <MapboxGL.ShapeSource id="fogLayer" shape={fogMask || fullMaskPolygon}>
           <MapboxGL.FillLayer
