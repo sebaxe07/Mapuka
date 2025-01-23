@@ -8,6 +8,7 @@ import { MAPBOX_ACCESS_TOKEN } from "@env";
 import SearchBar from "../components/SearchBar";
 import Map from "./MapFog";
 import { MotiView } from "moti";
+import Compass from "../components/Compass";
 
 MapboxGL.setAccessToken(MAPBOX_ACCESS_TOKEN);
 
@@ -59,12 +60,14 @@ const Home: React.FC = () => {
         >
           <Icons.Focus color="white" />
         </TouchableOpacity>
-        <TouchableOpacity
+
+        <Compass bearing={bearing} onPress={() => setTriggerAction("north")} />
+        {/*      <TouchableOpacity
           className="bg-[#668DEF] p-3 rounded-full items-center justify-center"
           onPress={() => setTriggerAction("north")}
         >
           <Icons.Compass color="white" />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
     </View>
   );

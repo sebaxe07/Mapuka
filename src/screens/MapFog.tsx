@@ -269,7 +269,8 @@ const Map: React.FC<MapProps> = ({
       <MapboxGL.MapView
         style={styles.map}
         styleURL="mapbox://styles/codekatabattle/cm55m9p3i003b01po2yh31h59/draft"
-        compassEnabled={true}
+        compassEnabled={false}
+        scaleBarEnabled={false}
         onCameraChanged={(e) => {
           onBearingChange(e.properties.heading);
         }}
@@ -331,8 +332,8 @@ const Map: React.FC<MapProps> = ({
         </MapboxGL.ShapeSource> */}
       </MapboxGL.MapView>
 
-      <View className="size-full relative items-center ">
-        <Button title="Clear discovered areas" onPress={clearDiscoveredAreas} />
+      <View className="size-full relative items-center justify-end">
+        <Button title="cl" onPress={clearDiscoveredAreas} />
       </View>
     </View>
   );
