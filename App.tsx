@@ -27,6 +27,7 @@ const RootStack = createNativeStackNavigator({
   screenOptions: {
     headerShown: false,
     statusBarHidden: true,
+    statusBarTranslucent: true,
     navigationBarHidden: true,
   },
   screens: {

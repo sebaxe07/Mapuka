@@ -117,9 +117,9 @@ const Home: React.FC = () => {
       />
 
       {/* Top Right Buttons */}
-      <View className="absolute top-20 right-5 space-y-3">
-        <TouchableOpacity className="bg-[#9C65E8] p-3 rounded-full items-center justify-center">
-          <Icons.Layers color="white" />
+      <View className="absolute top-32 right-5 space-y-3">
+        <TouchableOpacity className="bg-buttonPurple p-3 rounded-full items-center justify-center">
+          <Icons.Layers color="var(--color-text-white)" />
         </TouchableOpacity>
       </View>
 
@@ -129,15 +129,15 @@ const Home: React.FC = () => {
       />
 
       {/* Bottom Right Buttons */}
-      <View className="absolute bottom-32 right-5 space-y-10">
-        <TouchableOpacity className="bg-[#5FB5C9] p-3 rounded-full items-center justify-center">
-          <Icons.Focus color="white" />
-        </TouchableOpacity>
+      <View className="absolute bottom-32 right-5">
         <TouchableOpacity
-          className="bg-[#668DEF] p-3 rounded-full items-center justify-center"
+          className="bg-buttonAqua p-3 rounded-full items-center justify-center mb-6" // Adjusted margin-bottom
           onPress={searchLocation}
         >
-          <Icons.Compass color="white" />
+          <Icons.Focus color="var(--color-text-white)" />
+        </TouchableOpacity>
+        <TouchableOpacity className="bg-buttonBlue p-3 rounded-full items-center justify-center">
+          <Icons.Compass color="var(--color-text-white)" />
         </TouchableOpacity>
       </View>
     </View>

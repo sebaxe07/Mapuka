@@ -10,44 +10,68 @@ const Profile: React.FC = () => {
     ]);
   };
 
+  const daysExplored = 25; // Example value
+  const distanceExplored = 100; // Example value in km
+  const achievementsCount = 30; // Example value
+
   return (
-    <View className="flex-1 bg-bgMain px-5 py-5 mt-10 justify-around">
+    <View className="flex-1 bg-bgMain px-5 py-5 pt-10 justify-around">
       {/* Main Content */}
-      <View className="flex-row h-1/2">
+      <View className="flex-row h-2/5">
         {/* User Info Card */}
-        <View className="flex-1 bg-boxContainer rounded-xl p-4 mr-3">
+        <View className="flex-[0.8] bg-boxContainer rounded-3xl p-3 mr-3">
           <View className="flex-1 items-center justify-center">
             <Icons.UserIcon color="var(--color-text-white)" />
-            <View className="mt-4 items-center">
-              <Text className="text-textWhite text-4xl font-bold">
+            <View className="mt-3 items-center">
+              <Text className="text-textWhite text-3xl font-bold flex-wrap">
                 Hello, Sebastian!
               </Text>
-              <Text className="text-textBody text-xl">sebaxe09@gmail.com</Text>
+              <Text className="text-textBody text-sm">sebaxe09@gmail.com</Text>
             </View>
           </View>
         </View>
 
         {/* Stats Section */}
-        <View className="flex-[1.2] flex-col justify-between">
-          <View className="bg-boxContainer flex-1 flex-row items-center justify-center rounded-xl px-4 py-3 mb-3">
-            <Icons.Calendar color="var(--color-button-aqua)" width={32} />
-            <View className="flex-1 ml-4">
-              <Text className="text-buttonAqua text-lg font-bold">25 days</Text>
-              <Text className="text-textBody text-xs">Of Exploring</Text>
+        <View className="flex-1 flex-col justify-between">
+          {/* Calendar Section */}
+          <View className="bg-boxContainer flex-[0.3] flex-row items-center justify-center rounded-3xl px-3 py-2 shadow-md">
+            <View className="justify-center">
+              <Icons.Calendar color="var(--color-button-aqua)" width={40} />
+            </View>
+            <View className="flex-col items-start content-center justify-center ml-2">
+              <Text className="text-buttonAqua text-lg font-bold">
+                {daysExplored} days
+              </Text>
+              <Text className="text-textBody text-sm">Of Exploring</Text>
             </View>
           </View>
-          <View className="bg-boxContainer flex-1 flex-row items-center justify-center rounded-xl px-4 py-3 mb-3">
-            <Icons.Track color="var(--color-button-blue)" width={32} />
-            <View className="flex-1 ml-4">
-              <Text className="text-buttonBlue text-lg font-bold">100 km</Text>
-              <Text className="text-textBody text-xs">Explored</Text>
+
+          {/* Track Section */}
+          <View className="bg-boxContainer flex-[0.3] flex-row items-center justify-center rounded-3xl px-3 py-2 shadow-md mt-0.5">
+            <View className="justify-center">
+              <Icons.Track color="var(--color-button-blue)" width={40} />
+            </View>
+            <View className="flex-col items-start content-center justify-center ml-2">
+              <Text className="text-buttonBlue text-lg font-bold">
+                {distanceExplored} km
+              </Text>
+              <Text className="text-textBody text-sm">Explored</Text>
             </View>
           </View>
-          <View className="bg-boxContainer flex-1 flex-row items-center justify-center rounded-xl px-4 py-3">
-            <Icons.Achivements color="var(--color-button-purple)" width={32} />
-            <View className="flex-1 ml-4">
-              <Text className="text-buttonPurple text-lg font-bold">30</Text>
-              <Text className="text-textBody text-xs">Achievements</Text>
+
+          {/* Achievements Section */}
+          <View className="bg-boxContainer flex-[0.3] flex-row items-center justify-center rounded-3xl px-3 py-2 shadow-md mt-0.5">
+            <View className="justify-center">
+              <Icons.Achivements
+                color="var(--color-button-purple)"
+                width={40}
+              />
+            </View>
+            <View className="flex-col items-start content-center justify-center ml-2">
+              <Text className="text-buttonPurple text-lg font-bold">
+                {achievementsCount}
+              </Text>
+              <Text className="text-textBody text-sm">Achievements</Text>
             </View>
           </View>
         </View>
