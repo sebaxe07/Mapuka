@@ -9,7 +9,7 @@ import HomeScreen from "./src/screens/Home";
 import DetailsScreen from "./src/screens/Details";
 import MapScreen from "./src/screens/Map";
 import Achivements from "./src/screens/Achivements";
-import Bookmarks from "./src/screens/Bookmarks";
+import BookmarksScreen from "./src/screens/Bookmarks";
 import Leaderboard from "./src/screens/Leaderboard";
 import Profile from "./src/screens/Profile";
 import { BackArrow } from "./assets/icons/profile";
@@ -35,7 +35,20 @@ const RootStack = createNativeStackNavigator({
     Details: DetailsScreen,
     Map: MapScreen,
     Achivements: Achivements,
-    Bookmarks: Bookmarks,
+    Bookmarks: {
+      options: ({ navigation }) => ({
+        headerShown: true,
+        headerTitle: "",
+        headerTransparent: true,
+        headerLeft: () => (
+          <BackArrow
+            color="--color-text-white"
+            onPress={() => navigation.goBack()}
+          />
+        ),
+      }),
+      screen: BookmarksScreen,
+    },
     Leaderboard: Leaderboard,
     Profile: {
       options: ({ navigation }) => ({
