@@ -1,7 +1,10 @@
+import { vars } from "nativewind";
+
 export const themes = {
-  dark: vars({
+  light: vars({
     /* Background */
     "--color-bg-main": "#11112D",
+    "--color-primary": "#06D65D",
 
     /* Text */
     "--color-text-body": "#5D6F9D",

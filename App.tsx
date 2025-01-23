@@ -17,6 +17,10 @@ import MapFog from "./src/screens/MapFog";
 import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
 import { store, persistor } from "./src/contexts/store";
+import { themes } from "./themes";
+import { colors } from "./colors";
+import { useColorScheme } from "nativewind";
+import { View } from "react-native";
 
 const RootStack = createNativeStackNavigator({
   initialRouteName: "Home",
@@ -66,10 +70,17 @@ declare global {
 const Navigation = createStaticNavigation(RootStack);
 
 export default function App() {
+  const { colorScheme } = useColorScheme();
+
   return (
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
-        <Navigation />
+        <View
+          style={themes[colorScheme as unknown as keyof typeof themes]}
+          className="size-full"
+        >
+          <Navigation />
+        </View>
       </PersistGate>
     </Provider>
   );
