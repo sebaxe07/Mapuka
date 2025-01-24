@@ -10,7 +10,6 @@ import MapboxGL, { UserLocation } from "@rnmapbox/maps";
 import * as Location from "expo-location";
 import HeadingIndicator from "@rnmapbox/maps";
 import { MAPBOX_ACCESS_TOKEN } from "@env";
-import { BlurView } from "expo-blur";
 import { Button, Input } from "react-native-elements";
 import * as turf from "@turf/turf";
 import {
@@ -271,6 +270,7 @@ const Map: React.FC<MapProps> = ({
         styleURL="mapbox://styles/codekatabattle/cm55m9p3i003b01po2yh31h59/draft"
         compassEnabled={false}
         scaleBarEnabled={false}
+        logoPosition={{ top: 8, left: 8 }}
         onCameraChanged={(e) => {
           onBearingChange(e.properties.heading);
         }}
