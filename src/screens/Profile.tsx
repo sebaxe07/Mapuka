@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, TouchableOpacity, Alert } from "react-native";
 import * as Icons from "../../assets/icons/profile/index";
 import { signOut } from "../utils/UserManagement";
@@ -6,6 +6,7 @@ import { useAppDispatch, useAppSelector } from "../contexts/hooks";
 import { clearUserData } from "../contexts/slices/userDataSlice";
 import { useNavigation } from "@react-navigation/native";
 import { colors } from "../../colors";
+import { supabase } from "../utils/supabase";
 
 const Profile: React.FC = () => {
   const handleLogout = () => {
@@ -23,9 +24,28 @@ const Profile: React.FC = () => {
     dispatch(clearUserData());
   };
 
-  const daysExplored = 25; // Example value
-  const distanceExplored = 100; // Example value in km
-  const achievementsCount = 30; // Example value
+  const userData = useAppSelector((state) => state.userData);
+  const [daysExplored, setDaysExplored] = useState<number>(0);
+  const [distanceExplored, setDistanceExplored] = useState<number>(0);
+  const [achievementsCount, setAchievementsCount] = useState<number>(0);
+
+  useEffect(() => {
+    // limite the distance to 2 decimal places
+    const clampedDistance = Math.floor(userData.discovered_area * 100) / 100;
+    setDistanceExplored(clampedDistance);
+
+    // Calculate the number of days since the account was created
+    const createdDate = new Date(userData.created_at);
+    const currentDate = new Date();
+    const timeDiff = Math.abs(currentDate.getTime() - createdDate.getTime());
+    const daysSinceCreation = Math.ceil(timeDiff / (1000 * 3600 * 24));
+    // Check that is not nan
+    if (!isNaN(daysSinceCreation)) {
+      setDaysExplored(daysSinceCreation);
+    } else {
+      setDaysExplored(0);
+    }
+  }, [userData]);
 
   return (
     <View className="flex-1 bg-bgMain px-5 py-5 pt-10 justify-around w-full ">
@@ -37,10 +57,10 @@ const Profile: React.FC = () => {
             <Icons.UserIcon color={colors.lightText} />
             <View className="mt-3 items-center gap-3">
               <Text className="text-boxMenu text-3xl font-senSemiBold flex-wrap">
-                Hello, Sebastian!
+                Hello, {userData.name}!
               </Text>
               <Text className="text-textInput text-sm font-senRegular">
-                sebaxe09@gmail.com
+                {userData.email}
               </Text>
             </View>
           </View>
