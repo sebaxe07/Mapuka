@@ -100,8 +100,6 @@ const Login: React.FC<LoginProps> = ({}) => {
     if (result === undefined) {
       // Clear event listener for back button before navigating
       BackHandler.removeEventListener("hardwareBackPress", backAction);
-
-      //navigation.navigate("Home");
     }
 
     setLoading(false);

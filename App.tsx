@@ -47,6 +47,10 @@ function useIsSignedOut() {
 const RootStack = createNativeStackNavigator({
   screenOptions: {
     headerShown: false,
+    statusBarTranslucent: true,
+    statusBarBackgroundColor: "transparent",
+    navigationBarColor: "transparent",
+    navigationBarTranslucent: true,
   },
   screens: {
     // Common screens
@@ -137,6 +141,17 @@ export function RootNavigator() {
   const { colorScheme } = useColorScheme();
   const dispatch = useAppDispatch();
   const [loading, setLoading] = useState(true);
+  const [loaded, error] = useFonts({
+    SenBold: require("./assets/fonts/Sen-Bold.ttf"),
+    SenRegular: require("./assets/fonts/Sen-Regular.ttf"),
+    SenExtraBold: require("./assets/fonts/Sen-ExtraBold.ttf"),
+    SenMedium: require("./assets/fonts/Sen-Medium.ttf"),
+    SenSemiBold: require("./assets/fonts/Sen-SemiBold.ttf"),
+  });
+
+  useEffect(() => {
+    if (error) throw error;
+  }, [error]);
 
   const authState = useAppSelector((state) => state.userData.auth);
 
@@ -163,7 +178,7 @@ export function RootNavigator() {
     bootstrapAsync();
   }, [dispatch]);
 
-  if (loading) {
+  if (loading || !loaded) {
     return <SplashScreen />;
   }
 

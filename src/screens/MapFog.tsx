@@ -106,6 +106,7 @@ const Map: React.FC<MapProps> = ({
         );
         return;
       }
+      console.log("\x1b[32m", "Starting to watch position...");
 
       Location.watchPositionAsync(
         {
@@ -270,7 +271,6 @@ const Map: React.FC<MapProps> = ({
         styleURL="mapbox://styles/codekatabattle/cm55m9p3i003b01po2yh31h59/draft"
         compassEnabled={false}
         scaleBarEnabled={false}
-        logoPosition={{ top: 8, left: 8 }}
         onCameraChanged={(e) => {
           onBearingChange(e.properties.heading);
         }}
@@ -282,6 +282,15 @@ const Map: React.FC<MapProps> = ({
             pulsing={{ isEnabled: true, color: "blue", radius: "accuracy" }}
           />
         )}
+
+        {!userLocation && (
+          <View className="absolute items-center justify-center w-1/2 h-12 bg-boxMenu rounded-3xl z-10">
+            <Text className="text-textInput font-senSemiBold text-lg">
+              No location detected
+            </Text>
+          </View>
+        )}
+
         {markerLocation && (
           <MapboxGL.PointAnnotation id="marker" coordinate={markerLocation}>
             <View className="size-4 bg-red-500" />
