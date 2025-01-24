@@ -36,7 +36,7 @@ const Compass = ({ bearing, onPress }: CompassProps) => {
 
   return (
     <TouchableOpacity
-      className="bg-[#668DEF] p-3 rounded-full items-center justify-center"
+      className="bg-buttonBlue rounded-full items-center justify-center size-14"
       onPress={onPress}
     >
       <Animated.View style={animatedStyle}>

@@ -81,7 +81,6 @@ const RootStack = createNativeStackNavigator({
         Profile: {
           options: ({ navigation }) => ({
             headerShown: true,
-            headerTransparent: true,
             headerTitleAlign: "center",
             headerTitle: "Profile",
             headerLargeTitle: true,
@@ -90,6 +89,10 @@ const RootStack = createNativeStackNavigator({
             },
             headerLargeTitleStyle: {
               color: "#ffffff",
+            },
+            headerStyle: {
+              backgroundColor: colors.background,
+              shadowColor: "transparent",
             },
             headerLeft: () => (
               <BackArrow color="#ffffff" onPress={() => navigation.goBack()} />

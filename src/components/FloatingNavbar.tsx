@@ -17,7 +17,7 @@ const FloatingNavbar: React.FC = () => {
   return (
     <>
       {/* Main Navbar */}
-      <View className="absolute bottom-11 self-center w-10/12 h-16 bg-textWhite rounded-3xl shadow-lg flex-row items-center justify-around px-4">
+      <View className="self-center mx-4 h-20 bg-boxMenu rounded-3xl shadow-lg flex-row items-center justify-around<">
         {/* Left Buttons */}
         <TouchableOpacity
           className="flex-1 items-center justify-center"

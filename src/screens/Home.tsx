@@ -33,40 +33,47 @@ const Home: React.FC = () => {
       />
 
       {/* Search Bar */}
-      <SearchBar
-        value={text}
-        onChangeText={(value) => setText(value)}
-        placeholder="Search for a location"
-        onPress={handleSearch}
-      />
+      <View className="absolute inset-0 justify-center items-center   w-full">
+        <View className=" w-full h-full px-6  py-16 flex-1 justify-between">
+          {/* TopSection */}
+          <View className=" gap-6">
+            <SearchBar
+              value={text}
+              onChangeText={(value) => setText(value)}
+              placeholder="Search for a location"
+              onPress={handleSearch}
+            />
 
-      {/* Top Right Buttons */}
-      <View className="absolute top-32 right-5 space-y-3">
-        <TouchableOpacity className="bg-buttonPurple p-3 rounded-full items-center justify-center">
-          <Icons.Layers color="var(--color-text-white)" />
-        </TouchableOpacity>
-      </View>
+            {/* Top Right Buttons */}
+            <View className="items-end">
+              <TouchableOpacity className="bg-buttonPurple  rounded-full items-center justify-center size-14">
+                <Icons.Layers color="var(--color-text-white)" />
+              </TouchableOpacity>
+            </View>
+          </View>
 
-      {/* Bottom Floating Menu */}
-      <FloatingNavbar />
+          {/* Bottom Section */}
+          <View className=" gap-10">
+            {/* Bottom Right Buttons */}
 
-      {/* Bottom Right Buttons */}
+            <View className=" gap-8 items-end">
+              <TouchableOpacity
+                className="bg-buttonAqua  rounded-full items-center justify-center size-14"
+                onPress={() => setTriggerAction("gps")}
+              >
+                <Icons.Focus color="white" />
+              </TouchableOpacity>
 
-      <View className="absolute bottom-32 right-5 space-y-10">
-        <TouchableOpacity
-          className="bg-buttonAqua p-3 rounded-full items-center justify-center"
-          onPress={() => setTriggerAction("gps")}
-        >
-          <Icons.Focus color="white" />
-        </TouchableOpacity>
+              <Compass
+                bearing={bearing}
+                onPress={() => setTriggerAction("north")}
+              />
+            </View>
 
-        <Compass bearing={bearing} onPress={() => setTriggerAction("north")} />
-        {/*      <TouchableOpacity
-          className="bg-[#668DEF] p-3 rounded-full items-center justify-center"
-          onPress={() => setTriggerAction("north")}
-        >
-          <Icons.Compass color="white" />
-        </TouchableOpacity> */}
+            {/* Bottom Floating Menu */}
+            <FloatingNavbar />
+          </View>
+        </View>
       </View>
     </View>
   );

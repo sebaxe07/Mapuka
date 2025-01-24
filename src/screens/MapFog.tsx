@@ -25,6 +25,7 @@ import { debounce } from "lodash";
 import { useAppDispatch, useAppSelector } from "../contexts/hooks";
 import { setDiscoveredPolygon as setDiscStorage } from "../contexts/slices/userDataSlice";
 import { supabase } from "../utils/supabase";
+import { colors } from "../../colors";
 
 MapboxGL.setAccessToken(MAPBOX_ACCESS_TOKEN);
 
@@ -38,14 +39,14 @@ interface MapProps {
 const debouncedSaveDiscoveredAreas = debounce(
   async (discoveredPolygons, profileId, dispatch) => {
     try {
-      console.log("\x1b[34m Saving discovered areas: ", discoveredPolygons);
+      //console.log("\x1b[34m Saving discovered areas: ", discoveredPolygons);
       const discoveredPolygonsJson = JSON.stringify(discoveredPolygons);
       const areadiscovered = turf.convertArea(
         turf.area(discoveredPolygons),
         "meters",
         "kilometers"
       );
-      console.log("\x1b[31m", "saving on user " + profileId);
+      //console.log("\x1b[31m", "saving on user " + profileId);
       const { data, error } = await supabase
         .from("profiles")
         .update({
@@ -60,7 +61,7 @@ const debouncedSaveDiscoveredAreas = debounce(
       }
 
       dispatch(setDiscStorage(discoveredPolygons));
-      console.log("\x1b[33m Saved discovered areas: ", data);
+      //console.log("\x1b[33m Saved discovered areas: ", data);
     } catch (error) {
       console.error("Error saving discovered areas: ", error);
     }
@@ -80,16 +81,6 @@ const Map: React.FC<MapProps> = ({
 
   const dispatch = useAppDispatch();
   const userData = useAppSelector((state) => state.userData);
-
-  const handleRegionChange = async () => {
-    try {
-      if (cameraRef.current) {
-        const cameraState = await cameraRef.current;
-      }
-    } catch (error) {
-      console.error("Error getting camera state:", error);
-    }
-  };
 
   useEffect(() => {
     requestUserLocation();
@@ -118,6 +109,15 @@ const Map: React.FC<MapProps> = ({
           const { latitude, longitude } = location.coords;
           const coordinates: [number, number] = [longitude, latitude];
           setUserLocation(coordinates);
+          // Before focusing the camera on the user's location, check if the location change is significant
+
+          if (
+            userLocation &&
+            turf.distance(turf.point(userLocation), turf.point(coordinates)) <
+              0.01
+          ) {
+            return;
+          }
 
           discoverArea(coordinates, 0.1);
 
@@ -265,7 +265,7 @@ const Map: React.FC<MapProps> = ({
   }, [triggerAction]);
 
   return (
-    <View className="size-full flex-1 bg-blue-600 justify-center items-center">
+    <View className="size-full flex-1  justify-center items-center">
       <MapboxGL.MapView
         style={styles.map}
         styleURL="mapbox://styles/codekatabattle/cm55m9p3i003b01po2yh31h59/draft"
@@ -274,12 +274,24 @@ const Map: React.FC<MapProps> = ({
         onCameraChanged={(e) => {
           onBearingChange(e.properties.heading);
         }}
+        pitchEnabled={false}
       >
+        <MapboxGL.Images
+          images={{
+            locationIcon: require("../../assets/images/Navigation.png"),
+          }}
+        />
         <MapboxGL.Camera ref={cameraRef} zoomLevel={15} />
         {UserLocation && (
           <MapboxGL.LocationPuck
             puckBearing={"course"}
-            pulsing={{ isEnabled: true, color: "blue", radius: "accuracy" }}
+            topImage="locationIcon"
+            scale={2}
+            pulsing={{
+              isEnabled: true,
+              color: colors.purple,
+              radius: "accuracy",
+            }}
           />
         )}
 
@@ -293,7 +305,7 @@ const Map: React.FC<MapProps> = ({
 
         {markerLocation && (
           <MapboxGL.PointAnnotation id="marker" coordinate={markerLocation}>
-            <View className="size-4 bg-red-500" />
+            <View className="size-4 bg-buttonAccentRed" />
           </MapboxGL.PointAnnotation>
         )}
         {routeCoords && (
@@ -312,7 +324,7 @@ const Map: React.FC<MapProps> = ({
               id="routeLine"
               style={{
                 lineWidth: 5,
-                lineColor: "#007AFF",
+                lineColor: colors.aqua,
               }}
             />
           </MapboxGL.ShapeSource>
