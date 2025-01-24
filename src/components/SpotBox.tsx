@@ -9,7 +9,7 @@ const SpotBox: React.FC<{
   address: string;
   onPress: () => void;
   image?: string;
-}> = ({ title, date, address, onPress, image }) => {
+}> = ({ title, date: created_at, address: coordinates, onPress, image }) => {
   return (
     <View
       className="flex-row items-center rounded-3xl p-4 px-2 mb-4 bg-boxContainer"
@@ -35,7 +35,7 @@ const SpotBox: React.FC<{
       {/* Right Section: Content */}
       <View className="flex-1 justify-around h-auto">
         <View>
-          <Text className="text-textBody text-sm mb-1">{date}</Text>
+          <Text className="text-textBody text-sm mb-1">{created_at}</Text>
           <Text className="text-textWhite text-xl font-bold mb-2">{title}</Text>
           <View className="flex-row items-center mb-4">
             <Place
@@ -44,7 +44,7 @@ const SpotBox: React.FC<{
               color={"--color-text-body"}
               style={{ marginRight: 8 }} // Add space between icon and text
             />
-            <Text className="text-textBody text-sm">{address}</Text>
+            <Text className="text-textBody text-sm">{coordinates}</Text>
           </View>
         </View>
 

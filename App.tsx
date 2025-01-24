@@ -28,7 +28,6 @@ import LoginScreen from "./src/screens/Login";
 import { useEffect, useState } from "react";
 import * as Font from "expo-font";
 import { useFonts } from "expo-font";
-import { Sen_400Regular, Sen_700Bold } from "@expo-google-fonts/sen";
 
 const RootStack = createNativeStackNavigator({
   initialRouteName: "Login",

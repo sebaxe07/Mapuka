@@ -54,7 +54,7 @@ const Home: React.FC = () => {
 
       <View className="absolute bottom-32 right-5 space-y-10">
         <TouchableOpacity
-          className="bg-[#5FB5C9] p-3 rounded-full items-center justify-center"
+          className="bg-buttonAqua p-3 rounded-full items-center justify-center"
           onPress={() => setTriggerAction("gps")}
         >
           <Icons.Focus color="white" />
