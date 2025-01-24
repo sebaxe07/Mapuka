@@ -67,7 +67,9 @@ export async function signInWithEmail({
       })
     );
 
-    console.log("Setting data");
+    
+    // return confirmation of successful login
+    return;
   } catch (error) {
     console.error("Error fetching data:", (error as any).message);
     return error;
