@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { View, TouchableOpacity } from "react-native";
 import * as Icons from "../../assets/icons/home"; // Adjust the path based on your project structure
 import { useNavigation } from "@react-navigation/native";
-import ContentBox from "./ContentBox"; // Import the ContentBox
+import SaveBox from "./SaveBoxModal"; // Import the ContentBox
 
 const FloatingNavbar: React.FC = () => {
   const [menuExpanded, setMenuExpanded] = useState(false);
@@ -79,7 +79,7 @@ const FloatingNavbar: React.FC = () => {
 
       {/* Content Box */}
       {activeBox && (
-        <ContentBox type={activeBox} onClose={() => setActiveBox(null)} />
+        <SaveBox type={activeBox} onClose={() => setActiveBox(null)} />
       )}
     </>
   );

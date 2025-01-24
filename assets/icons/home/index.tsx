@@ -17,3 +17,6 @@ export { default as NewNote } from "./new_note.svg";
 
 /* Search Bar */
 export { default as Search } from "./search.svg";
+
+/* Save Modal */
+export { default as CloseNbg } from "./close_clean.svg";
