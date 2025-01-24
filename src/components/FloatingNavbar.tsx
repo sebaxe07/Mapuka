@@ -2,18 +2,16 @@ import React, { useState } from "react";
 import { View, TouchableOpacity } from "react-native";
 import * as Icons from "../../assets/icons/home"; // Adjust the path based on your project structure
 import { useNavigation } from "@react-navigation/native";
+import ContentBox from "./ContentBox"; // Import the ContentBox
 
-interface FloatingNavbarProps {
-  onOptionSelect?: (option: string) => void;
-}
-
-const FloatingNavbar: React.FC<FloatingNavbarProps> = ({ onOptionSelect }) => {
+const FloatingNavbar: React.FC = () => {
   const [menuExpanded, setMenuExpanded] = useState(false);
+  const [activeBox, setActiveBox] = useState<"note" | "spot" | null>(null);
   const navigation = useNavigation();
 
-  const handleOptionSelect = (option: string) => {
-    onOptionSelect?.(option);
-    setMenuExpanded(false); // Collapse the menu after selection
+  const handleOptionSelect = (option: "note" | "spot") => {
+    setActiveBox(option);
+    setMenuExpanded(false); // Collapse the menu
   };
 
   return (
@@ -66,17 +64,22 @@ const FloatingNavbar: React.FC<FloatingNavbarProps> = ({ onOptionSelect }) => {
         <View className="absolute bottom-32 self-center flex-row items-center space-x-12">
           <TouchableOpacity
             className="p-3 rounded-full items-center justify-center"
-            onPress={() => handleOptionSelect("newFavorite")}
-          >
-            <Icons.NewFavorite color="black" />
-          </TouchableOpacity>
-          <TouchableOpacity
-            className="p-3 rounded-full items-center justify-center"
-            onPress={() => handleOptionSelect("newNote")}
+            onPress={() => handleOptionSelect("note")}
           >
             <Icons.NewNote color="black" />
           </TouchableOpacity>
+          <TouchableOpacity
+            className="p-3 rounded-full items-center justify-center"
+            onPress={() => handleOptionSelect("spot")}
+          >
+            <Icons.NewSpot color="black" />
+          </TouchableOpacity>
         </View>
+      )}
+
+      {/* Content Box */}
+      {activeBox && (
+        <ContentBox type={activeBox} onClose={() => setActiveBox(null)} />
       )}
     </>
   );

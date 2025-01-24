@@ -124,9 +124,7 @@ const Home: React.FC = () => {
       </View>
 
       {/* Bottom Floating Menu */}
-      <FloatingNavbar
-        onOptionSelect={(option) => console.log("Selected Option:", option)}
-      />
+      <FloatingNavbar />
 
       {/* Bottom Right Buttons */}
       <View className="absolute bottom-32 right-5">

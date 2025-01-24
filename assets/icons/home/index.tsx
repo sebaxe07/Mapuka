@@ -12,7 +12,7 @@ export { default as Layers } from "./layers.svg";
 /* Expandable Buttons */
 export { default as Add } from "./add.svg";
 export { default as Close } from "./close.svg";
-export { default as NewFavorite } from "./new_favorite.svg";
+export { default as NewSpot } from "./new_favorite.svg";
 export { default as NewNote } from "./new_note.svg";
 
 /* Search Bar */
