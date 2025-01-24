@@ -80,6 +80,7 @@ const Login: React.FC<LoginProps> = ({}) => {
 
   const HandleLogin = async () => {
     setLoading(true);
+    setErrorColor("text-red-500");
     setError("");
     const result = await signInWithEmail({ email, password, dispatch });
     console.log("Result", result);
@@ -100,11 +101,87 @@ const Login: React.FC<LoginProps> = ({}) => {
       // Clear event listener for back button before navigating
       BackHandler.removeEventListener("hardwareBackPress", backAction);
 
-      navigation.navigate("Home");
+      //navigation.navigate("Home");
     }
 
     setLoading(false);
   };
+
+  const HandleSignUp = async () => {
+    setLoading(true);
+    setErrorColor("text-red-500");
+    setError("");
+    if (email.length < 1) {
+      setError("Email cannot be empty");
+      setLoading(false);
+      return;
+    }
+
+    if (password !== passwordConfirm) {
+      setError("Passwords do not match");
+      setLoading(false);
+      return;
+    }
+
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters long");
+      setLoading(false);
+      return;
+    }
+
+    if (name.length < 1) {
+      setError("Name cannot be empty");
+      setLoading(false);
+      return;
+    }
+
+    if (lastname.length < 1) {
+      setError("Lastname cannot be empty");
+      setLoading(false);
+      return;
+    }
+
+    const result = await signUpUser({
+      email,
+      password,
+      name,
+      lastname,
+      dispatch,
+    });
+
+    if (result instanceof Error) {
+      // Capitalize the first letter of the error message
+      setError(
+        result.message.charAt(0).toUpperCase() + result.message.slice(1)
+      );
+      console.log("Error", result);
+      setLoading(false);
+
+      return;
+    }
+
+    // If result is undefined, the user has successfully logged in and navigate to the home
+    if (result === undefined) {
+      // Clear event listener for back button before navigating
+      setError("Account created successfull, please verify your email");
+      setErrorColor("text-green-500");
+      setSignUp(false);
+
+      // Clear the fields
+      setPasswordConfirm("");
+      setName("");
+      setLastname("");
+    }
+
+    setLoading(false);
+  };
+
+  const [errorColor, setErrorColor] = useState("text-red-500");
+  const [screenWidth, setScreenWidth] = useState(0);
+
+  useEffect(() => {
+    setScreenWidth(window.innerWidth);
+  }, []);
 
   return (
     <View className="flex-1 flex-col items-center justify-end bg-bgMain">
@@ -117,9 +194,9 @@ const Login: React.FC<LoginProps> = ({}) => {
       <MotiView
         animate={{ scale: signUp ? 2 : 1, translateY: signUp ? 200 : 0 }}
         transition={{ type: "timing", duration: 800 } as any}
-        className="absolute top-0 left-0 right-0 bottom-0 "
+        className="absolute top-0 left-0 right-0 bottom-0  "
       >
-        <BgDesign />
+        <BgDesign width={screenWidth} />
       </MotiView>
       <KeyboardAvoidingView behavior="padding" keyboardVerticalOffset={-150}>
         <View className=" mb-24 mx-14 ">
@@ -129,10 +206,10 @@ const Login: React.FC<LoginProps> = ({}) => {
           >
             <LogoMapuka />
             <Text className="text-white text-2xl font-senMedium mt-[1.96rem]">
-              Login
+              {signUp ? "Sign up " : "Welcome back!"}
             </Text>
             {error && (
-              <Text className={`text-red-500 text-base font-senRegular`}>
+              <Text className={`${errorColor} text-base font-senRegular`}>
                 {error}
               </Text>
             )}
@@ -254,53 +331,15 @@ const Login: React.FC<LoginProps> = ({}) => {
             >
               <Button
                 label="Create account"
-                onPress={() => {}}
+                onPress={HandleSignUp}
                 width="w-[48%]"
+                disabled={loading}
               />
             </MotiView>
           </MotiView>
         </View>
       </KeyboardAvoidingView>
     </View>
-    /*     <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-      <Text>Login Screen</Text>
-
-      <Button onPress={() => navigation.goBack()}>Go back</Button>
-      {userData.auth ? (
-        <>
-          <Button onPress={logOut}>Logout</Button>
-          <Input placeholder="name" value={name} onChangeText={setName} />
-        </>
-      ) : (
-        <>
-          <Input placeholder="email" value={email} onChangeText={setEmail} />
-          <Input
-            placeholder="password"
-            value={password}
-            onChangeText={setPassword}
-          />
-          <Button
-            onPress={}
-          >
-            Login
-          </Button>
-
-          <Input placeholder="name" value={name} onChangeText={setName}></Input>
-          <Input
-            placeholder="lastname"
-            value={lastname}
-            onChangeText={setLastname}
-          ></Input>
-          <Button
-            onPress={() =>
-              signUpUser({ email, password, name, lastname, dispatch })
-            }
-          >
-            Sign Up
-          </Button>
-        </>
-      )}
-    </View> */
   );
 };
 

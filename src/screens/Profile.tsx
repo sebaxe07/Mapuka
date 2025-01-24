@@ -20,7 +20,6 @@ const Profile: React.FC = () => {
     console.log("User logged out");
     signOut();
     dispatch(clearUserData());
-    navigator.navigate("Login");
   };
 
   const daysExplored = 25; // Example value

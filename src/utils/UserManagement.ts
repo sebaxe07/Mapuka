@@ -67,7 +67,6 @@ export async function signInWithEmail({
       })
     );
 
-    
     // return confirmation of successful login
     return;
   } catch (error) {
@@ -101,7 +100,9 @@ export async function signUpUser({
   name,
   lastname,
   dispatch,
-}: SignUpUserProps): Promise<void> {
+}: SignUpUserProps): Promise<
+  void | AuthError | PostgrestError | null | unknown
+> {
   const { data, error } = await supabase.auth.signUp({
     email: email,
     password: password,
@@ -114,13 +115,12 @@ export async function signUpUser({
   });
 
   if (error) {
-    Alert.alert(error.message);
-    return;
+    return error;
   }
 
   if (data) {
-    signInWithEmail({ email, password, dispatch });
     console.log("User created");
     console.log(data);
+    return;
   }
 }

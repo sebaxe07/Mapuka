@@ -4,6 +4,7 @@ import "./global.css";
 import {
   createStaticNavigation,
   StaticParamList,
+  useNavigation,
 } from "@react-navigation/native";
 import { supabase } from "./src/utils/supabase";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
@@ -26,64 +27,90 @@ import { View, Text } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import LoginScreen from "./src/screens/Login";
 import { useEffect, useState } from "react";
+import SplashScreen from "./src/components/SplashScreen";
 import * as Font from "expo-font";
 import { useFonts } from "expo-font";
+import * as React from "react";
+import { useAppDispatch, useAppSelector } from "./src/contexts/hooks";
+import { setAuth, setSession } from "./src/contexts/slices/userDataSlice";
+
+function useIsSignedIn() {
+  const isSignedIn = useAppSelector((state) => state.userData.auth);
+  return isSignedIn === true;
+}
+
+function useIsSignedOut() {
+  const isSignedIn = useAppSelector((state) => state.userData.auth);
+  return isSignedIn === false || isSignedIn === null;
+}
 
 const RootStack = createNativeStackNavigator({
-  initialRouteName: "Login",
   screenOptions: {
     headerShown: false,
   },
   screens: {
-    Login: {
-      options: {
-        headerShown: false,
-        statusBarTranslucent: true,
-        statusBarBackgroundColor: "transparent",
-        navigationBarColor: "transparent",
-        navigationBarTranslucent: true,
+    // Common screens
+  },
+  groups: {
+    SignedIn: {
+      if: useIsSignedIn,
+      screens: {
+        Home: HomeScreen,
+        Details: DetailsScreen,
+        Map: MapScreen,
+        Achivements: Achivements,
+        Bookmarks: {
+          options: ({ navigation }) => ({
+            headerShown: true,
+            headerTitle: "",
+            headerTransparent: true,
+            headerLeft: () => (
+              <BackArrow
+                color="--color-text-white"
+                onPress={() => navigation.goBack()}
+              />
+            ),
+          }),
+          screen: BookmarksScreen,
+        },
+        Leaderboard: Leaderboard,
+        Profile: {
+          options: ({ navigation }) => ({
+            headerShown: true,
+            headerTransparent: true,
+            headerTitleAlign: "center",
+            headerTitle: "Profile",
+            headerLargeTitle: true,
+            headerTitleStyle: {
+              color: "#ffffff",
+            },
+            headerLargeTitleStyle: {
+              color: "#ffffff",
+            },
+            headerLeft: () => (
+              <BackArrow color="#ffffff" onPress={() => navigation.goBack()} />
+            ),
+          }),
+          screen: Profile,
+        },
+        MapFog: MapFog,
       },
-      screen: LoginScreen,
     },
-    Home: HomeScreen,
-    Details: DetailsScreen,
-    Map: MapScreen,
-    Achivements: Achivements,
-    Bookmarks: {
-      options: ({ navigation }) => ({
-        headerShown: true,
-        headerTitle: "",
-        headerTransparent: true,
-        headerLeft: () => (
-          <BackArrow
-            color="--color-text-white"
-            onPress={() => navigation.goBack()}
-          />
-        ),
-      }),
-      screen: BookmarksScreen,
-    },
-    Leaderboard: Leaderboard,
-    Profile: {
-      options: ({ navigation }) => ({
-        headerShown: true,
-        headerTransparent: true,
-        headerTitleAlign: "center",
-        headerTitle: "Profile",
-        headerLargeTitle: true,
-        headerTitleStyle: {
-          color: "#ffffff",
+    SignedOut: {
+      if: useIsSignedOut,
+      screens: {
+        Login: {
+          options: {
+            headerShown: false,
+            statusBarTranslucent: true,
+            statusBarBackgroundColor: "transparent",
+            navigationBarColor: "transparent",
+            navigationBarTranslucent: true,
+          },
+          screen: LoginScreen,
         },
-        headerLargeTitleStyle: {
-          color: "#ffffff",
-        },
-        headerLeft: () => (
-          <BackArrow color="#ffffff" onPress={() => navigation.goBack()} />
-        ),
-      }),
-      screen: Profile,
+      },
     },
-    MapFog: MapFog,
   },
 });
 
@@ -98,36 +125,56 @@ declare global {
 const Navigation = createStaticNavigation(RootStack);
 
 export default function App() {
-  const { colorScheme } = useColorScheme();
-
-  const [loaded, error] = useFonts({
-    SenBold: require("./assets/fonts/Sen-Bold.ttf"),
-    SenRegular: require("./assets/fonts/Sen-Regular.ttf"),
-    SenExtraBold: require("./assets/fonts/Sen-ExtraBold.ttf"),
-    SenMedium: require("./assets/fonts/Sen-Medium.ttf"),
-    SenSemiBold: require("./assets/fonts/Sen-SemiBold.ttf"),
-  });
-
-  useEffect(() => {
-    if (error) throw error;
-  }, [error]);
-
-  if (!loaded) {
-    return null;
-  }
-
   return (
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
-        <GestureHandlerRootView>
-          <View
-            style={themes[colorScheme as unknown as keyof typeof themes]}
-            className="size-full "
-          >
-            <Navigation />
-          </View>
-        </GestureHandlerRootView>
+        <RootNavigator />
       </PersistGate>
     </Provider>
+  );
+}
+export function RootNavigator() {
+  const { colorScheme } = useColorScheme();
+  const dispatch = useAppDispatch();
+  const [loading, setLoading] = useState(true);
+
+  const authState = useAppSelector((state) => state.userData.auth);
+
+  useEffect(() => {
+    const bootstrapAsync = async () => {
+      try {
+        const { data, error } = await supabase.auth.getSession();
+
+        if (data?.session) {
+          console.log("\x1b[32m", "User is signed in");
+          dispatch(setAuth(true));
+          dispatch(setSession(data.session));
+        } else {
+          console.log("\x1b[31m", "User is signed out");
+          dispatch(setAuth(false));
+        }
+      } catch (e) {
+        console.error("Error restoring session:", e);
+        dispatch(setAuth(false));
+      }
+      setLoading(false);
+    };
+
+    bootstrapAsync();
+  }, [dispatch]);
+
+  if (loading) {
+    return <SplashScreen />;
+  }
+
+  return (
+    <GestureHandlerRootView>
+      <View
+        style={themes[colorScheme as unknown as keyof typeof themes]}
+        className="size-full"
+      >
+        <Navigation />
+      </View>
+    </GestureHandlerRootView>
   );
 }
