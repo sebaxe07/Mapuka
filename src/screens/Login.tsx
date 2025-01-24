@@ -70,6 +70,8 @@ const Login: React.FC<LoginProps> = ({}) => {
 
   useEffect(() => {
     // This will force a re-render once the state changes after animation
+    setError("");
+    setErrorColor("text-red-500");
     setTimeout(() => {
       // Ensure any necessary state changes or layout updates
       forceUpdate(); // Custom method for triggering re-render
