@@ -1,3 +1,5 @@
+import "react-native-reanimated";
+import "react-native-gesture-handler";
 import "./global.css";
 import {
   createStaticNavigation,
@@ -20,17 +22,30 @@ import { store, persistor } from "./src/contexts/store";
 import { themes } from "./themes";
 import { colors } from "./colors";
 import { useColorScheme } from "nativewind";
-import { View } from "react-native";
+import { View, Text } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import LoginScreen from "./src/screens/Login";
+import { useEffect, useState } from "react";
+import * as Font from "expo-font";
+import { useFonts } from "expo-font";
+import { Sen_400Regular, Sen_700Bold } from "@expo-google-fonts/sen";
 
 const RootStack = createNativeStackNavigator({
-  initialRouteName: "Home",
+  initialRouteName: "Login",
   screenOptions: {
     headerShown: false,
-    statusBarHidden: true,
-    statusBarTranslucent: true,
-    navigationBarHidden: true,
   },
   screens: {
+    Login: {
+      options: {
+        headerShown: false,
+        statusBarTranslucent: true,
+        statusBarBackgroundColor: "transparent",
+        navigationBarColor: "transparent",
+        navigationBarTranslucent: true,
+      },
+      screen: LoginScreen,
+    },
     Home: HomeScreen,
     Details: DetailsScreen,
     Map: MapScreen,
@@ -86,15 +101,33 @@ const Navigation = createStaticNavigation(RootStack);
 export default function App() {
   const { colorScheme } = useColorScheme();
 
+  const [loaded, error] = useFonts({
+    SenBold: require("./assets/fonts/Sen-Bold.ttf"),
+    SenRegular: require("./assets/fonts/Sen-Regular.ttf"),
+    SenExtraBold: require("./assets/fonts/Sen-ExtraBold.ttf"),
+    SenMedium: require("./assets/fonts/Sen-Medium.ttf"),
+    SenSemiBold: require("./assets/fonts/Sen-SemiBold.ttf"),
+  });
+
+  useEffect(() => {
+    if (error) throw error;
+  }, [error]);
+
+  if (!loaded) {
+    return null;
+  }
+
   return (
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
-        <View
-          style={themes[colorScheme as unknown as keyof typeof themes]}
-          className="size-full"
-        >
-          <Navigation />
-        </View>
+        <GestureHandlerRootView>
+          <View
+            style={themes[colorScheme as unknown as keyof typeof themes]}
+            className="size-full "
+          >
+            <Navigation />
+          </View>
+        </GestureHandlerRootView>
       </PersistGate>
     </Provider>
   );

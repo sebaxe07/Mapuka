@@ -4,6 +4,13 @@ module.exports = {
   presets: [require("nativewind/preset")],
   theme: {
     extend: {
+      fontFamily: {
+        senRegular: ["SenRegular"],
+        senBold: ["SenBold"],
+        senSemiBold: ["SenSemiBold"],
+        senExtraBold: ["SenExtraBold"],
+        senMedium: ["SenMedium"],
+      },
       colors: {
         /* Background */
         primary: "var(--color-primary)",
@@ -30,5 +37,4 @@ module.exports = {
       },
     },
   },
-  plugins: [],
 };

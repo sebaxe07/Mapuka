@@ -1,6 +1,6 @@
 export const colors = {
   /* Background */
-  background: "#1E1E3F",
+  background: "#11112D",
 
   /* Texts */
   bodyText: "#5D6F9D",
@@ -11,7 +11,7 @@ export const colors = {
 
   /* Boxes */
   menus: "#E8EBFF",
-  box: "##27284E",
+  box: "#27284E",
 
   /* Buttons */
   accentRed: "#DC4F51",

@@ -51,6 +51,7 @@ export default ({ config }) => {
           launchMode: "most-recent",
         },
       ],
+      "expo-font",
     ],
 
     extra: {

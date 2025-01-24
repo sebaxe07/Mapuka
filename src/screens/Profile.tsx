@@ -1,6 +1,10 @@
 import React from "react";
 import { View, Text, TouchableOpacity, Alert } from "react-native";
 import * as Icons from "../../assets/icons/profile/index";
+import { signOut } from "../utils/UserManagement";
+import { useAppDispatch, useAppSelector } from "../contexts/hooks";
+import { clearUserData } from "../contexts/slices/userDataSlice";
+import { useNavigation } from "@react-navigation/native";
 
 const Profile: React.FC = () => {
   const handleLogout = () => {
@@ -8,6 +12,15 @@ const Profile: React.FC = () => {
       { text: "Cancel", style: "cancel" },
       { text: "Logout", onPress: () => console.log("User logged out") },
     ]);
+  };
+
+  const dispatch = useAppDispatch();
+  const navigator = useNavigation();
+  const logOut = async () => {
+    console.log("User logged out");
+    signOut();
+    dispatch(clearUserData());
+    navigator.navigate("Login");
   };
 
   const daysExplored = 25; // Example value
@@ -96,7 +109,7 @@ const Profile: React.FC = () => {
       {/* Logout Button */}
       <TouchableOpacity
         className="flex-row items-center py-3 rounded-lg justify-center"
-        onPress={handleLogout}
+        onPress={logOut}
       >
         <Icons.LogOut color="var(--color-text-white)" />
         <Text className="text-textWhite text-base ml-2">Log out</Text>
