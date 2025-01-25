@@ -6,7 +6,6 @@ import { useAppDispatch, useAppSelector } from "../contexts/hooks";
 import { clearUserData } from "../contexts/slices/userDataSlice";
 import { useNavigation } from "@react-navigation/native";
 import { colors } from "../../colors";
-import { supabase } from "../utils/supabase";
 
 const Profile: React.FC = () => {
   const handleLogout = () => {

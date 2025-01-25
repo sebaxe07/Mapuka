@@ -9,6 +9,8 @@ import SearchBar from "../components/SearchBar";
 import Map from "./MapFog";
 import { MotiView, MotiTransitionProp } from "moti";
 import Compass from "../components/Compass";
+import MaskedView from "@react-native-masked-view/masked-view";
+import NavbarBase from "../../assets/images/navbarbase.svg";
 
 MapboxGL.setAccessToken(MAPBOX_ACCESS_TOKEN);
 
@@ -34,9 +36,9 @@ const Home: React.FC = () => {
 
       {/* Search Bar */}
       <View className="absolute inset-0 justify-center items-center   w-full">
-        <View className=" w-full h-full px-6  py-16 flex-1 justify-between">
+        <View className=" w-full h-full px-6  py-16 flex-1 justify-between ">
           {/* TopSection */}
-          <View className=" gap-6">
+          <View className=" gap-6 ">
             <SearchBar
               value={text}
               onChangeText={(value) => setText(value)}
@@ -53,10 +55,10 @@ const Home: React.FC = () => {
           </View>
 
           {/* Bottom Section */}
-          <View className=" gap-10">
+          <View className=" gap-10 ">
             {/* Bottom Right Buttons */}
 
-            <View className=" gap-8 items-end">
+            <View className=" gap-4 items-end">
               <TouchableOpacity
                 className="bg-buttonAqua  rounded-full items-center justify-center size-14"
                 onPress={() => setTriggerAction("gps")}

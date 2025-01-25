@@ -17,7 +17,7 @@ const SaveBox: React.FC<SaveBoxProps> = ({ type, onClose }) => {
     onClose(); // Close the modal after saving
   };
   return (
-    <View className="absolute top-1/3 self-center w-11/12 bg-textWhite rounded-3xl shadow-lg py-5 px-10">
+    <View className="absolute bottom-56 self-center w-11/12 bg-textWhite rounded-3xl shadow-lg py-5 px-10">
       <View className="flex-row justify-between items-center mb-4 border-b border-textBody">
         <Text className="text-textBody text-2xl font-semibold mb-4">
           {type === "note" ? "Make a Note" : "Save a Spot"}

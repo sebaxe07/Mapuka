@@ -51,6 +51,7 @@ const RootStack = createNativeStackNavigator({
     statusBarBackgroundColor: "transparent",
     navigationBarColor: "transparent",
     navigationBarTranslucent: true,
+    animation: "slide_from_right",
   },
   screens: {
     // Common screens
@@ -62,7 +63,12 @@ const RootStack = createNativeStackNavigator({
         Home: HomeScreen,
         Details: DetailsScreen,
         Map: MapScreen,
-        Achivements: Achivements,
+        Achivements: {
+          options: ({ navigation }) => ({
+            animation: "slide_from_left",
+          }),
+          screen: Achivements,
+        },
         Bookmarks: {
           options: ({ navigation }) => ({
             headerShown: true,
@@ -77,7 +83,12 @@ const RootStack = createNativeStackNavigator({
           }),
           screen: BookmarksScreen,
         },
-        Leaderboard: Leaderboard,
+        Leaderboard: {
+          options: ({ navigation }) => ({
+            animation: "slide_from_left",
+          }),
+          screen: Leaderboard,
+        },
         Profile: {
           options: ({ navigation }) => ({
             headerShown: true,
