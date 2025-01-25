@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity } from "react-native";
 import { colors } from "../../colors";
 import HolderV from "../../assets/icons/bookmarks/holder.svg";
 import HolderH from "../../assets/icons/bookmarks/holderH.svg";
+import * as Icons from "../../assets/icons/leaderboard/index";
 
 // Define the array of unlocked colors
 const unlockedColors = [
@@ -13,17 +14,21 @@ const unlockedColors = [
   "#9C65E8", // Purple
 ];
 
-interface AchievementBoxProps {
+interface ContentBoxProps {
+  category: string;
   title: string;
   description: string;
-  unlocked: boolean;
+  unlocked?: boolean;
+  top?: string;
   layout?: "vertical" | "horizontal";
 }
 
-const AchievementBox: React.FC<AchievementBoxProps> = ({
+const ContentBox: React.FC<ContentBoxProps> = ({
+  category,
   title,
   description,
   unlocked,
+  top = "",
   layout = "vertical",
 }) => {
   // Generate a random color for unlocked achievements
@@ -35,39 +40,115 @@ const AchievementBox: React.FC<AchievementBoxProps> = ({
       ? "flex-row gap-1 px-2 py-5 "
       : "flex-col gap-1 px-5 py-2";
 
-  return (
-    <View
-      className={`rounded-3xl items-center  w-full ${boxStyles} `}
-      style={{
-        backgroundColor: unlocked ? randomColor : colors.white,
-      }}
-    >
-      {/* SVG Placeholder */}
-      <View className={`flex items-center justify-center`}>
-        {layout === "horizontal" ? (
-          <HolderV width={50} height={80} preserveAspectRatio="none" />
-        ) : (
-          <HolderH width={70} height={50} preserveAspectRatio="none" />
-        )}
-      </View>
+  const renderTrophy = (top: string) => {
+    switch (top) {
+      case "1":
+        return <Icons.Trophy1 width={90} height={90} />;
+      case "2":
+        return <Icons.Trophy2 width={70} height={90} />;
+      case "3":
+        return <Icons.Trophy3 width={70} height={90} />;
+      default:
+        return <Icons.Trophy width={70} height={90} />;
+    }
+  };
 
-      {/* Text Content */}
-      <View
-        className={`${
-          layout === "horizontal"
-            ? "flex-1 gap-2 px-4 py-3"
-            : "items-center py-2"
-        } justify-center`}
-      >
-        <Text className="text-bgMain font-senBold text-sm text-wrap text-center">
-          {title}
-        </Text>
-        <Text className="text-textBody font-senRegular text-xs text-center flex-wrap">
-          {description}
-        </Text>
-      </View>
-    </View>
+  const renderColor = (top: string) => {
+    switch (top) {
+      case "1":
+        return colors.accentRed;
+      case "2":
+        return colors.darkRed;
+      case "3":
+        return colors.orange;
+      default:
+        return colors.box;
+    }
+  };
+
+  const renderTextColor = (top: string) => {
+    switch (top) {
+      case "1":
+        return colors.darkRed;
+      case "2":
+        return colors.orange;
+      case "3":
+        return colors.accentRed;
+      default:
+        return colors.lightText;
+    }
+  };
+
+  return (
+    <>
+      {category === "achivement" ? (
+        <View
+          className={`rounded-3xl items-center  w-full ${boxStyles} `}
+          style={{
+            backgroundColor: unlocked ? randomColor : colors.white,
+          }}
+        >
+          {/* SVG Placeholder */}
+          <View className={`flex items-center justify-center`}>
+            {layout === "horizontal" ? (
+              <HolderV width={50} height={80} preserveAspectRatio="none" />
+            ) : (
+              <HolderH width={70} height={50} preserveAspectRatio="none" />
+            )}
+          </View>
+
+          {/* Text Content */}
+          <View
+            className={`${
+              layout === "horizontal"
+                ? "flex-1 gap-2 px-4 py-3"
+                : "items-center py-2"
+            } justify-center`}
+          >
+            <Text className="text-bgMain font-senBold text-sm text-wrap text-center">
+              {title}
+            </Text>
+            <Text className="text-textBody font-senRegular text-xs text-center flex-wrap">
+              {description}
+            </Text>
+          </View>
+        </View>
+      ) : (
+        <View
+          className={`rounded-3xl items-center  w-full ${boxStyles} `}
+          style={{
+            backgroundColor: renderColor(top),
+          }}
+        >
+          {/* SVG Placeholder */}
+          <View className="flex items-center justify-center">
+            {renderTrophy(top)}
+          </View>
+
+          {/* Text Content */}
+          <View
+            className={`${
+              layout === "horizontal"
+                ? "flex-1 gap-2 px-4 py-3"
+                : "items-center py-2"
+            } justify-start`}
+          >
+            <Text
+              className={`text-textWhite font-senSemiBold text-${4 - Number(top)}xl text-wrap`}
+            >
+              {title}
+            </Text>
+            <Text
+              className="text-textBody font-senRegular text-lg  flex-wrap"
+              style={{ color: renderTextColor(top) }}
+            >
+              {description} km
+            </Text>
+          </View>
+        </View>
+      )}
+    </>
   );
 };
 
-export default AchievementBox;
+export default ContentBox;

@@ -1,15 +1,24 @@
 import React, { useEffect, useState } from "react";
 import { View, Text } from "react-native";
-import AchievementBox from "../components/ContentBox";
+import ContentBox from "../components/ContentBox";
 
 const Achievements: React.FC = () => {
   // Initial static metadata
-  const [achievementMetadata, setAchievementMetadata] = useState({
+  type Metadata = {
+    title: string;
+    description: string;
+    layout: "vertical" | "horizontal";
+    unlocked: boolean;
+  };
+
+  const [achievementMetadata, setAchievementMetadata] = useState<
+    Record<number, Metadata>
+  >({
     1: {
       title: "Welcome Aboard",
       description: "Log into your account for the first time.",
       layout: "horizontal",
-      unlocked: false, // Initially set unlocked to false
+      unlocked: false,
     },
     2: {
       title: "First Steps",
@@ -107,7 +116,8 @@ const Achievements: React.FC = () => {
             className="justify-center items-center"
             style={{ flex: 2, width: "60%" }}
           >
-            <AchievementBox
+            <ContentBox
+              category="achivement"
               title={achievementMetadata[1].title}
               description={achievementMetadata[1].description}
               unlocked={achievementMetadata[1].unlocked}
@@ -118,7 +128,8 @@ const Achievements: React.FC = () => {
             className="justify-center items-center"
             style={{ flex: 1, width: "30%" }}
           >
-            <AchievementBox
+            <ContentBox
+              category="achivement"
               title={achievementMetadata[2].title}
               description={achievementMetadata[2].description}
               unlocked={achievementMetadata[2].unlocked}
@@ -132,7 +143,8 @@ const Achievements: React.FC = () => {
           className={`flex-row flex-wrap rounded-3xl justify-between gap-3 ${debugFlexbox ? "bg-buttonBlue" : ""}`}
         >
           <View className="justify-center items-center" style={{ flex: 1 }}>
-            <AchievementBox
+            <ContentBox
+              category="achivement"
               title={achievementMetadata[3].title}
               description={achievementMetadata[3].description}
               unlocked={achievementMetadata[3].unlocked}
@@ -140,7 +152,8 @@ const Achievements: React.FC = () => {
             />
           </View>
           <View className="justify-center items-center" style={{ flex: 1 }}>
-            <AchievementBox
+            <ContentBox
+              category="achivement"
               title={achievementMetadata[4].title}
               description={achievementMetadata[4].description}
               unlocked={achievementMetadata[4].unlocked}
@@ -148,7 +161,8 @@ const Achievements: React.FC = () => {
             />
           </View>
           <View className="justify-center items-center" style={{ flex: 1 }}>
-            <AchievementBox
+            <ContentBox
+              category="achivement"
               title={achievementMetadata[5].title}
               description={achievementMetadata[5].description}
               unlocked={achievementMetadata[5].unlocked}
@@ -166,7 +180,8 @@ const Achievements: React.FC = () => {
             className="justify-center items-center"
             style={{ flex: 0.5, height: "100%" }}
           >
-            <AchievementBox
+            <ContentBox
+              category="achivement"
               title={achievementMetadata[6].title}
               description={achievementMetadata[6].description}
               unlocked={achievementMetadata[6].unlocked}
@@ -180,7 +195,8 @@ const Achievements: React.FC = () => {
             style={{ flex: 1, height: "100%" }}
           >
             <View className="justify-center items-center" style={{ flex: 1 }}>
-              <AchievementBox
+              <ContentBox
+                category="achivement"
                 title={achievementMetadata[7].title}
                 description={achievementMetadata[7].description}
                 unlocked={achievementMetadata[7].unlocked}
@@ -190,7 +206,8 @@ const Achievements: React.FC = () => {
 
             <View className="flex-row justify-center gap-3" style={{ flex: 1 }}>
               <View className="justify-center items-center" style={{ flex: 1 }}>
-                <AchievementBox
+                <ContentBox
+                  category="achivement"
                   title={achievementMetadata[8].title}
                   description={achievementMetadata[8].description}
                   unlocked={achievementMetadata[8].unlocked}
@@ -198,7 +215,8 @@ const Achievements: React.FC = () => {
                 />
               </View>
               <View className="justify-center items-center" style={{ flex: 1 }}>
-                <AchievementBox
+                <ContentBox
+                  category="achivement"
                   title={achievementMetadata[9].title}
                   description={achievementMetadata[9].description}
                   unlocked={achievementMetadata[9].unlocked}
