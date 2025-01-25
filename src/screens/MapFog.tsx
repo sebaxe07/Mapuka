@@ -29,11 +29,15 @@ import { colors } from "../../colors";
 
 MapboxGL.setAccessToken(MAPBOX_ACCESS_TOKEN);
 
+// define 3 types of map, custom, dark, light as a type
+type MapType = "custom" | "dark" | "light";
+
 interface MapProps {
   searchText: string;
   triggerAction: string;
   setTriggerAction: (action: string) => void;
   onBearingChange: (bearing: number) => void;
+  mapType: MapType;
 }
 
 const debouncedSaveDiscoveredAreas = debounce(
@@ -73,6 +77,7 @@ const Map: React.FC<MapProps> = ({
   triggerAction,
   setTriggerAction,
   onBearingChange,
+  mapType,
 }) => {
   const [userLocation, setUserLocation] = useState<[number, number] | null>(
     null
@@ -81,6 +86,16 @@ const Map: React.FC<MapProps> = ({
 
   const dispatch = useAppDispatch();
   const userData = useAppSelector((state) => state.userData);
+
+  const mapTypes = {
+    custom: "mapbox://styles/codekatabattle/cm55m9p3i003b01po2yh31h59/draft",
+    dark: "mapbox://styles/mapbox/dark-v11",
+    light: "mapbox://styles/mapbox/light-v11",
+  };
+  const [mapStyle, setMapStyle] = useState(mapTypes[mapType]);
+  useEffect(() => {
+    setMapStyle(mapTypes[mapType]);
+  }, [mapType]);
 
   useEffect(() => {
     requestUserLocation();
@@ -268,7 +283,7 @@ const Map: React.FC<MapProps> = ({
     <View className="size-full flex-1  justify-center items-center">
       <MapboxGL.MapView
         style={styles.map}
-        styleURL="mapbox://styles/codekatabattle/cm55m9p3i003b01po2yh31h59/draft"
+        styleURL={mapStyle}
         compassEnabled={false}
         scaleBarEnabled={false}
         onCameraChanged={(e) => {
@@ -353,9 +368,9 @@ const Map: React.FC<MapProps> = ({
         </MapboxGL.ShapeSource> */}
       </MapboxGL.MapView>
 
-      <View className="size-full relative items-center justify-end">
+      {/*       <View className="size-full relative items-center justify-end">
         <Button title="cl" onPress={clearDiscoveredAreas} />
-      </View>
+      </View> */}
     </View>
   );
 };

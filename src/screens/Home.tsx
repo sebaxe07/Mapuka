@@ -11,6 +11,8 @@ import { MotiView, MotiTransitionProp } from "moti";
 import Compass from "../components/Compass";
 import MaskedView from "@react-native-masked-view/masked-view";
 import NavbarBase from "../../assets/images/navbarbase.svg";
+import { colors } from "../../colors";
+import { Easing } from "react-native-reanimated";
 
 MapboxGL.setAccessToken(MAPBOX_ACCESS_TOKEN);
 
@@ -20,8 +22,26 @@ const Home: React.FC = () => {
   const [triggerAction, setTriggerAction] = useState("");
   const [bearing, setBearing] = useState(0);
 
+  const [changeTheme, setChangeTheme] = useState(false);
+
   const handleSearch = () => {
     setSearchText(text);
+  };
+
+  type MapType = "custom" | "dark" | "light";
+
+  const [mapType, setMapType] = useState<MapType>("custom");
+
+  const handleMapCustom = () => {
+    setMapType("custom");
+  };
+
+  const handleMapDark = () => {
+    setMapType("dark");
+  };
+
+  const handleMapLight = () => {
+    setMapType("light");
   };
 
   return (
@@ -32,6 +52,7 @@ const Home: React.FC = () => {
         triggerAction={triggerAction}
         setTriggerAction={setTriggerAction}
         onBearingChange={setBearing}
+        mapType={mapType}
       />
 
       {/* Search Bar */}
@@ -47,10 +68,67 @@ const Home: React.FC = () => {
             />
 
             {/* Top Right Buttons */}
-            <View className="items-end">
-              <TouchableOpacity className="bg-buttonPurple  rounded-full items-center justify-center size-14">
-                <Icons.Layers color="var(--color-text-white)" />
+            <View className="items-end gap-3">
+              <TouchableOpacity
+                className="bg-buttonPurple  rounded-full items-center justify-center size-14 z-10"
+                onPress={() => setChangeTheme(!changeTheme)}
+              >
+                <Icons.Layers color={colors.white} />
               </TouchableOpacity>
+
+              <MotiView
+                animate={{ translateY: changeTheme ? 0 : -60, scale: 0.9 }}
+                transition={
+                  {
+                    type: "timing",
+                    duration: 300,
+                    easing: Easing.linear,
+                  } as any
+                }
+              >
+                <TouchableOpacity
+                  className="bg-[#1a1b3f] rounded-full items-center justify-center size-14"
+                  onPress={handleMapCustom}
+                >
+                  <Icons.Layers color={colors.white} />
+                </TouchableOpacity>
+              </MotiView>
+
+              <MotiView
+                animate={{ translateY: changeTheme ? 0 : -120, scale: 0.9 }}
+                transition={
+                  {
+                    type: "timing",
+                    duration: 300,
+                    easing: Easing.linear,
+                  } as any
+                }
+              >
+                <TouchableOpacity
+                  className="bg-[#292929]  rounded-full items-center justify-center size-14"
+                  onPress={handleMapDark}
+                >
+                  <Icons.Layers color={colors.white} />
+                </TouchableOpacity>
+              </MotiView>
+
+              <MotiView
+                animate={{ translateY: changeTheme ? 0 : -180, scale: 0.9 }}
+                transition={
+                  {
+                    type: "timing",
+                    duration: 300,
+                    easing: Easing.linear,
+                  } as any
+                }
+              >
+                <TouchableOpacity
+                  className="bg-white  rounded-full items-center justify-center size-14"
+                  onPress={handleMapLight}
+                >
+                  <Icons.Layers color={colors.white} />
+                </TouchableOpacity>
+              </MotiView>
             </View>
           </View>
 
