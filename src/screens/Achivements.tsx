@@ -38,7 +38,7 @@ const Achievements: React.FC = () => {
     6: {
       title: "Night Owl",
       description: "Open the app for the first time after 10:00 PM.",
-      layout: "horizontal",
+      layout: "vertical",
       unlocked: false,
     },
     7: {
@@ -63,15 +63,15 @@ const Achievements: React.FC = () => {
 
   // Simulated achievement data fetched from the database
   const [achievementData, setAchievementData] = useState([
-    { id: 1, unlocked: true },
+    { id: 1, unlocked: false },
     { id: 2, unlocked: false },
-    { id: 3, unlocked: true },
-    { id: 4, unlocked: false },
-    { id: 5, unlocked: true },
+    { id: 3, unlocked: false },
+    { id: 4, unlocked: true },
+    { id: 5, unlocked: false },
     { id: 6, unlocked: false },
-    { id: 7, unlocked: true },
-    { id: 8, unlocked: false },
-    { id: 9, unlocked: true },
+    { id: 7, unlocked: false },
+    { id: 8, unlocked: true },
+    { id: 9, unlocked: false },
   ]);
 
   useEffect(() => {
@@ -87,94 +87,121 @@ const Achievements: React.FC = () => {
   }, [achievementData]);
 
   return (
-    <View className="flex-1 bg-bgMain px-5 py-5 pt-24">
-      {/* Header */}
-      <Text className="text-textWhite text-4xl font-senRegular mb-1 ml-10">
-        Achievements
-      </Text>
-
-      {/* First Group of Achievements */}
-      <View className="flex-row flex-wrap justify-between mb-4">
-        {/* 1 Row */}
-        <View className="mb-4" style={{ flex: 1, height: 150 }}>
-          <AchievementBox
-            title={achievementMetadata[1].title}
-            description={achievementMetadata[1].description}
-            unlocked={achievementMetadata[4].description}
-            layout={achievementMetadata[1].layout}
-          />
-        </View>
-        <View className="mb-4" style={{ flex: 1, height: 150 }}>
-          <AchievementBox
-            title={achievementMetadata[2].title}
-            description={achievementMetadata[2].description}
-            unlocked={achievementMetadata[4].description}
-            layout={achievementMetadata[2].layout}
-          />
-        </View>
+    <View className="bg-bgMain px-5 py-5 pt-24">
+      <View className="flex w-full my-16 justify-center items-center">
+        {/* Header */}
+        <Text className="text-textWhite text-4xl font-senRegular mb-1 ml-10">
+          Achievements
+        </Text>
       </View>
+      <View className="flex-4 h-full bg-buttonDarkRed">
+        {/* 1st Row */}
+        <View className="flex-row flex-wrap rounded-3xl justify-between mb-4 bg-buttonAqua">
+          <View
+            className="justify-center items-center flex-shrink-0"
+            style={{ flex: 2, width: "70%" }}
+          >
+            <AchievementBox
+              title={achievementMetadata[1].title}
+              description={achievementMetadata[1].description}
+              unlocked={achievementMetadata[1].unlocked}
+              layout={achievementMetadata[1].layout}
+            />
+          </View>
+          <View
+            className="justify-center items-center flex-shrink-0"
+            style={{ flex: 1, width: "30%" }}
+          >
+            <AchievementBox
+              title={achievementMetadata[2].title}
+              description={achievementMetadata[2].description}
+              unlocked={achievementMetadata[2].unlocked}
+              layout={achievementMetadata[2].layout}
+            />
+          </View>
+        </View>
 
-      {/* 2 Row */}
-      <View className="flex-row flex-wrap justify-between mb-4">
-        <View className="mb-4" style={{ flex: 2 }}>
-          <AchievementBox
-            title={achievementMetadata[3].title}
-            description={achievementMetadata[3].description}
-            unlocked={achievementMetadata[4].description}
-            layout={achievementMetadata[3].layout}
-          />
+        {/* 2nd Row */}
+        <View className="flex-row flex-wrap rounded-3xl justify-between gap-4 mb-4 bg-buttonBlue">
+          <View
+            className="justify-center items-center"
+            style={{ flex: 1, height: 150 }}
+          >
+            <AchievementBox
+              title={achievementMetadata[3].title}
+              description={achievementMetadata[3].description}
+              unlocked={achievementMetadata[3].unlocked}
+              layout={achievementMetadata[3].layout}
+            />
+          </View>
+          <View
+            className="justify-center items-center"
+            style={{ flex: 1, height: 150 }}
+          >
+            <AchievementBox
+              title={achievementMetadata[4].title}
+              description={achievementMetadata[4].description}
+              unlocked={achievementMetadata[4].unlocked}
+              layout={achievementMetadata[4].layout}
+            />
+          </View>
+          <View
+            className="justify-center items-center"
+            style={{ flex: 1, height: 150 }}
+          >
+            <AchievementBox
+              title={achievementMetadata[5].title}
+              description={achievementMetadata[5].description}
+              unlocked={achievementMetadata[5].unlocked}
+              layout={achievementMetadata[5].layout}
+            />
+          </View>
         </View>
-        <View className="mb-4" style={{ flex: 2 }}>
-          <AchievementBox
-            title={achievementMetadata[4].title}
-            description={achievementMetadata[4].description}
-            unlocked={achievementMetadata[4].unlocked}
-            layout={achievementMetadata[4].layout}
-          />
-        </View>
-        <View className="mb-4" style={{ flex: 3 }}>
-          <AchievementBox
-            title={achievementMetadata[5].title}
-            description={achievementMetadata[5].description}
-            unlocked={achievementMetadata[5].description}
-            layout={achievementMetadata[5].layout}
-          />
-        </View>
-      </View>
 
-      {/* Second Group of Achievements */}
-      <View className="flex-row flex-wrap justify-between">
-        <View className="mb-4" style={{ flex: 1, height: 150 }}>
-          <AchievementBox
-            title={achievementMetadata[6].title}
-            description={achievementMetadata[6].description}
-            unlocked={achievementMetadata[6].description}
-            layout={achievementMetadata[6].layout}
-          />
-        </View>
-        <View className="mb-4" style={{ flex: 1, height: 150 }}>
-          <AchievementBox
-            title={achievementMetadata[7].title}
-            description={achievementMetadata[7].description}
-            unlocked={achievementMetadata[7].description}
-            layout={achievementMetadata[7].layout}
-          />
-        </View>
-        <View className="mb-4" style={{ flex: 1, height: 150 }}>
-          <AchievementBox
-            title={achievementMetadata[8].title}
-            description={achievementMetadata[8].description}
-            unlocked={achievementMetadata[8].description}
-            layout={achievementMetadata[8].layout}
-          />
-        </View>
-        <View className="mb-4" style={{ flex: 1, height: 150 }}>
-          <AchievementBox
-            title={achievementMetadata[9].title}
-            description={achievementMetadata[9].description}
-            unlocked={achievementMetadata[9].description}
-            layout={achievementMetadata[9].layout}
-          />
+        {/* 3rd Row */}
+        <View className="flex-row h-[35%] rounded-3xl justify-between gap-4 bg-buttonOrange">
+          {/* Left Column */}
+          <View
+            className="justify-center items-center"
+            style={{ flex: 1, width: "33%", height: "100%" }}
+          >
+            <AchievementBox
+              title={achievementMetadata[6].title}
+              description={achievementMetadata[6].description}
+              unlocked={achievementMetadata[6].unlocked}
+              layout={achievementMetadata[6].layout}
+            />
+          </View>
+
+          {/* Right Column */}
+          <View className="flex-1 flex-col gap-4">
+            <View className="justify-center items-center " style={{ flex: 1 }}>
+              <AchievementBox
+                title={achievementMetadata[7].title}
+                description={achievementMetadata[7].description}
+                unlocked={achievementMetadata[7].unlocked}
+                layout={achievementMetadata[7].layout}
+              />
+            </View>
+            <View className="flex-row justify-between gap-4">
+              <View className="justify-center items-center" style={{ flex: 1 }}>
+                <AchievementBox
+                  title={achievementMetadata[8].title}
+                  description={achievementMetadata[8].description}
+                  unlocked={achievementMetadata[8].unlocked}
+                  layout={achievementMetadata[8].layout}
+                />
+              </View>
+              <View className="justify-center items-center" style={{ flex: 1 }}>
+                <AchievementBox
+                  title={achievementMetadata[9].title}
+                  description={achievementMetadata[9].description}
+                  unlocked={achievementMetadata[9].unlocked}
+                  layout={achievementMetadata[9].layout}
+                />
+              </View>
+            </View>
+          </View>
         </View>
       </View>
     </View>

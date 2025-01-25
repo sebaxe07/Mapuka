@@ -1,7 +1,8 @@
 import React from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import { colors } from "../../colors";
-import Holder from "../../assets/icons/bookmarks/holder.svg";
+import HolderV from "../../assets/icons/bookmarks/holder.svg";
+import HolderH from "../../assets/icons/bookmarks/holderH.svg";
 
 // Define the array of unlocked colors
 const unlockedColors = [
@@ -29,32 +30,25 @@ const AchievementBox = ({
 
   return (
     <View
-      className={`rounded-lg ${boxStyles}`}
+      className={`rounded-3xl ${boxStyles}`}
       style={{
-        backgroundColor: unlocked ? randomColor : colors.white, // Use random color if unlocked
+        backgroundColor: unlocked ? randomColor : colors.white,
       }}
     >
       {/* SVG Placeholder */}
-      <View
-        style={{
-          width: layout === "horizontal" ? "30%" : "100%",
-          height: layout === "horizontal" ? "100%" : 80,
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <Holder
-          width={layout === "horizontal" ? 40 : "70%"}
-          height={layout === "horizontal" ? "70%" : 40}
-          fill={unlocked ? colors.bodyText : colors.white} // Adjust color for the SVG
-        />
+      <View className={`flex items-center justify-center`}>
+        {layout === "horizontal" ? (
+          <HolderV width={50} height={90} preserveAspectRatio="none" />
+        ) : (
+          <HolderH width={80} height={50} preserveAspectRatio="none" />
+        )}
       </View>
 
       {/* Text Content */}
       <View
         className={`${
           layout === "horizontal" ? "flex-1" : "items-center"
-        } justify-center`}
+        } justify-center p-4`}
       >
         <Text
           className="text-bgMain font-senBold text-sm text-center"
