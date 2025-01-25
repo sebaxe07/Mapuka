@@ -25,12 +25,12 @@ const AchievementBox = ({
 
   const boxStyles =
     layout === "horizontal"
-      ? "flex-row items-center p-3 space-x-4"
-      : "flex-col items-center p-3 space-y-2";
+      ? "flex-row gap-1 px-2 py-5 "
+      : "flex-col gap-1 px-5 py-2";
 
   return (
     <View
-      className={`rounded-3xl ${boxStyles}`}
+      className={`rounded-3xl items-center  w-full ${boxStyles} `}
       style={{
         backgroundColor: unlocked ? randomColor : colors.white,
       }}
@@ -38,9 +38,9 @@ const AchievementBox = ({
       {/* SVG Placeholder */}
       <View className={`flex items-center justify-center`}>
         {layout === "horizontal" ? (
-          <HolderV width={50} height={90} preserveAspectRatio="none" />
+          <HolderV width={50} height={80} preserveAspectRatio="none" />
         ) : (
-          <HolderH width={80} height={50} preserveAspectRatio="none" />
+          <HolderH width={70} height={50} preserveAspectRatio="none" />
         )}
       </View>
 
@@ -48,15 +48,12 @@ const AchievementBox = ({
       <View
         className={`${
           layout === "horizontal" ? "flex-1" : "items-center"
-        } justify-center p-4`}
+        } justify-center p-2`}
       >
-        <Text
-          className="text-bgMain font-senBold text-sm text-center"
-          numberOfLines={1}
-        >
+        <Text className="text-bgMain font-senBold text-sm text-wrap text-center">
           {title}
         </Text>
-        <Text className="text-textBody text-xs text-center flex-wrap">
+        <Text className="text-textBody font-senRegular text-xs text-center flex-wrap">
           {description}
         </Text>
       </View>
