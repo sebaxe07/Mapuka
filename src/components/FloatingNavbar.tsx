@@ -82,7 +82,7 @@ const FloatingNavbar: React.FC = () => {
     setActiveBox(option);
     setMenuExpanded(false); // Collapse the menu
     
-    if (option === "newFavorite") {
+    if (option === "spot") {
       // Add new spot to database
       console.log("ADDING NEW SPOT");
 
@@ -97,7 +97,7 @@ const FloatingNavbar: React.FC = () => {
 
       console.log("LOCAL SPOTS AFTER ADDING: ", userData.spots);
 
-  } else if(option == "newNote") {
+  } else if(option == "note") {
       console.log("ADDING NEW NOTE");
       // TODO: UNCOMMENT WHEN THERE IS AN ACTUAL PROFILE ID IN THE STATE.
       // const profileid = userData.profile_id
