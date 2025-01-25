@@ -2,6 +2,7 @@ import React from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import Place from "../../assets/icons/bookmarks/place.svg";
 import SpotDefault from "../../assets/images/bookmarks/spotDefault.svg";
+import { colors } from "../../colors";
 
 const SpotBox: React.FC<{
   title: string;
@@ -17,31 +18,27 @@ const SpotBox: React.FC<{
     >
       {/* Left Section: SVG or Image */}
       <View className="mr-6 h-full">
-        {image ? (
-          <SpotDefault
-          /*  width="100%"
+        <SpotDefault
+        /*  width="100%"
             height="100%"
             preserveAspectRatio="xMidYMid meet" */
-          />
-        ) : (
-          <SpotDefault
-          /*  width="100%"
-            height="100%"
-            preserveAspectRatio="xMidYMid meet" */
-          />
-        )}
+        />
       </View>
 
       {/* Right Section: Content */}
       <View className="flex-1 justify-around h-auto">
         <View>
-          <Text className="text-textBody text-sm mb-1">{created_at}</Text>
-          <Text className="text-textWhite text-xl font-bold mb-2">{title}</Text>
+          <Text className="text-textBody font-senRegular text-sm mb-1">
+            {created_at}
+          </Text>
+          <Text className="text-textWhite font-senRegular text-xl font-bold mb-2">
+            {title}
+          </Text>
           <View className="flex-row items-center mb-4">
             <Place
               width={16} // Slightly larger icon
               height={16}
-              color={"--color-text-body"}
+              color={colors.bodyText}
               style={{ marginRight: 8 }} // Add space between icon and text
             />
             <Text className="text-textBody text-sm">{coordinates}</Text>
@@ -53,7 +50,7 @@ const SpotBox: React.FC<{
             className="bg-buttonOrange rounded-full items-center justify-center w-1/3 px-5 py-3"
             onPress={onPress}
           >
-            <Text className="text-white text-sm font-bold">View Spot</Text>
+            <Text className="text-white text-sm font-senBold">View Spot</Text>
           </TouchableOpacity>
         </View>
       </View>

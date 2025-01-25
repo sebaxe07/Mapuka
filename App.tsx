@@ -11,10 +11,10 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import HomeScreen from "./src/screens/Home";
 import DetailsScreen from "./src/screens/Details";
 import MapScreen from "./src/screens/Map";
-import Achivements from "./src/screens/Achivements";
+import AchivementsScreen from "./src/screens/Achivements";
 import BookmarksScreen from "./src/screens/Bookmarks";
-import Leaderboard from "./src/screens/Leaderboard";
-import Profile from "./src/screens/Profile";
+import LeaderboardScreen from "./src/screens/Leaderboard";
+import ProfileScreen from "./src/screens/Profile";
 import { BackArrow } from "./assets/icons/profile";
 import MapFog from "./src/screens/MapFog";
 import { Provider } from "react-redux";
@@ -62,7 +62,20 @@ const RootStack = createNativeStackNavigator({
         Home: HomeScreen,
         Details: DetailsScreen,
         Map: MapScreen,
-        Achivements: Achivements,
+        Achivements: {
+          options: ({ navigation }) => ({
+            headerShown: true,
+            headerTitle: "",
+            headerTransparent: true,
+            headerLeft: () => (
+              <BackArrow
+                color={colors.lightText}
+                onPress={() => navigation.goBack()}
+              />
+            ),
+          }),
+          screen: AchivementsScreen,
+        },
         Bookmarks: {
           options: ({ navigation }) => ({
             headerShown: true,
@@ -70,14 +83,14 @@ const RootStack = createNativeStackNavigator({
             headerTransparent: true,
             headerLeft: () => (
               <BackArrow
-                color="--color-text-white"
+                color={colors.lightText}
                 onPress={() => navigation.goBack()}
               />
             ),
           }),
           screen: BookmarksScreen,
         },
-        Leaderboard: Leaderboard,
+        Leaderboard: LeaderboardScreen,
         Profile: {
           options: ({ navigation }) => ({
             headerShown: true,
@@ -85,28 +98,46 @@ const RootStack = createNativeStackNavigator({
             headerTitle: "Profile",
             headerLargeTitle: true,
             headerTitleStyle: {
-              color: "#ffffff",
+              color: colors.white,
             },
             headerLargeTitleStyle: {
-              color: "#ffffff",
+              color: colors.white,
             },
             headerStyle: {
               backgroundColor: colors.background,
               shadowColor: "transparent",
             },
             headerLeft: () => (
-              <BackArrow color="#ffffff" onPress={() => navigation.goBack()} />
+              <BackArrow
+                color={colors.lightText}
+                onPress={() => navigation.goBack()}
+              />
             ),
           }),
-          screen: Profile,
+          screen: ProfileScreen,
         },
-        MapFog: MapFog,
+        /* MapFog: MapFog, */
       },
     },
     SignedOut: {
       if: useIsSignedOut,
       screens: {
-        Login: {
+        Home: HomeScreen,
+        Achivements: {
+          options: ({ navigation }) => ({
+            headerShown: true,
+            headerTitle: "",
+            headerTransparent: true,
+            headerLeft: () => (
+              <BackArrow
+                color={colors.lightText}
+                onPress={() => navigation.goBack()}
+              />
+            ),
+          }),
+          screen: AchivementsScreen,
+        },
+        /* Login: {
           options: {
             headerShown: false,
             statusBarTranslucent: true,
@@ -115,7 +146,7 @@ const RootStack = createNativeStackNavigator({
             navigationBarTranslucent: true,
           },
           screen: LoginScreen,
-        },
+        }, */
       },
     },
   },

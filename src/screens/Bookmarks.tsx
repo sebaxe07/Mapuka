@@ -113,10 +113,10 @@ const BookmarksScreen: React.FC = () => {
   return (
     <View className="flex-1 bg-bgMain px-5 py-5 pt-24">
       {/* Header */}
-      <Text className="text-textWhite text-4xl font-normal mb-1 ml-10">
+      <Text className="text-textWhite text-4xl font-senRegular mb-1 ml-10">
         Your
       </Text>
-      <Text className="text-textWhite text-4xl font-normal mb-5 ml-10">
+      <Text className="text-textWhite text-4xl font-senRegular mb-5 ml-10">
         Bookmarks
       </Text>
 
@@ -126,13 +126,13 @@ const BookmarksScreen: React.FC = () => {
           className={`flex-1 items-center py-3 rounded-full ${activeTab === "notes" ? "bg-buttonOrange" : "bg-boxContainer"}`}
           onPress={() => setActiveTab("notes")}
         >
-          <Text className="text-white font-bold">Notes</Text>
+          <Text className="text-white font-senBold">Notes</Text>
         </TouchableOpacity>
         <TouchableOpacity
           className={`flex-1 items-center py-3 rounded-full ${activeTab === "spots" ? "bg-buttonOrange" : "bg-boxContainer"}`}
           onPress={() => setActiveTab("spots")}
         >
-          <Text className="text-white font-bold">Spots</Text>
+          <Text className="text-white font-senBold">Spots</Text>
         </TouchableOpacity>
       </View>
 

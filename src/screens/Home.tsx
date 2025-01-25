@@ -9,6 +9,7 @@ import SearchBar from "../components/SearchBar";
 import Map from "./MapFog";
 import { MotiView, MotiTransitionProp } from "moti";
 import Compass from "../components/Compass";
+import { colors } from "../../colors";
 
 MapboxGL.setAccessToken(MAPBOX_ACCESS_TOKEN);
 
@@ -25,12 +26,12 @@ const Home: React.FC = () => {
   return (
     <View className="flex-1">
       {/* Full-screen Map */}
-      <Map
+      {/* <Map
         searchText={searchText}
         triggerAction={triggerAction}
         setTriggerAction={setTriggerAction}
         onBearingChange={setBearing}
-      />
+      /> */}
 
       {/* Search Bar */}
       <View className="absolute inset-0 justify-center items-center   w-full">
@@ -47,7 +48,7 @@ const Home: React.FC = () => {
             {/* Top Right Buttons */}
             <View className="items-end">
               <TouchableOpacity className="bg-buttonPurple  rounded-full items-center justify-center size-14">
-                <Icons.Layers color="var(--color-text-white)" />
+                <Icons.Layers color={colors.white} />
               </TouchableOpacity>
             </View>
           </View>
@@ -61,7 +62,7 @@ const Home: React.FC = () => {
                 className="bg-buttonAqua  rounded-full items-center justify-center size-14"
                 onPress={() => setTriggerAction("gps")}
               >
-                <Icons.Focus color="white" />
+                <Icons.Focus color={colors.white} />
               </TouchableOpacity>
 
               <Compass
