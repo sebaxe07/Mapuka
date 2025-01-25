@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, TouchableOpacity } from "react-native";
 import * as Icons from "../../assets/icons/home"; // Adjust the path based on your project structure
 import { useNavigation } from "@react-navigation/native";
 import SaveBox from "./SaveBoxModal"; // Import the ContentBox
 import NavbarBase from "../../assets/images/navbarbase.svg";
 import MaskedView from "@react-native-masked-view/masked-view";
+import { MotiView } from "moti";
 
 const FloatingNavbar: React.FC = () => {
   const [menuExpanded, setMenuExpanded] = useState(false);
@@ -65,29 +66,35 @@ const FloatingNavbar: React.FC = () => {
         className="w-16 h-16 items-center justify-center shadow-lg  absolute -top-8 left-1/2 transform -translate-x-1/2"
         onPress={() => setMenuExpanded(!menuExpanded)}
       >
-        {menuExpanded ? (
-          <Icons.Close color="white" />
-        ) : (
+        <MotiView
+          animate={{ rotate: menuExpanded ? "45deg" : "0deg" }}
+          transition={{ type: "timing", duration: 200 } as any}
+        >
           <Icons.Add color="white" />
-        )}
+        </MotiView>
       </TouchableOpacity>
       {/* Expandable Options */}
-      {menuExpanded && (
-        <View className="absolute bottom-24 self-center flex-row items-center space-x-12">
-          <TouchableOpacity
-            className="p-3 rounded-full items-center justify-center"
-            onPress={() => handleOptionSelect("note")}
-          >
-            <Icons.NewNote color="black" />
-          </TouchableOpacity>
-          <TouchableOpacity
-            className="p-3 rounded-full items-center justify-center"
-            onPress={() => handleOptionSelect("spot")}
-          >
-            <Icons.NewSpot color="black" />
-          </TouchableOpacity>
-        </View>
-      )}
+      <MotiView
+        animate={{
+          scale: menuExpanded ? 1 : 0,
+        }}
+        className="absolute bottom-24 self-center flex-row items-center space-x-12"
+      >
+        <TouchableOpacity
+          disabled={!menuExpanded}
+          className="p-3 rounded-full items-center justify-center "
+          onPress={() => handleOptionSelect("note")}
+        >
+          <Icons.NewNote color="black" />
+        </TouchableOpacity>
+        <TouchableOpacity
+          disabled={!menuExpanded}
+          className="p-3 rounded-full items-center justify-center "
+          onPress={() => handleOptionSelect("spot")}
+        >
+          <Icons.NewSpot color="black" />
+        </TouchableOpacity>
+      </MotiView>
 
       {/* Content Box */}
       {activeBox && (
