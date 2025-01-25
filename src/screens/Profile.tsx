@@ -1,6 +1,11 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, TouchableOpacity, Alert } from "react-native";
 import * as Icons from "../../assets/icons/profile/index";
+import { signOut } from "../utils/UserManagement";
+import { useAppDispatch, useAppSelector } from "../contexts/hooks";
+import { clearUserData } from "../contexts/slices/userDataSlice";
+import { useNavigation } from "@react-navigation/native";
+import { colors } from "../../colors";
 
 const Profile: React.FC = () => {
   const handleLogout = () => {
@@ -10,73 +15,142 @@ const Profile: React.FC = () => {
     ]);
   };
 
+  const dispatch = useAppDispatch();
+  const navigator = useNavigation();
+  const logOut = async () => {
+    console.log("User logged out");
+    signOut();
+    dispatch(clearUserData());
+  };
+
+  const userData = useAppSelector((state) => state.userData);
+  const [daysExplored, setDaysExplored] = useState<number>(0);
+  const [distanceExplored, setDistanceExplored] = useState<number>(0);
+  const [achievementsCount, setAchievementsCount] = useState<number>(0);
+
+  useEffect(() => {
+    // limite the distance to 2 decimal places
+    const clampedDistance = Math.floor(userData.discovered_area * 100) / 100;
+    setDistanceExplored(clampedDistance);
+
+    // Calculate the number of days since the account was created
+    const createdDate = new Date(userData.created_at);
+    const currentDate = new Date();
+    const timeDiff = Math.abs(currentDate.getTime() - createdDate.getTime());
+    const daysSinceCreation = Math.ceil(timeDiff / (1000 * 3600 * 24));
+    // Check that is not nan
+    if (!isNaN(daysSinceCreation)) {
+      setDaysExplored(daysSinceCreation);
+    } else {
+      setDaysExplored(0);
+    }
+  }, [userData]);
+
   return (
-    <View className="flex-1 bg-bgMain px-5 py-5 mt-10 justify-around">
+    <View className="flex-1 bg-bgMain px-5 py-5 pt-10 justify-around w-full ">
       {/* Main Content */}
-      <View className="flex-row h-1/2">
+      <View className="flex-row h-2/5 w-full  justify-between">
         {/* User Info Card */}
-        <View className="flex-1 bg-boxContainer rounded-xl p-4 mr-3">
+        <View className="flex-[0.55] bg-boxContainer rounded-3xl p-3 mr-3   ">
           <View className="flex-1 items-center justify-center">
-            <Icons.UserIcon color="var(--color-text-white)" />
-            <View className="mt-4 items-center">
-              <Text className="text-textWhite text-4xl font-bold">
-                Hello, Sebastian!
+            <Icons.UserIcon color={colors.lightText} />
+            <View className="mt-3 items-center gap-3">
+              <Text className="text-boxMenu text-3xl font-senSemiBold flex-wrap">
+                Hello, {userData.name}!
               </Text>
-              <Text className="text-textBody text-xl">sebaxe09@gmail.com</Text>
+              <Text className="text-textInput text-sm font-senRegular">
+                {userData.email}
+              </Text>
             </View>
           </View>
         </View>
 
         {/* Stats Section */}
-        <View className="flex-[1.2] flex-col justify-between">
-          <View className="bg-boxContainer flex-1 flex-row items-center justify-center rounded-xl px-4 py-3 mb-3">
-            <Icons.Calendar color="var(--color-button-aqua)" width={32} />
-            <View className="flex-1 ml-4">
-              <Text className="text-buttonAqua text-lg font-bold">25 days</Text>
-              <Text className="text-textBody text-xs">Of Exploring</Text>
+        <View className="flex-[0.5] flex-col  justify-between shrink-1 ">
+          {/* Calendar Section */}
+          <View className="bg-boxContainer flex-[0.3] flex-row items-center justify-center rounded-3xl px-3 py-2 shadow-md ">
+            <View className="justify-center">
+              <Icons.Calendar color="var(--color-button-aqua)" width={40} />
+            </View>
+            <View className="flex-col items-start content-center justify-center ml-2 w-24">
+              <Text className="text-buttonAqua text-lg  font-senSemiBold">
+                {daysExplored} days
+              </Text>
+              <Text className="text-textBody text-sm font-senRegular">
+                Of Exploring
+              </Text>
             </View>
           </View>
-          <View className="bg-boxContainer flex-1 flex-row items-center justify-center rounded-xl px-4 py-3 mb-3">
-            <Icons.Track color="var(--color-button-blue)" width={32} />
-            <View className="flex-1 ml-4">
-              <Text className="text-buttonBlue text-lg font-bold">100 km</Text>
-              <Text className="text-textBody text-xs">Explored</Text>
+
+          {/* Track Section */}
+          <View className="bg-boxContainer flex-[0.3] flex-row items-center justify-center rounded-3xl px-3 py-2 shadow-md mt-0.5 ">
+            <View className="justify-center">
+              <Icons.Track color="var(--color-button-blue)" width={40} />
+            </View>
+            <View className="flex-col items-start content-center justify-center ml-2  w-24">
+              <Text className="text-buttonBlue text-lg  font-senSemiBold">
+                {distanceExplored} km
+              </Text>
+              <Text className="text-textBody text-sm font-senRegular">
+                Explored
+              </Text>
             </View>
           </View>
-          <View className="bg-boxContainer flex-1 flex-row items-center justify-center rounded-xl px-4 py-3">
-            <Icons.Achivements color="var(--color-button-purple)" width={32} />
-            <View className="flex-1 ml-4">
-              <Text className="text-buttonPurple text-lg font-bold">30</Text>
-              <Text className="text-textBody text-xs">Achievements</Text>
+
+          {/* Achievements Section */}
+          <View className="bg-boxContainer flex-[0.3] flex-row items-center justify-center rounded-3xl px-3 py-2 shadow-md mt-0.5 ">
+            <View className="justify-center">
+              <Icons.Achivements
+                color="var(--color-button-purple)"
+                width={40}
+              />
+            </View>
+            <View className="flex-col items-start content-center justify-center ml-2  w-24">
+              <Text className="text-buttonPurple text-lg  font-senSemiBold">
+                {achievementsCount}%
+              </Text>
+              <Text className="text-textBody text-sm font-senRegular">
+                Achievements
+              </Text>
             </View>
           </View>
         </View>
       </View>
 
       {/* Options Section */}
-      <View className="space-y-4 mb-10">
+      <View className="space-y-4 mb-10 ">
         <TouchableOpacity className="flex-row items-center py-3 border-b border-textBody">
-          <Icons.User color="var(--color-text-white)" />
-          <Text className="text-textWhite text-base ml-4">Your info</Text>
+          <Icons.User color={colors.lightText} />
+          <Text className="text-textInput text-base ml-4 font-senRegular">
+            Your info
+          </Text>
         </TouchableOpacity>
         <TouchableOpacity className="flex-row items-center py-3 border-b border-textBody">
-          <Icons.Lock color="var(--color-text-white)" />
-          <Text className="text-textWhite text-base ml-4">Password</Text>
+          <Icons.Lock color={colors.lightText} />
+          <Text className="text-textInput text-base ml-4 font-senRegular">
+            Password
+          </Text>
         </TouchableOpacity>
         <TouchableOpacity className="flex-row items-center py-3 border-b border-textBody">
-          <Icons.Settings color="var(--color-text-white)" />
-          <Text className="text-textWhite text-base ml-4">Settings</Text>
+          <Icons.Settings color={colors.lightText} />
+          <Text className="text-textInput text-base ml-4 font-senRegular">
+            Settings
+          </Text>
         </TouchableOpacity>
       </View>
 
       {/* Logout Button */}
-      <TouchableOpacity
-        className="flex-row items-center py-3 rounded-lg justify-center"
-        onPress={handleLogout}
-      >
-        <Icons.LogOut color="var(--color-text-white)" />
-        <Text className="text-textWhite text-base ml-2">Log out</Text>
-      </TouchableOpacity>
+      <View className="flex-row items-start py-3 rounded-lg justify-start ">
+        <TouchableOpacity
+          className="flex-row items-center py-3 rounded-lg justify-center "
+          onPress={logOut}
+        >
+          <Icons.LogOut color={colors.lightText} />
+          <Text className="text-textInput text-base ml-2 font-senRegular">
+            Log out
+          </Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };

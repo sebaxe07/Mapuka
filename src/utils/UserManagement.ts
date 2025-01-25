@@ -3,6 +3,7 @@ import { supabase } from "./supabase";
 import { useAppDispatch } from "../contexts/hooks";
 import { setUserData, clearUserData } from "../contexts/slices/userDataSlice";
 import { Feature, Polygon, MultiPolygon, GeoJsonProperties } from "geojson";
+import { AuthError, PostgrestError } from "@supabase/supabase-js";
 
 interface signInWithEmailProps {
   email: string;
@@ -14,18 +15,16 @@ export async function signInWithEmail({
   email,
   password,
   dispatch,
-}: signInWithEmailProps): Promise<void> {
+}: signInWithEmailProps): Promise<
+  void | AuthError | PostgrestError | null | unknown
+> {
   const { data, error } = await supabase.auth.signInWithPassword({
     email: email,
     password: password,
   });
 
   if (error) {
-    Alert.alert(error.message);
-    console.error("Error sign message", error.message);
-    console.error("Error sign error", error);
-
-    return;
+    return error;
   }
   console.log(JSON.stringify(data, null, 2));
 
@@ -38,8 +37,7 @@ export async function signInWithEmail({
       .single();
 
     if (error) {
-      console.error("Error fetching profiles:", error.message);
-      return;
+      return error;
     }
     console.log("profiles", profiles);
 
@@ -64,14 +62,17 @@ export async function signInWithEmail({
         discovered_area: profiles?.discovered_area ?? 0,
         discovered_polygon: discoveredPolygon,
         achievements: profiles?.achievements ?? "",
+        created_at: profiles?.created_at ?? "",
         notes: profiles?.notes ?? [],
         spots: profiles?.spots ?? [],
       })
     );
 
-    console.log("Setting data");
+    // return confirmation of successful login
+    return;
   } catch (error) {
-    console.error("Error fetching todos:", (error as any).message);
+    console.error("Error fetching data:", (error as any).message);
+    return error;
   }
 }
 
@@ -100,7 +101,9 @@ export async function signUpUser({
   name,
   lastname,
   dispatch,
-}: SignUpUserProps): Promise<void> {
+}: SignUpUserProps): Promise<
+  void | AuthError | PostgrestError | null | unknown
+> {
   const { data, error } = await supabase.auth.signUp({
     email: email,
     password: password,
@@ -113,13 +116,12 @@ export async function signUpUser({
   });
 
   if (error) {
-    Alert.alert(error.message);
-    return;
+    return error;
   }
 
   if (data) {
-    signInWithEmail({ email, password, dispatch });
     console.log("User created");
     console.log(data);
+    return;
   }
 }

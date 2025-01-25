@@ -17,10 +17,10 @@ const SearchBar: React.FC<SearchBarProps> = ({
   onPress,
 }) => {
   return (
-    <View className="absolute w-full top-14 mx-5 bg-white rounded-3xl shadow-lg flex-row items-center justify-center p-4">
+    <View className="bg-boxMenu rounded-2xl shadow-lg flex-row items-center justify-center p-4 mx-4">
       <Search color="#aaa" />
       <TextInput
-        className="ml-2 flex-1 text-black"
+        className="ml-2 flex-1 text-black font-senRegular"
         placeholder={placeholder}
         placeholderTextColor="#aaa"
         value={value}

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, TouchableOpacity } from "react-native";
 import * as Icons from "../../assets/icons/home"; // Adjust the path based on your project structure
 import { useNavigation } from "@react-navigation/native";
@@ -8,10 +8,10 @@ import { supabase } from "../utils/supabase";
 import { useAppDispatch, useAppSelector } from "../contexts/hooks";
 import { Note, setNotes, setSpots, Spot } from "../contexts/slices/userDataSlice";
 
-
-interface FloatingNavbarProps {
-  onOptionSelect?: (option: string) => void;
-}
+import SaveBox from "./SaveBoxModal"; // Import the ContentBox
+import NavbarBase from "../../assets/images/navbarbase.svg";
+import MaskedView from "@react-native-masked-view/masked-view";
+import { MotiView } from "moti";
 
 const addSpot = async(profileid: String, coordinates: number, title: String, dispatch: any, currentSpots: Spot[]) => {
   console.log('Adding spot:', { profileid, coordinates, title });
@@ -71,15 +71,16 @@ const addNote = async(
     dispatch(setNotes([...currentNotes, ...data]));
 }
 
-const FloatingNavbar: React.FC<FloatingNavbarProps> = ({ onOptionSelect }) => {
+const FloatingNavbar: React.FC = () => {
   const [menuExpanded, setMenuExpanded] = useState(false);
+  const [activeBox, setActiveBox] = useState<"note" | "spot" | null>(null);
   const navigation = useNavigation();
   const userData = useAppSelector((state) => state.userData);
   const dispatch = useAppDispatch();
 
-  const handleOptionSelect = (option: string) => {
-    onOptionSelect?.(option);
-    setMenuExpanded(false); // Collapse the menu after selection
+  const handleOptionSelect = (option: "note" | "spot") => {
+    setActiveBox(option);
+    setMenuExpanded(false); // Collapse the menu
     
     if (option === "newFavorite") {
       // Add new spot to database
@@ -111,68 +112,89 @@ const FloatingNavbar: React.FC<FloatingNavbarProps> = ({ onOptionSelect }) => {
 }
 
   return (
-    <>
+    <View className="  justify-center items-center ">
       {/* Main Navbar */}
-      <View className="absolute bottom-11 self-center w-10/12 h-16 bg-boxContainer rounded-3xl shadow-lg flex-row items-center justify-around px-4">
-        {/* Left Buttons */}
-        <TouchableOpacity
-          className="flex-1 items-center justify-center"
-          onPress={() => navigation.navigate("Achivements")}
-        >
-          <Icons.Achivements color="black" />
-        </TouchableOpacity>
-        <TouchableOpacity
-          className="flex-1 items-center justify-center"
-          onPress={() => navigation.navigate("Leaderboard")}
-        >
-          <Icons.Leaderboard color="black" />
-        </TouchableOpacity>
+      <MaskedView
+        style={{ width: "auto" }}
+        maskElement={
+          <View className="flex items-center justify-center">
+            <NavbarBase />
+          </View>
+        }
+      >
+        {/* The background content (colored rectangle) */}
 
-        {/* Middle Button */}
-        <TouchableOpacity
-          className="w-16 h-16 items-center justify-center shadow-lg -mt-16"
-          onPress={() => setMenuExpanded(!menuExpanded)}
-        >
-          {menuExpanded ? (
-            <Icons.Close color="white" />
-          ) : (
-            <Icons.Add color="white" />
-          )}
-        </TouchableOpacity>
-
-        {/* Right Buttons */}
-        <TouchableOpacity
-          className="flex-1 items-center justify-center"
-          onPress={() => navigation.navigate("Bookmarks")}
-        >
-          <Icons.Favorites color="black" />
-        </TouchableOpacity>
-        <TouchableOpacity
-          className="flex-1 items-center justify-center"
-          onPress={() => navigation.navigate("Profile")}
-        >
-          <Icons.Profile color="black" />
-        </TouchableOpacity>
-      </View>
-
-      {/* Expandable Options */}
-      {menuExpanded && (
-        <View className="absolute bottom-32 self-center flex-row items-center space-x-12">
+        <View className="self-center mx-4 h-[4.5rem] bg-boxMenu rounded-3xl shadow-lg flex-row items-center justify-around<">
+          {/* Left Buttons */}
           <TouchableOpacity
-            className="p-3 rounded-full items-center justify-center"
-            onPress={() => handleOptionSelect("newFavorite")}
+            className="flex-1 items-center justify-center"
+            onPress={() => navigation.navigate("Achivements")}
           >
-            <Icons.NewFavorite color="black" />
+            <Icons.Achivements color="black" />
           </TouchableOpacity>
           <TouchableOpacity
-            className="p-3 rounded-full items-center justify-center"
-            onPress={() => handleOptionSelect("newNote")}
+            className="flex-1 items-center justify-center"
+            onPress={() => navigation.navigate("Leaderboard")}
           >
-            <Icons.NewNote color="black" />
+            <Icons.Leaderboard color="black" />
+          </TouchableOpacity>
+          <View className="size-20" />
+          {/* Right Buttons */}
+          <TouchableOpacity
+            className="flex-1 items-center justify-center"
+            onPress={() => navigation.navigate("Bookmarks")}
+          >
+            <Icons.Favorites color="black" />
+          </TouchableOpacity>
+          <TouchableOpacity
+            className="flex-1 items-center justify-center"
+            onPress={() => navigation.navigate("Profile")}
+          >
+            <Icons.Profile color="black" />
           </TouchableOpacity>
         </View>
+      </MaskedView>
+
+      {/* Middle Button */}
+      <TouchableOpacity
+        className="w-16 h-16 items-center justify-center shadow-lg  absolute -top-8 left-1/2 transform -translate-x-1/2"
+        onPress={() => setMenuExpanded(!menuExpanded)}
+      >
+        <MotiView
+          animate={{ rotate: menuExpanded ? "45deg" : "0deg" }}
+          transition={{ type: "timing", duration: 200 } as any}
+        >
+          <Icons.Add color="white" />
+        </MotiView>
+      </TouchableOpacity>
+      {/* Expandable Options */}
+      <MotiView
+        animate={{
+          scale: menuExpanded ? 1 : 0,
+        }}
+        className="absolute bottom-24 self-center flex-row items-center space-x-12"
+      >
+        <TouchableOpacity
+          disabled={!menuExpanded}
+          className="p-3 rounded-full items-center justify-center "
+          onPress={() => handleOptionSelect("note")}
+        >
+          <Icons.NewNote color="black" />
+        </TouchableOpacity>
+        <TouchableOpacity
+          disabled={!menuExpanded}
+          className="p-3 rounded-full items-center justify-center "
+          onPress={() => handleOptionSelect("spot")}
+        >
+          <Icons.NewSpot color="black" />
+        </TouchableOpacity>
+      </MotiView>
+
+      {/* Content Box */}
+      {activeBox && (
+        <SaveBox type={activeBox} onClose={() => setActiveBox(null)} />
       )}
-    </>
+    </View>
   );
 };
 

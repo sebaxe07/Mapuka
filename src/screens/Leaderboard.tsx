@@ -9,11 +9,7 @@ const Leaderboard: React.FC<DetailsProps> = ({}) => {
   const navigation = useNavigation();
 
   return (
-    <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-      <Text>Details Screen</Text>
-
-      <Button onPress={() => navigation.goBack()}>Go back</Button>
-    </View>
+    <View className="flex-1 bg-bgMain px-5 py-5 pt-10 justify-around"></View>
   );
 };
 

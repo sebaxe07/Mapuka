@@ -38,6 +38,7 @@ export interface UserDataState {
   discovered_area: number;
   discovered_polygon: Feature<Polygon | MultiPolygon, GeoJsonProperties> | null;
   achievements: string;
+  created_at: string;
   notes: Note[];
   spots: Spot[];
 }
@@ -53,6 +54,7 @@ const initialState = {
   discovered_area: 0,
   discovered_polygon: null,
   achievements: "",
+  created_at: "",
   notes: [],
   spots: [],
 } as UserDataState;
@@ -110,6 +112,7 @@ export const userDataSlice = createSlice({
       state.discovered_area = action.payload.discovered_area;
       state.discovered_polygon = action.payload.discovered_polygon;
       state.achievements = action.payload.achievements;
+      state.created_at = action.payload.created_at;
       state.notes = action.payload.notes;
       state.spots = action.payload.spots;
     },
