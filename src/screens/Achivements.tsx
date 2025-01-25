@@ -86,7 +86,7 @@ const Achievements: React.FC = () => {
     setAchievementMetadata(updatedMetadata);
   }, [achievementData]);
 
-  const debugFlexbox = true;
+  const debugFlexbox = false;
 
   return (
     <View className="bg-bgMain px-5 py-5 pt-24">
@@ -96,7 +96,9 @@ const Achievements: React.FC = () => {
           Achievements
         </Text>
       </View>
-      <View className="flex-4 h-full bg-buttonDarkRed gap-3">
+      <View
+        className={`flex-4 h-full gap-3 ${debugFlexbox ? "bg-buttonDarkRed" : ""}`}
+      >
         {/* 1st Row */}
         <View
           className={`flex-row flex-wrap rounded-3xl gap-3 justify-between ${debugFlexbox ? "bg-buttonAqua" : ""}`}

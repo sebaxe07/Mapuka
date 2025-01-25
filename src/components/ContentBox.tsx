@@ -13,7 +13,14 @@ const unlockedColors = [
   "#9C65E8", // Purple
 ];
 
-const AchievementBox = ({
+interface AchievementBoxProps {
+  title: string;
+  description: string;
+  unlocked: boolean;
+  layout?: "vertical" | "horizontal";
+}
+
+const AchievementBox: React.FC<AchievementBoxProps> = ({
   title,
   description,
   unlocked,
@@ -47,8 +54,10 @@ const AchievementBox = ({
       {/* Text Content */}
       <View
         className={`${
-          layout === "horizontal" ? "flex-1" : "items-center"
-        } justify-center p-2`}
+          layout === "horizontal"
+            ? "flex-1 gap-2 px-4 py-3"
+            : "items-center py-2"
+        } justify-center`}
       >
         <Text className="text-bgMain font-senBold text-sm text-wrap text-center">
           {title}

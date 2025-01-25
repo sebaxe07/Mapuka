@@ -98,10 +98,10 @@ const RootStack = createNativeStackNavigator({
             headerTitle: "Profile",
             headerLargeTitle: true,
             headerTitleStyle: {
-              color: colors.white,
+              color: colors.lightText,
             },
             headerLargeTitleStyle: {
-              color: colors.white,
+              color: colors.lightText,
             },
             headerStyle: {
               backgroundColor: colors.background,
@@ -122,7 +122,7 @@ const RootStack = createNativeStackNavigator({
     SignedOut: {
       if: useIsSignedOut,
       screens: {
-        Home: HomeScreen,
+        /*  Home: HomeScreen,
         Achivements: {
           options: ({ navigation }) => ({
             headerShown: true,
@@ -136,8 +136,8 @@ const RootStack = createNativeStackNavigator({
             ),
           }),
           screen: AchivementsScreen,
-        },
-        /* Login: {
+        }, */
+        Login: {
           options: {
             headerShown: false,
             statusBarTranslucent: true,
@@ -146,7 +146,7 @@ const RootStack = createNativeStackNavigator({
             navigationBarTranslucent: true,
           },
           screen: LoginScreen,
-        }, */
+        },
       },
     },
   },
