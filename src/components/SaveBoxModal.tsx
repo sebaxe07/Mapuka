@@ -61,8 +61,7 @@ const SaveBox: React.FC<SaveBoxProps> = ({ type, onClose, coordinates }) => {
       onClose(); // Close the modal after saving
 
     } else if (type == "note") {
-      const image_url = "https://source.unsplash.com/random/800x600";
-      console.log('Adding spot:', { title, description, coordinates, address, image_url, profileid});
+      console.log('Adding spot:', { title, description, coordinates, address, profileid});
   
       // Add note to database
       const { data, error } = await supabase
@@ -74,7 +73,6 @@ const SaveBox: React.FC<SaveBoxProps> = ({ type, onClose, coordinates }) => {
             address: address,
             title: title,
             content: description,
-            image_url: image_url
           }
         ])
         .select();
