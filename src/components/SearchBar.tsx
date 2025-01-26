@@ -20,7 +20,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
     <View className="bg-boxMenu rounded-2xl shadow-lg flex-row items-center justify-center p-4 mx-4">
       <Search color="#aaa" />
       <TextInput
-        className="ml-2 flex-1 text-black font-senRegular"
+        className="ml-2 flex-1 text-bgMain font-senRegular"
         placeholder={placeholder}
         placeholderTextColor="#aaa"
         value={value}

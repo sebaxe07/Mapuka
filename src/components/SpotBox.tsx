@@ -31,7 +31,7 @@ const SpotBox: React.FC<{
           <Text className="text-textBody font-senRegular text-sm mb-1">
             {created_at}
           </Text>
-          <Text className="text-textWhite font-senRegular text-xl font-bold mb-2">
+          <Text className="text-textWhite font-senMedium text-xl font-bold mb-2">
             {title}
           </Text>
           <View className="flex-row items-center mb-4">
@@ -41,13 +41,15 @@ const SpotBox: React.FC<{
               color={colors.bodyText}
               style={{ marginRight: 8 }} // Add space between icon and text
             />
-            <Text className="text-textBody text-sm">{coordinates}</Text>
+            <Text className="text-textBody font-senRegular text-sm">
+              {coordinates}
+            </Text>
           </View>
         </View>
 
-        <View>
+        <View className="flex-row justify-between w-full">
           <TouchableOpacity
-            className="bg-buttonOrange rounded-full items-center justify-center w-1/3 px-5 py-3"
+            className="bg-buttonOrange rounded-3xl items-center justify-center w-2/3 px-5 py-3"
             onPress={onPress}
           >
             <Text className="text-white text-sm font-senBold">View Spot</Text>

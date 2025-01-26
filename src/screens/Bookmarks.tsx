@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { View, Text, TouchableOpacity, ScrollView } from "react-native";
 import NoteBox from "../components/NoteBox";
 import SpotBox from "../components/SpotBox";
+import { useNavigation } from "@react-navigation/native";
 
 const BookmarksScreen: React.FC = () => {
   const [activeTab, setActiveTab] = useState("notes");
@@ -105,62 +106,75 @@ const BookmarksScreen: React.FC = () => {
     },
   ];
 
+  const navigation = useNavigation();
+
   const tabs = [
     { key: "notes", label: "Notes" },
     { key: "spots", label: "Spots" },
   ];
 
+  const goToDetails = (type: "note" | "spot", itemId: number) => {
+    if (type === "note") {
+      navigation.navigate("NoteDetails", { itemId });
+    } else {
+      navigation.navigate("Home");
+    }
+  };
+
   return (
-    <View className="flex-1 bg-bgMain px-5 py-5 pt-24">
+    <View className="flex-1 bg-bgMain h-full px-5 pb-10 ">
       {/* Header */}
-      <Text className="text-textWhite text-4xl font-senRegular mb-1 ml-10">
-        Your
-      </Text>
-      <Text className="text-textWhite text-4xl font-senRegular mb-5 ml-10">
-        Bookmarks
-      </Text>
-
-      {/* Tabs */}
-      <View className="flex-row mb-5 space-x-2">
-        <TouchableOpacity
-          className={`flex-1 items-center py-3 rounded-full ${activeTab === "notes" ? "bg-buttonOrange" : "bg-boxContainer"}`}
-          onPress={() => setActiveTab("notes")}
-        >
-          <Text className="text-white font-senBold">Notes</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          className={`flex-1 items-center py-3 rounded-full ${activeTab === "spots" ? "bg-buttonOrange" : "bg-boxContainer"}`}
-          onPress={() => setActiveTab("spots")}
-        >
-          <Text className="text-white font-senBold">Spots</Text>
-        </TouchableOpacity>
+      <View className="flex w-full my-14 justify-center items-start">
+        <Text className="text-textWhite text-4xl font-senMedium mb-1 ml-10">
+          Your
+        </Text>
+        <Text className="text-textWhite text-4xl font-senMedium mb-5 ml-10">
+          Bookmarks
+        </Text>
       </View>
+      <View className={`flex-1 h-3/4 gap-3 `}>
+        {/* Tabs */}
+        <View className="flex-row mb-5 space-x-2">
+          <TouchableOpacity
+            className={`flex-1 items-center py-3 rounded-full ${activeTab === "notes" ? "bg-buttonOrange" : "bg-boxContainer"}`}
+            onPress={() => setActiveTab("notes")}
+          >
+            <Text className="text-white font-senBold">Notes</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            className={`flex-1 items-center py-3 rounded-full ${activeTab === "spots" ? "bg-buttonOrange" : "bg-boxContainer"}`}
+            onPress={() => setActiveTab("spots")}
+          >
+            <Text className="text-white font-senBold">Spots</Text>
+          </TouchableOpacity>
+        </View>
 
-      {/* Content */}
-      <ScrollView showsVerticalScrollIndicator={false}>
-        {activeTab === "notes" &&
-          notesData.map((note) => (
-            <NoteBox
-              key={note.id}
-              title={note.title}
-              date={note.date}
-              address={note.address}
-              styleVariant={note.styleVariant}
-              onPress={() => console.log("Open Note")}
-            />
-          ))}
-        {activeTab === "spots" &&
-          spotsData.map((spot) => (
-            <SpotBox
-              key={spot.id}
-              image={spot.image}
-              title={spot.title}
-              date={spot.date}
-              address={spot.address}
-              onPress={() => console.log("View Spot")}
-            />
-          ))}
-      </ScrollView>
+        {/* Content */}
+        <ScrollView showsVerticalScrollIndicator={false}>
+          {activeTab === "notes" &&
+            notesData.map((note) => (
+              <NoteBox
+                key={note.id}
+                title={note.title}
+                date={note.date}
+                address={note.address}
+                styleVariant={note.styleVariant}
+                onPress={() => goToDetails("note", note.id)}
+              />
+            ))}
+          {activeTab === "spots" &&
+            spotsData.map((spot) => (
+              <SpotBox
+                key={spot.id}
+                image={spot.image}
+                title={spot.title}
+                date={spot.date}
+                address={spot.address}
+                onPress={() => goToDetails("spot", spot.id)}
+              />
+            ))}
+        </ScrollView>
+      </View>
     </View>
   );
 };
