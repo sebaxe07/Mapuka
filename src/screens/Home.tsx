@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { View, TouchableOpacity, Alert } from "react-native";
 import MapboxGL from "@rnmapbox/maps";
 import * as Icons from "../../assets/icons/home";
@@ -48,6 +48,73 @@ const Home: React.FC = () => {
     setMapType("light");
   };
 
+  const memoizedTheme = useMemo(
+    () => (
+      <>
+        <MotiView
+          animate={{ translateY: changeTheme ? 0 : -60, scale: 0.9 }}
+          transition={
+            {
+              type: "timing",
+              duration: 300,
+              easing: Easing.linear,
+            } as any
+          }
+        >
+          <TouchableOpacity
+            className="bg-[#1a1b3f] rounded-full items-center justify-center size-14"
+            onPress={handleMapCustom}
+          >
+            <Icons.Layers color={colors.white} />
+          </TouchableOpacity>
+        </MotiView>
+        <MotiView
+          animate={{ translateY: changeTheme ? 0 : -120, scale: 0.9 }}
+          transition={
+            {
+              type: "timing",
+              duration: 300,
+              easing: Easing.linear,
+            } as any
+          }
+        >
+          <TouchableOpacity
+            className="bg-[#292929]  rounded-full items-center justify-center size-14"
+            onPress={handleMapDark}
+          >
+            <Icons.Layers color={colors.white} />
+          </TouchableOpacity>
+        </MotiView>
+
+        <MotiView
+          animate={{ translateY: changeTheme ? 0 : -180, scale: 0.9 }}
+          transition={
+            {
+              type: "timing",
+              duration: 300,
+              easing: Easing.linear,
+            } as any
+          }
+        >
+          <TouchableOpacity
+            className="bg-white  rounded-full items-center justify-center size-14"
+            onPress={handleMapLight}
+          >
+            <Icons.Layers color={colors.white} />
+          </TouchableOpacity>
+        </MotiView>
+      </>
+    ),
+    [changeTheme]
+  );
+
+  const memoizedCompass = useMemo(
+    () => (
+      <Compass bearing={bearing} onPress={() => setTriggerAction("north")} />
+    ),
+    [bearing]
+  );
+
   return (
     <View className="flex-1">
       {/* Full-screen Map */}
@@ -81,59 +148,10 @@ const Home: React.FC = () => {
                 <Icons.Layers color={colors.white} />
               </TouchableOpacity>
 
-              <MotiView
-                animate={{ translateY: changeTheme ? 0 : -60, scale: 0.9 }}
-                transition={
-                  {
-                    type: "timing",
-                    duration: 300,
-                    easing: Easing.linear,
-                  } as any
-                }
-              >
-                <TouchableOpacity
-                  className="bg-[#1a1b3f] rounded-full items-center justify-center size-14"
-                  onPress={handleMapCustom}
-                >
-                  <Icons.Layers color={colors.white} />
-                </TouchableOpacity>
-              </MotiView>
+              {memoizedTheme}
 
-              <MotiView
-                animate={{ translateY: changeTheme ? 0 : -120, scale: 0.9 }}
-                transition={
-                  {
-                    type: "timing",
-                    duration: 300,
-                    easing: Easing.linear,
-                  } as any
-                }
-              >
-                <TouchableOpacity
-                  className="bg-[#292929]  rounded-full items-center justify-center size-14"
-                  onPress={handleMapDark}
-                >
-                  <Icons.Layers color={colors.white} />
-                </TouchableOpacity>
-              </MotiView>
-
-              <MotiView
-                animate={{ translateY: changeTheme ? 0 : -180, scale: 0.9 }}
-                transition={
-                  {
-                    type: "timing",
-                    duration: 300,
-                    easing: Easing.linear,
-                  } as any
-                }
-              >
-                <TouchableOpacity
-                  className="bg-white  rounded-full items-center justify-center size-14"
-                  onPress={handleMapLight}
-                >
-                  <Icons.Layers color={colors.white} />
-                </TouchableOpacity>
-              </MotiView>
+              {/*
+               */}
             </View>
           </View>
 
@@ -149,10 +167,7 @@ const Home: React.FC = () => {
                 <Icons.Focus color="white" />
               </TouchableOpacity>
 
-              {/* <Compass
-                bearing={bearing}
-                onPress={() => setTriggerAction("north")}
-              /> */}
+              {memoizedCompass}
             </View>
 
             {/* Bottom Floating Menu */}

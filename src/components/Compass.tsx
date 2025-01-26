@@ -1,13 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo } from "react";
 import { TouchableOpacity } from "react-native";
-import { MotiView } from "moti";
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withTiming,
-  Easing,
-} from "react-native-reanimated";
+import { MotiView, useAnimationState } from "moti";
 import * as Icons from "../../assets/icons/home";
+import { Easing } from "react-native-reanimated";
 
 interface CompassProps {
   bearing: number;
@@ -18,30 +13,45 @@ const Compass = ({ bearing, onPress }: CompassProps) => {
   // Offset to adjust for the icon misalignment (tweak as needed)
   const BEARING_OFFSET = -35; // Adjust this value to fine-tune alignment
 
-  // Shared value to store the compass rotation angle
-  const rotation = useSharedValue(0);
+  // Define animation states
+  const animationState = useAnimationState({
+    from: {
+      rotate: `${BEARING_OFFSET}deg`,
+    },
+    to: {
+      rotate: `${-bearing + BEARING_OFFSET}deg`,
+    },
+  });
 
-  // Update rotation with the adjusted offset
+  // Throttle the bearing updates
   useEffect(() => {
-    rotation.value = withTiming(-bearing + BEARING_OFFSET, {
-      duration: 0, // Reduce duration for quicker response
-      easing: Easing.linear,
-    });
+    animationState.transitionTo("to");
   }, [bearing]);
 
-  // Animated style for rotating the compass
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ rotate: `${rotation.value}deg` }],
-  }));
+  const memoizedMotiView = useMemo(
+    () => (
+      <MotiView
+        state={animationState}
+        transition={
+          {
+            type: "timing",
+            duration: 0,
+            easing: Easing.linear,
+          } as any
+        }
+      >
+        <Icons.Compass color="white" />
+      </MotiView>
+    ),
+    [animationState]
+  );
 
   return (
     <TouchableOpacity
       className="bg-buttonBlue rounded-full items-center justify-center size-14"
       onPress={onPress}
     >
-      <Animated.View style={animatedStyle}>
-        <Icons.Compass color="white" />
-      </Animated.View>
+      {memoizedMotiView}
     </TouchableOpacity>
   );
 };
