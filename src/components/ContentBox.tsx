@@ -73,7 +73,7 @@ const ContentBox: React.FC<ContentBoxProps> = ({
       case "2":
         return colors.orange;
       case "3":
-        return colors.accentRed;
+        return colors.darkRed;
       default:
         return colors.lightText;
     }
@@ -83,9 +83,9 @@ const ContentBox: React.FC<ContentBoxProps> = ({
     <>
       {category === "achivement" ? (
         <View
-          className={`rounded-3xl items-center  w-full ${boxStyles} `}
+          className={`rounded-3xl items-center  w-full h-full ${boxStyles} `}
           style={{
-            backgroundColor: unlocked ? randomColor : colors.white,
+            backgroundColor: unlocked ? randomColor : colors.menus,
           }}
         >
           {/* SVG Placeholder */}
@@ -115,7 +115,7 @@ const ContentBox: React.FC<ContentBoxProps> = ({
         </View>
       ) : (
         <View
-          className={`rounded-3xl items-center  w-full ${boxStyles} `}
+          className={`rounded-3xl items-center  w-full h-full ${boxStyles} `}
           style={{
             backgroundColor: renderColor(top),
           }}

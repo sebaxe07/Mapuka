@@ -54,57 +54,53 @@ const Leaderboard: React.FC<DetailsProps> = ({}) => {
   const debugFlexbox = false;
 
   return (
-    <View className="bg-bgMain px-5 py-2 pt-24">
-      <View className="flex w-full my-16 justify-center items-center">
+    <View className="bg-bgMain px-5 pb-10  h-full">
+      <View className="flex w-full my-16 justify-center items-center ">
         {/* Header */}
-        <Text className="text-textWhite text-4xl font-senRegular mb-1 ml-10">
+        <Text className="text-textWhite text-4xl font-senMedium mb-1 ml-10">
           Leaderboard
         </Text>
       </View>
       <View
-        className={`flex-4 h-full gap-6 ${debugFlexbox ? "bg-buttonDarkRed" : ""}`}
+        className={`flex-4 h-3/4  gap-3 ${debugFlexbox ? "bg-buttonDarkRed" : ""}`}
       >
         <View
-          className={`flex-row h-[35%] w-full rounded-3xl justify-around gap-3 ${debugFlexbox ? "bg-buttonPurple" : ""}`}
+          className={`flex-col flex-[66%] h-[35%] w-full rounded-3xl justify-around gap-3 ${debugFlexbox ? "bg-buttonPurple" : ""}`}
         >
-          <View
-            className="flex-col justify-center "
-            style={{ flex: 1, height: "100%" }}
-          >
-            <View className="justify-center items-center" style={{ flex: 1 }}>
+          <View className="justify-center items-center" style={{ flex: 1 }}>
+            <ContentBox
+              category="leaderboard"
+              top="1"
+              title={achievementMetadata[1].user}
+              description={achievementMetadata[1].distance}
+              layout={achievementMetadata[1].layout}
+            />
+          </View>
+
+          <View className="flex-row flex-1 justify-center gap-3">
+            <View className="justify-center items-center flex-[55%]">
               <ContentBox
                 category="leaderboard"
-                top="1"
-                title={achievementMetadata[1].user}
-                description={achievementMetadata[1].distance}
-                layout={achievementMetadata[1].layout}
+                top="2"
+                title={achievementMetadata[2].user}
+                description={achievementMetadata[2].distance}
+                layout={achievementMetadata[2].layout}
               />
             </View>
-
-            <View className="flex-row justify-center gap-3" style={{ flex: 1 }}>
-              <View className="justify-center items-center" style={{ flex: 1 }}>
-                <ContentBox
-                  category="leaderboard"
-                  top="2"
-                  title={achievementMetadata[2].user}
-                  description={achievementMetadata[2].distance}
-                  layout={achievementMetadata[2].layout}
-                />
-              </View>
-              <View className="justify-center items-center" style={{ flex: 1 }}>
-                <ContentBox
-                  category="leaderboard"
-                  top="3"
-                  title={achievementMetadata[3].user}
-                  description={achievementMetadata[3].distance}
-                  layout={achievementMetadata[3].layout}
-                />
-              </View>
+            <View className="justify-center items-center flex-[45%]">
+              <ContentBox
+                category="leaderboard"
+                top="3"
+                title={achievementMetadata[3].user}
+                description={achievementMetadata[3].distance}
+                layout={achievementMetadata[3].layout}
+              />
             </View>
           </View>
         </View>
+
         <View
-          className={`flex-row flex-wrap rounded-3xl justify-between gap-3 ${debugFlexbox ? "bg-buttonBlue" : ""}`}
+          className={`flex-row flex-[33%] rounded-3xl justify-between items-center gap-3 ${debugFlexbox ? "bg-buttonBlue" : ""}`}
         >
           <View className="justify-center items-center" style={{ flex: 1 }}>
             <ContentBox

@@ -98,82 +98,77 @@ const Achievements: React.FC = () => {
   const debugFlexbox = false;
 
   return (
-    <View className="bg-bgMain px-5 py-5 pt-24">
+    <View className="bg-bgMain px-5  pb-10 h-full">
       <View className="flex w-full my-16 justify-center items-center">
         {/* Header */}
-        <Text className="text-textWhite text-4xl font-senRegular mb-1 ml-10">
+        <Text className="text-textWhite text-4xl font-senMedium mb-1 ml-10">
           Achievements
         </Text>
       </View>
       <View
-        className={`flex-4 h-full gap-3 ${debugFlexbox ? "bg-buttonDarkRed" : ""}`}
+        className={`flex-4 h-3/4 gap-3 ${debugFlexbox ? "bg-buttonDarkRed" : ""}`}
       >
-        {/* 1st Row */}
-        <View
-          className={`flex-row flex-wrap rounded-3xl gap-3 justify-between ${debugFlexbox ? "bg-buttonAqua" : ""}`}
-        >
+        <View className="flex-1 gap-3">
+          {/* 1st Row */}
           <View
-            className="justify-center items-center"
-            style={{ flex: 2, width: "60%" }}
+            className={`flex-row flex-1 rounded-3xl gap-3 justify-between ${debugFlexbox ? "bg-buttonAqua" : ""}`}
           >
-            <ContentBox
-              category="achivement"
-              title={achievementMetadata[1].title}
-              description={achievementMetadata[1].description}
-              unlocked={achievementMetadata[1].unlocked}
-              layout={achievementMetadata[1].layout}
-            />
+            <View className="justify-center items-center flex-[60%]">
+              <ContentBox
+                category="achivement"
+                title={achievementMetadata[1].title}
+                description={achievementMetadata[1].description}
+                unlocked={achievementMetadata[1].unlocked}
+                layout={achievementMetadata[1].layout}
+              />
+            </View>
+            <View className="justify-center items-center flex-[40%]">
+              <ContentBox
+                category="achivement"
+                title={achievementMetadata[2].title}
+                description={achievementMetadata[2].description}
+                unlocked={achievementMetadata[2].unlocked}
+                layout={achievementMetadata[2].layout}
+              />
+            </View>
           </View>
+
+          {/* 2nd Row */}
           <View
-            className="justify-center items-center"
-            style={{ flex: 1, width: "30%" }}
+            className={`flex-row flex-1 rounded-3xl justify-between gap-3 ${debugFlexbox ? "bg-buttonBlue" : ""}`}
           >
-            <ContentBox
-              category="achivement"
-              title={achievementMetadata[2].title}
-              description={achievementMetadata[2].description}
-              unlocked={achievementMetadata[2].unlocked}
-              layout={achievementMetadata[2].layout}
-            />
+            <View className="justify-center items-center" style={{ flex: 1 }}>
+              <ContentBox
+                category="achivement"
+                title={achievementMetadata[3].title}
+                description={achievementMetadata[3].description}
+                unlocked={achievementMetadata[3].unlocked}
+                layout={achievementMetadata[3].layout}
+              />
+            </View>
+            <View className="justify-center items-center" style={{ flex: 1 }}>
+              <ContentBox
+                category="achivement"
+                title={achievementMetadata[4].title}
+                description={achievementMetadata[4].description}
+                unlocked={achievementMetadata[4].unlocked}
+                layout={achievementMetadata[4].layout}
+              />
+            </View>
+            <View className="justify-center items-center" style={{ flex: 1 }}>
+              <ContentBox
+                category="achivement"
+                title={achievementMetadata[5].title}
+                description={achievementMetadata[5].description}
+                unlocked={achievementMetadata[5].unlocked}
+                layout={achievementMetadata[5].layout}
+              />
+            </View>
           </View>
         </View>
-
-        {/* 2nd Row */}
-        <View
-          className={`flex-row flex-wrap rounded-3xl justify-between gap-3 ${debugFlexbox ? "bg-buttonBlue" : ""}`}
-        >
-          <View className="justify-center items-center" style={{ flex: 1 }}>
-            <ContentBox
-              category="achivement"
-              title={achievementMetadata[3].title}
-              description={achievementMetadata[3].description}
-              unlocked={achievementMetadata[3].unlocked}
-              layout={achievementMetadata[3].layout}
-            />
-          </View>
-          <View className="justify-center items-center" style={{ flex: 1 }}>
-            <ContentBox
-              category="achivement"
-              title={achievementMetadata[4].title}
-              description={achievementMetadata[4].description}
-              unlocked={achievementMetadata[4].unlocked}
-              layout={achievementMetadata[4].layout}
-            />
-          </View>
-          <View className="justify-center items-center" style={{ flex: 1 }}>
-            <ContentBox
-              category="achivement"
-              title={achievementMetadata[5].title}
-              description={achievementMetadata[5].description}
-              unlocked={achievementMetadata[5].unlocked}
-              layout={achievementMetadata[5].layout}
-            />
-          </View>
-        </View>
-
         {/* 3rd Row */}
         <View
-          className={`flex-row h-[35%] w-full rounded-3xl justify-around gap-3 ${debugFlexbox ? "bg-buttonPurple" : ""}`}
+          className={`flex-row flex-1 h-[35%] w-full rounded-3xl justify-around gap-3 ${debugFlexbox ? "bg-buttonPurple" : ""}`}
         >
           {/* Left Column */}
           <View
@@ -191,7 +186,7 @@ const Achievements: React.FC = () => {
 
           {/* Right Column */}
           <View
-            className="flex-col justify-center "
+            className="flex-col justify-center gap-3"
             style={{ flex: 1, height: "100%" }}
           >
             <View className="justify-center items-center" style={{ flex: 1 }}>

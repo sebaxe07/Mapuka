@@ -65,8 +65,18 @@ const RootStack = createNativeStackNavigator({
         Achivements: {
           options: ({ navigation }) => ({
             headerShown: true,
+            headerTitleAlign: "center",
             headerTitle: "",
-            headerTransparent: true,
+            headerLargeTitle: true,
+            headerTitleStyle: {
+              color: colors.lightText,
+            },
+            headerLargeTitleStyle: {
+              color: colors.lightText,
+            },
+            headerStyle: {
+              backgroundColor: colors.background,
+            },
             headerLeft: () => (
               <BackArrow
                 color={colors.lightText}
@@ -90,7 +100,30 @@ const RootStack = createNativeStackNavigator({
           }),
           screen: BookmarksScreen,
         },
-        Leaderboard: LeaderboardScreen,
+        Leaderboard: {
+          options: ({ navigation }) => ({
+            headerShown: true,
+            headerTitleAlign: "center",
+            headerTitle: "",
+            headerLargeTitle: true,
+            headerTitleStyle: {
+              color: colors.lightText,
+            },
+            headerLargeTitleStyle: {
+              color: colors.lightText,
+            },
+            headerStyle: {
+              backgroundColor: colors.background,
+            },
+            headerLeft: () => (
+              <BackArrow
+                color={colors.lightText}
+                onPress={() => navigation.goBack()}
+              />
+            ),
+          }),
+          screen: LeaderboardScreen,
+        },
         Profile: {
           options: ({ navigation }) => ({
             headerShown: true,
