@@ -21,6 +21,10 @@ const Home: React.FC = () => {
   const [searchText, setSearchText] = useState("");
   const [triggerAction, setTriggerAction] = useState("");
   const [bearing, setBearing] = useState(0);
+  const [[latitude, longitude], setCoordinates] = useState<[number, number]>([
+    0,
+    0,
+  ]);
 
   const [changeTheme, setChangeTheme] = useState(false);
 
@@ -53,6 +57,7 @@ const Home: React.FC = () => {
         setTriggerAction={setTriggerAction}
         onBearingChange={setBearing}
         mapType={mapType}
+        onCoordinatesChange={setCoordinates}
       />
 
       {/* Search Bar */}
@@ -144,14 +149,16 @@ const Home: React.FC = () => {
                 <Icons.Focus color="white" />
               </TouchableOpacity>
 
-              <Compass
+              {/* <Compass
                 bearing={bearing}
                 onPress={() => setTriggerAction("north")}
-              />
+              /> */}
             </View>
 
             {/* Bottom Floating Menu */}
-            <FloatingNavbar />
+            <FloatingNavbar 
+              coordinates = {[latitude, longitude]}
+            />
           </View>
         </View>
       </View>

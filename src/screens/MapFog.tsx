@@ -38,6 +38,8 @@ interface MapProps {
   setTriggerAction: (action: string) => void;
   onBearingChange: (bearing: number) => void;
   mapType: MapType;
+  onCoordinatesChange: (coordinates: [number, number]) => void;
+  
 }
 
 const debouncedSaveDiscoveredAreas = debounce(
@@ -78,6 +80,7 @@ const Map: React.FC<MapProps> = ({
   setTriggerAction,
   onBearingChange,
   mapType,
+  onCoordinatesChange,
 }) => {
   const [userLocation, setUserLocation] = useState<[number, number] | null>(
     null
@@ -124,6 +127,8 @@ const Map: React.FC<MapProps> = ({
           const { latitude, longitude } = location.coords;
           const coordinates: [number, number] = [longitude, latitude];
           setUserLocation(coordinates);
+          onCoordinatesChange(coordinates);
+          // console.log("User location: ", coordinates);
           // Before focusing the camera on the user's location, check if the location change is significant
 
           if (

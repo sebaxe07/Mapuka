@@ -3,112 +3,22 @@ import { View, TouchableOpacity } from "react-native";
 import * as Icons from "../../assets/icons/home"; // Adjust the path based on your project structure
 import { useNavigation } from "@react-navigation/native";
 
-// New imports
-import { supabase } from "../utils/supabase";
-import { useAppDispatch, useAppSelector } from "../contexts/hooks";
-import { Note, setNotes, setSpots, Spot } from "../contexts/slices/userDataSlice";
-
 import SaveBox from "./SaveBoxModal"; // Import the ContentBox
 import NavbarBase from "../../assets/images/navbarbase.svg";
 import MaskedView from "@react-native-masked-view/masked-view";
 import { MotiView } from "moti";
 
-const addSpot = async(profileid: String, coordinates: number, title: String, dispatch: any, currentSpots: Spot[]) => {
-  console.log('Adding spot:', { profileid, coordinates, title });
-  const { data, error } = await supabase
-    .from("spots")
-    .insert([
-      {
-        profile_id: profileid,
-        coordinates: coordinates,
-        title: title
-      }
 
-    ])
-    .select();
-
-    console.log("SPOTS: Made it this far.")
-    if (error) {
-      console.error("Failed to add spot:", error.message);
-      return;
-    }
-    console.log("Spot added successfully:", data);
-
-    // Add spot to local context
-    dispatch(setSpots([...currentSpots, ...data]));
-
-}
-
-const addNote = async(
-  profileid: String, coordinates: number, 
-  title: String, content: String,
-  image_url: String, 
-  dispatch: any, currentNotes: Note[]
-) => {
-  console.log("Adding note: ", {profileid, coordinates, title, content, image_url});
-
-  const { data, error } = await supabase
-    .from("notes")
-    .insert([
-      {
-        profile_id: profileid,
-        coordinates: coordinates,
-        title: title,
-        content: content,
-        image_url: image_url
-      }
-    ])
-    .select();
-
-    console.log("NOTES: Made it this far.")
-    if (error) {
-      console.error("Failed to add note:", error.message);
-      return;
-    }
-    console.log("Note added successfully:", data);
-
-    // Add spot to local context
-    dispatch(setNotes([...currentNotes, ...data]));
-}
-
-const FloatingNavbar: React.FC = () => {
+const FloatingNavbar: React.FC<{
+  coordinates: [number, number];
+}> = ({ coordinates }) => {
   const [menuExpanded, setMenuExpanded] = useState(false);
   const [activeBox, setActiveBox] = useState<"note" | "spot" | null>(null);
   const navigation = useNavigation();
-  const userData = useAppSelector((state) => state.userData);
-  const dispatch = useAppDispatch();
 
   const handleOptionSelect = (option: "note" | "spot") => {
     setActiveBox(option);
     setMenuExpanded(false); // Collapse the menu
-    
-    if (option === "spot") {
-      // Add new spot to database
-      console.log("ADDING NEW SPOT");
-
-      const currentSpots = userData.spots;
-
-      // TODO: UNCOMMENT WHEN THERE IS AN ACTUAL PROFILE ID IN THE STATE.
-      // const profileid = userData.profile_id
-      // TODO: FETCH ACTUAL COORDINATES
-
-      // TODO: INTEGRATE WITH FORM
-      addSpot("6ce0ce", 1, "Duomo", dispatch, currentSpots);
-
-      console.log("LOCAL SPOTS AFTER ADDING: ", userData.spots);
-
-  } else if(option == "note") {
-      console.log("ADDING NEW NOTE");
-      // TODO: UNCOMMENT WHEN THERE IS AN ACTUAL PROFILE ID IN THE STATE.
-      // const profileid = userData.profile_id
-      // TODO: FETCH ACTUAL COORDINATES
-
-      // TODO: INTEGRATE WITH FORM
-      const currentNotes = userData.notes;
-      addNote("6ce0ce", 1, "Duomo", "I love the Duomo", "bit.ly/something", dispatch, currentNotes);
-
-      console.log("LOCAL NOTES AFTER ADDING: ", userData.notes);
-  };
 }
 
   return (
@@ -192,7 +102,11 @@ const FloatingNavbar: React.FC = () => {
 
       {/* Content Box */}
       {activeBox && (
-        <SaveBox type={activeBox} onClose={() => setActiveBox(null)} />
+        <SaveBox 
+        type={activeBox} 
+        onClose={() => setActiveBox(null)}
+        coordinates={coordinates} 
+        />
       )}
     </View>
   );

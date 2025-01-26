@@ -2,21 +2,67 @@ import React, { useState } from "react";
 import { View, Text, TouchableOpacity, TextInput } from "react-native";
 import Close from "../../assets/icons/home/close_clean.svg";
 import Divider from "./utils/Divider";
+import { supabase } from "../utils/supabase";
+import { useAppDispatch, useAppSelector } from "../contexts/hooks";
+import { setSpots } from "../contexts/slices/userDataSlice";
+import { MAPBOX_ACCESS_TOKEN } from "@env";
 
 interface SaveBoxProps {
   type: "note" | "spot";
   onClose: () => void;
+  coordinates: [number, number];
 }
 
-const SaveBox: React.FC<SaveBoxProps> = ({ type, onClose }) => {
+const SaveBox: React.FC<SaveBoxProps> = ({ type, onClose, coordinates }) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const userData = useAppSelector((state) => state.userData);
+  const dispatch = useAppDispatch();
 
-  const handleSave = () => {
+  const currentSpots = userData.spots;
+  const profileid = userData.profile_id;
+  console.log("COORDINATES AT SAVEBOX:", coordinates);
+
+
+  const handleSave = async () => {
     console.log("Title:", title);
     console.log("Description:", description);
+
+    // Get spot address from Mapbox API
+    const response = await fetch(
+      `https://api.mapbox.com/search/geocode/v6/reverse?longitude=${coordinates[0]}&latitude=${coordinates[1]}&access_token=${MAPBOX_ACCESS_TOKEN}`
+    );
+    const addressData = await response.json();
+    const address = addressData.features[0]?.properties?.name || "Unknown address";
+
+    console.log('Adding spot:', { title, coordinates, address, profileid });
+
+    // Add spot to database
+    const { data, error } = await supabase
+      .from("spots")
+      .insert([
+        {
+          profile_id: profileid,
+          coordinates: coordinates,
+          title: title,
+          address: address
+        }
+      ])
+      .select();
+  
+    if (error) {
+      console.error("Failed to add spot:", error.message);
+      return;
+    }
+    console.log("Spot added successfully:", data);
+
+    // Add spot to local context
+    dispatch(setSpots([...currentSpots, ...data]));
+
     onClose(); // Close the modal after saving
   };
+
+
   return (
     <View className="absolute bottom-56 self-center w-11/12 bg-textWhite rounded-3xl shadow-lg py-5 px-10">
       <View className="flex-row justify-between items-center mb-4 border-textBody ">
