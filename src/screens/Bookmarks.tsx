@@ -151,7 +151,7 @@ const BookmarksScreen: React.FC = () => {
     })
   ).current;
   return (
-    <View className="flex-1 bg-bgMain px-5 py-5 pt-24">
+    <View className="flex-1 bg-bgMain px-5 py-5 pt-20">
       {/* Header */}
       <Text className="text-textWhite text-4xl font-senMedium mb-1 ml-10">
         Your

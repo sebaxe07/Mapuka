@@ -63,6 +63,7 @@ export async function signInWithEmail({
         discovered_polygon: discoveredPolygon,
         achievements: profiles?.achievements ?? "",
         created_at: profiles?.created_at ?? "",
+        pic: profiles?.pic ?? null,
         notes: profiles?.notes ?? [],
         spots: profiles?.spots ?? [],
       })

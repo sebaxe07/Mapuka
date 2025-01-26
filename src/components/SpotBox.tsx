@@ -50,10 +50,12 @@ const SpotBox: React.FC<{
 
         <View>
           <TouchableOpacity
-            className="bg-buttonOrange rounded-full items-center justify-center w-1/3 px-5 py-3"
+            className="bg-buttonOrange rounded-full items-center justify-center w-1/3  py-3"
             onPress={onPress}
           >
-            <Text className="text-white text-sm font-bold">View Spot</Text>
+            <Text className="text-white text-sm font-bold " numberOfLines={1}>
+              View Spot
+            </Text>
           </TouchableOpacity>
         </View>
       </View>
