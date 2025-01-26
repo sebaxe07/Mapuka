@@ -15,7 +15,6 @@ import Achivements from "./src/screens/Achivements";
 import BookmarksScreen from "./src/screens/Bookmarks";
 import Leaderboard from "./src/screens/Leaderboard";
 import Profile from "./src/screens/Profile";
-import { BackArrow } from "./assets/icons/profile";
 import MapFog from "./src/screens/MapFog";
 import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
@@ -33,6 +32,7 @@ import { useFonts } from "expo-font";
 import * as React from "react";
 import { useAppDispatch, useAppSelector } from "./src/contexts/hooks";
 import { setAuth, setSession } from "./src/contexts/slices/userDataSlice";
+import BackArrow from "./src/components/BackArrow";
 
 function useIsSignedIn() {
   const isSignedIn = useAppSelector((state) => state.userData.auth);
@@ -61,8 +61,6 @@ const RootStack = createNativeStackNavigator({
       if: useIsSignedIn,
       screens: {
         Home: HomeScreen,
-        Details: DetailsScreen,
-        Map: MapScreen,
         Achivements: {
           options: ({ navigation }) => ({
             animation: "slide_from_left",
@@ -70,16 +68,23 @@ const RootStack = createNativeStackNavigator({
           screen: Achivements,
         },
         Bookmarks: {
-          options: ({ navigation }) => ({
+          options: () => ({
             headerShown: true,
+            headerTitleAlign: "center",
             headerTitle: "",
-            headerTransparent: true,
-            headerLeft: () => (
-              <BackArrow
-                color="--color-text-white"
-                onPress={() => navigation.goBack()}
-              />
-            ),
+            headerLargeTitle: true,
+            headerTitleStyle: {
+              color: "#ffffff",
+            },
+            headerLargeTitleStyle: {
+              color: "#ffffff",
+            },
+            headerStyle: {
+              backgroundColor: colors.background,
+              shadowColor: "transparent",
+            },
+            headerShadowVisible: false,
+            headerLeft: () => <BackArrow />,
           }),
           screen: BookmarksScreen,
         },
@@ -105,9 +110,9 @@ const RootStack = createNativeStackNavigator({
               backgroundColor: colors.background,
               shadowColor: "transparent",
             },
-            headerLeft: () => (
-              <BackArrow color="#ffffff" onPress={() => navigation.goBack()} />
-            ),
+            headerShadowVisible: false,
+            headerBackVisible: false,
+            headerLeft: () => <BackArrow />,
           }),
           screen: Profile,
         },

@@ -16,14 +16,16 @@ export interface Note {
   note_id: string;
   created_at: string;
   coordinates: number[];
+  address: string;
   title: string;
   content: string;
-  image: Photo;
+  image: number;
 }
 export interface Spot {
   spot_id: string;
   created_at: string;
   coordinates: number[];
+  address: string;
   title: string;
 }
 
