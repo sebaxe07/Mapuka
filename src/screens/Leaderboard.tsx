@@ -2,7 +2,7 @@ import { Button } from "@react-navigation/elements";
 import { useNavigation } from "@react-navigation/native";
 import React, { useEffect, useState } from "react";
 import { View, Text } from "react-native";
-import ContentBox from "../components/ContentBox";
+import LeaderBox from "../components/LeaderBox";
 
 interface DetailsProps {}
 
@@ -65,34 +65,31 @@ const Leaderboard: React.FC<DetailsProps> = ({}) => {
         className={`flex-4 h-3/4  gap-3 ${debugFlexbox ? "bg-buttonDarkRed" : ""}`}
       >
         <View
-          className={`flex-col flex-[66%] h-[35%] w-full rounded-3xl justify-around gap-3 ${debugFlexbox ? "bg-buttonPurple" : ""}`}
+          className={`flex-col flex-[66%] h-[30%] w-full rounded-3xl justify-around gap-3 ${debugFlexbox ? "bg-buttonPurple" : ""}`}
         >
-          <View className="justify-center items-center" style={{ flex: 1 }}>
-            <ContentBox
-              category="leaderboard"
+          <View className="justify-center flex-1 items-center">
+            <LeaderBox
               top="1"
-              title={achievementMetadata[1].user}
-              description={achievementMetadata[1].distance}
+              user={achievementMetadata[1].user}
+              distance={achievementMetadata[1].distance}
               layout={achievementMetadata[1].layout}
             />
           </View>
 
           <View className="flex-row flex-1 justify-center gap-3">
             <View className="justify-center items-center flex-[55%]">
-              <ContentBox
-                category="leaderboard"
+              <LeaderBox
                 top="2"
-                title={achievementMetadata[2].user}
-                description={achievementMetadata[2].distance}
+                user={achievementMetadata[2].user}
+                distance={achievementMetadata[2].distance}
                 layout={achievementMetadata[2].layout}
               />
             </View>
             <View className="justify-center items-center flex-[45%]">
-              <ContentBox
-                category="leaderboard"
+              <LeaderBox
                 top="3"
-                title={achievementMetadata[3].user}
-                description={achievementMetadata[3].distance}
+                user={achievementMetadata[3].user}
+                distance={achievementMetadata[3].distance}
                 layout={achievementMetadata[3].layout}
               />
             </View>
@@ -102,30 +99,27 @@ const Leaderboard: React.FC<DetailsProps> = ({}) => {
         <View
           className={`flex-row flex-[33%] rounded-3xl justify-between items-center gap-3 ${debugFlexbox ? "bg-buttonBlue" : ""}`}
         >
-          <View className="justify-center items-center" style={{ flex: 1 }}>
-            <ContentBox
-              category="leaderboard"
+          <View className="justify-center flex-1 items-center">
+            <LeaderBox
               top="4"
-              title={achievementMetadata[4].user}
-              description={achievementMetadata[4].distance}
+              user={achievementMetadata[4].user}
+              distance={achievementMetadata[4].distance}
               layout={achievementMetadata[4].layout}
             />
           </View>
-          <View className="justify-center items-center" style={{ flex: 1 }}>
-            <ContentBox
-              category="leaderboard"
+          <View className="justify-center flex-1 items-center">
+            <LeaderBox
               top="5"
-              title={achievementMetadata[5].user}
-              description={achievementMetadata[5].distance}
+              user={achievementMetadata[5].user}
+              distance={achievementMetadata[5].distance}
               layout={achievementMetadata[5].layout}
             />
           </View>
-          <View className="justify-center items-center" style={{ flex: 1 }}>
-            <ContentBox
-              category="leaderboard"
+          <View className="justify-center flex-1 items-center">
+            <LeaderBox
               top="6"
-              title={achievementMetadata[6].user}
-              description={achievementMetadata[6].distance}
+              user={achievementMetadata[6].user}
+              distance={achievementMetadata[6].distance}
               layout={achievementMetadata[6].layout}
             />
           </View>
