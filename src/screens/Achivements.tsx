@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { View, Text } from "react-native";
 import AchivementBox from "../components/AchivementBox";
+import { Achievement } from "../contexts/slices/userDataSlice";
+import { useAppSelector } from "../contexts/hooks";
+import { supabase } from "../utils/supabase";
 
 const Achievements: React.FC = () => {
   // Initial static metadata
@@ -70,18 +73,33 @@ const Achievements: React.FC = () => {
     },
   });
 
+  const userData = useAppSelector((state) => state.userData);
+
   // Simulated achievement data fetched from the database
-  const [achievementData, setAchievementData] = useState([
-    { id: 1, unlocked: false },
-    { id: 2, unlocked: false },
-    { id: 3, unlocked: false },
-    { id: 4, unlocked: false },
-    { id: 5, unlocked: false },
-    { id: 6, unlocked: false },
-    { id: 7, unlocked: false },
-    { id: 8, unlocked: false },
-    { id: 9, unlocked: false },
-  ]);
+  const [achievementData, setAchievementData] = useState<Achievement[]>(
+    userData.achievements
+  );
+
+  useEffect(() => {
+    // Check if there are new achievements to update
+    RequestAchievement();
+  }, []);
+
+  const RequestAchievement = async () => {
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("achievements")
+      .eq("profile_id", userData.profile_id);
+
+    if (error) {
+      console.error("Error fetching achievements:", error.message);
+      return;
+    }
+
+    // Update the achievement data
+    const parsedAchievements = JSON.parse(data[0].achievements);
+    setAchievementData(parsedAchievements);
+  };
 
   useEffect(() => {
     const updatedMetadata = { ...achievementMetadata };
