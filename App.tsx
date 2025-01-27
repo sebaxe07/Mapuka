@@ -11,10 +11,11 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import HomeScreen from "./src/screens/Home";
 import DetailsScreen from "./src/screens/Details";
 import MapScreen from "./src/screens/Map";
-import Achivements from "./src/screens/Achivements";
+import AchivementsScreen from "./src/screens/Achivements";
 import BookmarksScreen from "./src/screens/Bookmarks";
-import Leaderboard from "./src/screens/Leaderboard";
-import Profile from "./src/screens/Profile";
+import NoteDetailsScreen from "./src/screens/NoteDetails";
+import LeaderboardScreen from "./src/screens/Leaderboard";
+import ProfileScreen from "./src/screens/Profile";
 import MapFog from "./src/screens/MapFog";
 import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
@@ -32,6 +33,7 @@ import { useFonts } from "expo-font";
 import * as React from "react";
 import { useAppDispatch, useAppSelector } from "./src/contexts/hooks";
 import { setAuth, setSession } from "./src/contexts/slices/userDataSlice";
+
 import BackArrow from "./src/components/BackArrow";
 
 function useIsSignedIn() {
@@ -61,50 +63,100 @@ const RootStack = createNativeStackNavigator({
       if: useIsSignedIn,
       screens: {
         Home: HomeScreen,
+        Details: DetailsScreen,
+        Map: MapScreen,
         Achivements: {
           options: ({ navigation }) => ({
             animation: "slide_from_left",
-          }),
-          screen: Achivements,
-        },
-        Bookmarks: {
-          options: () => ({
             headerShown: true,
             headerTitleAlign: "center",
             headerTitle: "",
             headerLargeTitle: true,
             headerTitleStyle: {
-              color: "#ffffff",
+              color: colors.lightText,
             },
             headerLargeTitleStyle: {
-              color: "#ffffff",
+              color: colors.lightText,
             },
             headerStyle: {
               backgroundColor: colors.background,
-              shadowColor: "transparent",
             },
-            headerShadowVisible: false,
+            headerLeft: () => <BackArrow />,
+          }),
+          screen: AchivementsScreen,
+        },
+        Bookmarks: {
+          options: ({ navigation }) => ({
+            animation: "slide_from_left",
+            headerShown: true,
+            headerTitleAlign: "center",
+            headerTitle: "",
+            headerLargeTitle: true,
+            headerTitleStyle: {
+              color: colors.lightText,
+            },
+            headerLargeTitleStyle: {
+              color: colors.lightText,
+            },
+            headerStyle: {
+              backgroundColor: colors.background,
+            },
             headerLeft: () => <BackArrow />,
           }),
           screen: BookmarksScreen,
         },
+        NoteDetails: {
+          initialParams: { itemId: 0 },
+          options: ({ navigation }) => ({
+            headerShown: true,
+            headerTitleAlign: "center",
+            headerTitle: "",
+            headerLargeTitle: true,
+            headerTitleStyle: {
+              color: colors.lightText,
+            },
+            headerLargeTitleStyle: {
+              color: colors.lightText,
+            },
+            headerStyle: {
+              backgroundColor: colors.background,
+            },
+            headerLeft: () => <BackArrow />,
+          }),
+          screen: NoteDetailsScreen,
+        },
         Leaderboard: {
           options: ({ navigation }) => ({
             animation: "slide_from_left",
+            headerShown: true,
+            headerTitleAlign: "center",
+            headerTitle: "",
+            headerLargeTitle: true,
+            headerTitleStyle: {
+              color: colors.lightText,
+            },
+            headerLargeTitleStyle: {
+              color: colors.lightText,
+            },
+            headerStyle: {
+              backgroundColor: colors.background,
+            },
+            headerLeft: () => <BackArrow />,
           }),
-          screen: Leaderboard,
+          screen: LeaderboardScreen,
         },
         Profile: {
           options: ({ navigation }) => ({
+            animation: "slide_from_left",
             headerShown: true,
             headerTitleAlign: "center",
             headerTitle: "Profile",
             headerLargeTitle: true,
             headerTitleStyle: {
-              color: "#ffffff",
+              color: colors.lightText,
             },
             headerLargeTitleStyle: {
-              color: "#ffffff",
+              color: colors.lightText,
             },
             headerStyle: {
               backgroundColor: colors.background,
@@ -114,9 +166,9 @@ const RootStack = createNativeStackNavigator({
             headerBackVisible: false,
             headerLeft: () => <BackArrow />,
           }),
-          screen: Profile,
+          screen: ProfileScreen,
         },
-        MapFog: MapFog,
+        /* MapFog: MapFog, */
       },
     },
     SignedOut: {

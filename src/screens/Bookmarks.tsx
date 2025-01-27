@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import NoteBox from "../components/NoteBox";
 import SpotBox from "../components/SpotBox";
-import BackArrow from "../components/BackArrow";
+import { useNavigation } from "@react-navigation/native";
 import { MotiView } from "moti";
 import { MotiPressable } from "moti/interactions";
 import { colors } from "../../colors";
@@ -75,6 +75,7 @@ const BookmarksScreen: React.FC = () => {
       image: 0,
     },
   ];
+
   const spotsData: Spot[] = [
     {
       spot_id: "1",
@@ -120,10 +121,44 @@ const BookmarksScreen: React.FC = () => {
     },
   ];
 
+  const navigation = useNavigation();
+
   const tabs = [
     { key: "notes", label: "Notes" },
     { key: "spots", label: "Spots" },
   ];
+
+  const goToDetails = (type: "note" | "spot", itemId: string) => {
+    if (type === "note") {
+      navigation.navigate("NoteDetails", { itemId });
+    } else {
+      // Replace `notesData` with `spotsData` when accessing spots
+      const spot = spotsData.find((spot) => spot.spot_id === itemId);
+
+      if (!spot) {
+        console.error("Spot not found with id:", itemId);
+        return;
+      }
+
+      const { coordinates } = spot;
+
+      if (!coordinates) {
+        console.error("Coordinates not available for spot:", itemId);
+        return;
+      }
+
+      try {
+        navigation.navigate("Home", {
+          externalCoordinates: {
+            latitude: coordinates[0],
+            longitude: coordinates[1],
+          },
+        });
+      } catch (error) {
+        console.error("Navigation error:", error);
+      }
+    }
+  };
 
   const [activeWidth, setActiveWidth] = useState(0);
   const [inactiveWidth, setInactiveWidth] = useState(0);
@@ -257,7 +292,7 @@ const BookmarksScreen: React.FC = () => {
                 date={item.created_at}
                 address={item.address}
                 styleVariant={item.image}
-                onPress={() => console.log("Open Note")}
+                onPress={() => goToDetails("note", item.note_id)}
               />
             )}
           />
@@ -289,7 +324,7 @@ const BookmarksScreen: React.FC = () => {
                 title={item.title}
                 date={item.created_at}
                 address={item.address}
-                onPress={() => console.log("View Spot")}
+                onPress={() => goToDetails("spot", item.spot_id)}
               />
             )}
           />
@@ -298,30 +333,30 @@ const BookmarksScreen: React.FC = () => {
 
       {/* Content */}
       {/*       <ScrollView showsVerticalScrollIndicator={false}>
-        <MotiView animate={{ opacity: activeTab === "notes" ? 1 : 0 }}>
-          {notesData.map((note) => (
-            <NoteBox
-              key={note.id}
-              title={note.title}
-              date={note.date}
-              address={note.address}
-              styleVariant={note.styleVariant}
-              onPress={() => console.log("Open Note")}
-            />
-          ))}
-        </MotiView>
+          <MotiView animate={{ opacity: activeTab === "notes" ? 1 : 0 }}>
+            {notesData.map((note) => (
+              <NoteBox
+                key={note.id}
+                title={note.title}
+                date={note.date}
+                address={note.address}
+                styleVariant={note.styleVariant}
+                onPress={() => goToDetails("note", note.id)}
+              />
+            ))}
+          </MotiView>
         <MotiView animate={{ opacity: activeTab === "spots" ? 1 : 0 }}>
-          {spotsData.map((spot) => (
-            <SpotBox
-              key={spot.id}
-              image={spot.image}
-              title={spot.title}
-              date={spot.date}
-              address={spot.address}
-              onPress={() => console.log("View Spot")}
-            />
-          ))}
-        </MotiView>
+            {spotsData.map((spot) => (
+              <SpotBox
+                key={spot.id}
+                image={spot.image}
+                title={spot.title}
+                date={spot.date}
+                address={spot.address}
+                onPress={() => goToDetails("spot", spot.id)}
+              />
+            ))}
+          </MotiView>
       </ScrollView> */}
     </View>
   );
