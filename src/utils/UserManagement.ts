@@ -5,6 +5,7 @@ import {
   setUserData,
   clearUserData,
   Photo,
+  Achievement,
 } from "../contexts/slices/userDataSlice";
 import { Feature, Polygon, MultiPolygon, GeoJsonProperties } from "geojson";
 import * as ImagePicker from "expo-image-picker";
@@ -93,6 +94,53 @@ export async function signInWithEmail({
       }
     }
 
+    const achievements: Achievement[] = JSON.parse(
+      profiles?.achievements ?? "[]"
+    );
+    /*     // Check if there are any achievements in the database
+    if (!profiles?.achievements) {
+      // If there are no achievements, create the default achievements
+      achievements = await defaultAchievements(profiles.profile_id);
+    } */
+
+    let pic: Photo | null = null;
+    // Fetch the user's profile pic from the 'avatars' bucket
+    const { data: listdata, error: listerror } = await supabase.storage
+      .from("avatars")
+      .list(profiles.profile_id);
+
+    if (listerror) {
+      console.error("Error fetching list of photos:", listerror.message);
+      throw listerror;
+    } else if (listdata && listdata.length > 0) {
+      console.log("List of photos:", listdata);
+
+      const imageUrl = await supabase.storage
+        .from("avatars")
+        .getPublicUrl(profiles.profile_id + "/" + listdata[0].name);
+
+      if (!imageUrl) {
+        console.error(
+          "Error fetching Public URL for photo:",
+          profiles.profile_id + ".jpeg"
+        );
+      } else if (!imageUrl.data) {
+        console.error(
+          "Error fetching Public URL for photo:",
+          profiles.profile_id + ".jpeg"
+        );
+      } else {
+        // Update the user's profile pic URL in the app
+        pic = {
+          pictureUrl: imageUrl.data.publicUrl,
+          arrayBuffer: "",
+          path: profiles.profile_id,
+          image: {} as ImagePicker.ImagePickerAsset,
+        };
+        console.log("\x1b[32m", "pic URL:", pic.pictureUrl);
+      }
+    }
+
     // Fetch user spots
     const { data: spotsData, error: spotsError } = await supabase.from("spots").select("*").eq("profile_id", profiles.profile_id);
     if (spotsError) {
@@ -118,8 +166,9 @@ export async function signInWithEmail({
         lastname: profiles?.lastname ?? "",
         discovered_area: profiles?.discovered_area ?? 0,
         discovered_polygon: discoveredPolygon,
-        achievements: profiles?.achievements ?? "",
+        achievements: achievements ?? [],
         created_at: profiles?.created_at ?? "",
+        pic: pic ?? null,
         pic: pic ?? null,
         notes: notesData ?? [],
         spots: spotsData ?? [],
@@ -133,6 +182,37 @@ export async function signInWithEmail({
     return error;
   }
 }
+
+const defaultAchievements = async (userid: String) => {
+  const emptyAchievements = [
+    { id: 1, unlocked: false },
+    { id: 2, unlocked: false },
+    { id: 3, unlocked: false },
+    { id: 4, unlocked: false },
+    { id: 5, unlocked: false },
+    { id: 6, unlocked: false },
+    { id: 7, unlocked: false },
+    { id: 8, unlocked: false },
+    { id: 9, unlocked: false },
+  ];
+
+  // Map to jsonb
+  const achievements = JSON.stringify(emptyAchievements);
+
+  // upload the achievements to the database
+  const { data: profiles, error } = await supabase
+    .from("profiles")
+    .update({ achievements })
+    .eq("profile_id", userid);
+
+  if (error) {
+    console.error("Error updating achievements:", error.message);
+    return error;
+  }
+
+  console.log("Achievements updated");
+  return emptyAchievements;
+};
 
 export const signOut = async () => {
   console.log("Signing out");
@@ -187,6 +267,7 @@ export async function signUpUser({
   if (data) {
     console.log("User created");
     console.log(data);
+
     return;
   }
 }

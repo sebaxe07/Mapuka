@@ -95,9 +95,18 @@ const Map: React.FC<MapProps> = ({
     dark: "mapbox://styles/mapbox/dark-v11",
     light: "mapbox://styles/mapbox/light-v11",
   };
+
+  const fogTypes = {
+    custom: "#08081B",
+    dark: "#1D1D1D",
+    light: "#AEAEAE",
+  };
+
+  const [fogColor, setFogColor] = useState(fogTypes[mapType]);
   const [mapStyle, setMapStyle] = useState(mapTypes[mapType]);
   useEffect(() => {
     setMapStyle(mapTypes[mapType]);
+    setFogColor(fogTypes[mapType]);
   }, [mapType]);
 
   useEffect(() => {
@@ -353,8 +362,8 @@ const Map: React.FC<MapProps> = ({
           <MapboxGL.FillLayer
             id="fogFill"
             style={{
-              fillColor: "black", // Mask color (can be adjusted)
-              fillOpacity: 1, // Adjust visibility of the fog
+              fillColor: fogColor,
+              fillOpacity: 0.95, // Adjust visibility of the fog
             }}
           />
         </MapboxGL.ShapeSource>

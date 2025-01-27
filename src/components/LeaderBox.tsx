@@ -4,6 +4,7 @@ import { colors } from "../../colors";
 import HolderV from "../../assets/icons/bookmarks/holder.svg";
 import HolderH from "../../assets/icons/bookmarks/holderH.svg";
 import * as Icons from "../../assets/icons/leaderboard/index";
+import ProfilePic from "./ProfilePic";
 
 // Define the array of unlocked colors
 const unlockedColors = [
@@ -17,6 +18,7 @@ const unlockedColors = [
 interface ContentBoxProps {
   user: string;
   distance: string;
+  image?: string;
   top?: string;
   layout?: "vertical" | "horizontal";
 }
@@ -24,24 +26,25 @@ interface ContentBoxProps {
 const LeaderBox: React.FC<ContentBoxProps> = ({
   user,
   distance,
+  image = "https://picsum.photos/200",
   top = "",
   layout = "vertical",
 }) => {
   const boxStyles =
     layout === "horizontal"
-      ? "flex-row gap-5 px-5 py-5 "
+      ? "flex-row gap-2 px-5 py-5 "
       : "flex-col gap-1 px-5 py-2";
 
   const renderTrophy = (top: string) => {
     switch (top) {
       case "1":
-        return <Icons.Trophy1 width={90} height={90} />;
+        return <ProfilePic avatarUrl={image} size={90} crown />;
       case "2":
-        return <Icons.Trophy2 width={70} height={90} />;
+        return <ProfilePic avatarUrl={image} size={70} border="border-[3px]" />;
       case "3":
-        return <Icons.Trophy3 width={70} height={90} />;
+        return <ProfilePic avatarUrl={image} size={70} border="border-[3px]" />;
       default:
-        return <Icons.Trophy width={70} height={90} />;
+        return <ProfilePic avatarUrl={image} size={50} border="border-2" />;
     }
   };
 
@@ -86,17 +89,25 @@ const LeaderBox: React.FC<ContentBoxProps> = ({
 
   return (
     <View
-      className={`flex rounded-3xl  ${top == "1" ? "items-center justify-around" : ""} w-full h-full ${boxStyles}`}
+      className={`flex rounded-3xl  ${top == "1" ? "items-center justify-center " : " items-center justify-center"} w-full h-full ${boxStyles}`}
       style={{
         backgroundColor: renderColor(top),
       }}
     >
+      <View className="absolute top-4 left-3 size-6 aspect-square bg-boxMenu rounded-full justify-center items-center flex">
+        <Text
+          className={`font-senBold text-lg  `}
+          style={{ color: renderColor(top), lineHeight: 20 }}
+        >
+          {top}
+        </Text>
+      </View>
       {/* SVG Placeholder */}
-      <View className="flex items-center">{renderTrophy(top)}</View>
+      <View className="flex items-center ">{renderTrophy(top)}</View>
       {/* Text Content */}
       <View
         className={`${
-          layout === "horizontal" ? "flex-1 gap-2 px-4 py-3" : "items-center "
+          layout === "horizontal" ? "flex gap-2 px-4 py-3 " : "items-center "
         } justify-center`}
       >
         <Text
