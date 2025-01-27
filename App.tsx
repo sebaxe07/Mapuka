@@ -33,6 +33,7 @@ import { useFonts } from "expo-font";
 import * as React from "react";
 import { useAppDispatch, useAppSelector } from "./src/contexts/hooks";
 import { setAuth, setSession } from "./src/contexts/slices/userDataSlice";
+
 import BackArrow from "./src/components/BackArrow";
 
 function useIsSignedIn() {
@@ -44,8 +45,6 @@ function useIsSignedOut() {
   const isSignedIn = useAppSelector((state) => state.userData.auth);
   return isSignedIn === false || isSignedIn === null;
 }
-
-const navigate = useNavigation();
 
 const RootStack = createNativeStackNavigator({
   screenOptions: {

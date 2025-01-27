@@ -5,85 +5,69 @@ import Place from "../../assets/icons/bookmarks/place.svg"; // Assuming Place is
 import { colors } from "../../colors";
 import { useNavigation } from "@react-navigation/native";
 
+import { Note } from "../contexts/slices/userDataSlice";
+
 const NoteDetails: React.FC = ({ route }: any) => {
   const { itemId } = route.params;
 
-  const [notesData, setNotesData] = useState([
+  const [notesData, setNotesData] = useState<Note[]>([
     {
-      id: 1,
-      title: "Mystical Riverbend Spot",
-      date: "12-01-2025",
-      address: "Greenway Trail, 15",
-      coordinates: { latitude: 37.7749, longitude: -122.4194 }, // San Francisco, CA
-      content:
-        "Etiam vitae augue ultrices, efficitur lectus et, malesuada nulla. Aliquam porttitor in est eget dapibus. Ut ac mi ac urna condimentum molestie vel non ex. Vestibulum dictum purus vulputate diam congue luctus vel ac eros. Vivamus convallis pretium diam, eu volutpat justo cursus id. Suspendisse fermentum venenatis eros nec interdum. Aliquam at pretium erat. Aliquam facilisis consectetur purus, a susc. elementum mauris, ut ornare elit euismod in. Proin et massa nisi. Suspendisse ipsum augue, viverra iaculis tincidunt laoreet, feugiat vulputate massa. ",
+      note_id: "1",
+      created_at: "14-04-2024",
+      coordinates: [37.7749, -122.4194],
+      address: "San Francisco, CA",
+      title: "Golden Gate Park",
+      content: "A beautiful park in the heart of San Francisco",
+      image: 1,
     },
     {
-      id: 2,
-      title: "Quiet Nook in the Library",
-      date: "05-11-2024",
-      address: "Maplewood Street, 34",
-      coordinates: { latitude: 40.7128, longitude: -74.006 }, // New York, NY
-      content:
-        "Etiam vitae augue ultrices, efficitur lectus et, malesuada nulla. Aliquam porttitor in est eget dapibus. Ut ac mi ac urna condimentum molestie vel non ex. Vestibulum dictum purus vulputate diam congue luctus vel ac eros. Vivamus convallis pretium diam, eu volutpat justo cursus id. Suspendisse fermentum venenatis eros nec interdum. Aliquam at pretium erat. Aliquam facilisis consectetur purus, a susc. elementum mauris, ut ornare elit euismod in. Proin et massa nisi. Suspendisse ipsum augue, viverra iaculis tincidunt laoreet, feugiat vulputate massa. ",
+      note_id: "2",
+      created_at: "09-06-2023",
+      coordinates: [40.7831, -73.9712],
+      address: "Skyline Boulevard, NY",
+      title: "Rooftop Cafe",
+      content: "A nice place to have a coffee",
+      image: 2,
     },
     {
-      id: 3,
-      title: "Hidden Garden Oasis",
-      date: "23-08-2023",
-      address: "Hilltop Avenue, 102",
-      coordinates: { latitude: 34.0522, longitude: -118.2437 }, // Los Angeles, CA
-      content:
-        "Etiam vitae augue ultrices, efficitur lectus et, malesuada nulla. Aliquam porttitor in est eget dapibus. Ut ac mi ac urna condimentum molestie vel non ex. Vestibulum dictum purus vulputate diam congue luctus vel ac eros. Vivamus convallis pretium diam, eu volutpat justo cursus id. Suspendisse fermentum venenatis eros nec interdum. Aliquam at pretium erat. Aliquam facilisis consectetur purus, a susc. elementum mauris, ut ornare elit euismod in. Proin et massa nisi. Suspendisse ipsum augue, viverra iaculis tincidunt laoreet, feugiat vulputate massa. ",
+      note_id: "3",
+      created_at: "27-09-2024",
+      coordinates: [46.7296, -94.6859],
+      address: "Lakeview Crescent, MN",
+      title: "Crystal Lake Dock",
+      content: "A dock with a beautiful view",
+      image: 3,
     },
     {
-      id: 4,
-      title: "Sunny Meadow Viewpoint",
-      date: "17-02-2025",
-      address: "Orchard Lane, 56",
-      coordinates: { latitude: 36.7783, longitude: -119.4179 }, // California (Central)
-      content:
-        "Etiam vitae augue ultrices, efficitur lectus et, malesuada nulla. Aliquam porttitor in est eget dapibus. Ut ac mi ac urna condimentum molestie vel non ex. Vestibulum dictum purus vulputate diam congue luctus vel ac eros. Vivamus convallis pretium diam, eu volutpat justo cursus id. Suspendisse fermentum venenatis eros nec interdum. Aliquam at pretium erat. Aliquam facilisis consectetur purus, a susc. elementum mauris, ut ornare elit euismod in. Proin et massa nisi. Suspendisse ipsum augue, viverra iaculis tincidunt laoreet, feugiat vulputate massa. ",
+      note_id: "4",
+      created_at: "19-03-2025",
+      coordinates: [30.2672, -97.7431],
+      address: "Downtown Square, TX",
+      title: "Vintage Market Plaza",
+      content: "A plaza with a lot of vintage stuff",
+      image: 4,
     },
     {
-      id: 5,
-      title: "Old Stone Bridge Path",
-      date: "10-07-2023",
-      address: "Riverside Road, 18",
-      coordinates: { latitude: 51.5074, longitude: -0.1278 }, // London, UK
-      content:
-        "Etiam vitae augue ultrices, efficitur lectus et, malesuada nulla. Aliquam porttitor in est eget dapibus. Ut ac mi ac urna condimentum molestie vel non ex. Vestibulum dictum purus vulputate diam congue luctus vel ac eros. Vivamus convallis pretium diam, eu volutpat justo cursus id. Suspendisse fermentum venenatis eros nec interdum. Aliquam at pretium erat. Aliquam facilisis consectetur purus, a susc. elementum mauris, ut ornare elit euismod in. Proin et massa nisi. Suspendisse ipsum augue, viverra iaculis tincidunt laoreet, feugiat vulputate massa. ",
+      note_id: "5",
+      created_at: "31-08-2024",
+      coordinates: [44.0521, -121.3153],
+      address: "Cascade Hills, OR",
+      title: "Secluded Waterfall",
+      content: "A hidden waterfall in the hills",
+      image: 5,
     },
     {
-      id: 6,
-      title: "Enchanted Woods Retreat",
-      date: "30-03-2024",
-      address: "Willow Lane, 75",
-      coordinates: { latitude: 48.8566, longitude: 2.3522 }, // Paris, France
-      content:
-        "Etiam vitae augue ultrices, efficitur lectus et, malesuada nulla. Aliquam porttitor in est eget dapibus. Ut ac mi ac urna condimentum molestie vel non ex. Vestibulum dictum purus vulputate diam congue luctus vel ac eros. Vivamus convallis pretium diam, eu volutpat justo cursus id. Suspendisse fermentum venenatis eros nec interdum. Aliquam at pretium erat. Aliquam facilisis consectetur purus, a susc. elementum mauris, ut ornare elit euismod in. Proin et massa nisi. Suspendisse ipsum augue, viverra iaculis tincidunt laoreet, feugiat vulputate massa. ",
-    },
-    {
-      id: 7,
-      title: "Cozy Bench Under the Stars",
-      date: "21-10-2024",
-      address: "Lakeview Drive, 89",
-      coordinates: { latitude: 47.6062, longitude: -122.3321 }, // Seattle, WA
-      content:
-        "Etiam vitae augue ultrices, efficitur lectus et, malesuada nulla. Aliquam porttitor in est eget dapibus. Ut ac mi ac urna condimentum molestie vel non ex. Vestibulum dictum purus vulputate diam congue luctus vel ac eros. Vivamus convallis pretium diam, eu volutpat justo cursus id. Suspendisse fermentum venenatis eros nec interdum. Aliquam at pretium erat. Aliquam facilisis consectetur purus, a susc. elementum mauris, ut ornare elit euismod in. Proin et massa nisi. Suspendisse ipsum augue, viverra iaculis tincidunt laoreet, feugiat vulputate massa. ",
-    },
-    {
-      id: 8,
-      title: "Serene Forest Clearing",
-      date: "06-12-2023",
-      address: "Evergreen Boulevard, 12",
-      coordinates: { latitude: 35.6895, longitude: 139.6917 }, // Tokyo, Japan
-      content:
-        "Etiam vitae augue ultrices, efficitur lectus et, malesuada nulla. Aliquam porttitor in est eget dapibus. Ut ac mi ac urna condimentum molestie vel non ex. Vestibulum dictum purus vulputate diam congue luctus vel ac eros. Vivamus convallis pretium diam, eu volutpat justo cursus id. Suspendisse fermentum venenatis eros nec interdum. Aliquam at pretium erat. Aliquam facilisis consectetur purus, a susc. elementum mauris, ut ornare elit euismod in. Proin et massa nisi. Suspendisse ipsum augue, viverra iaculis tincidunt laoreet, feugiat vulputate massa. ",
+      note_id: "6",
+      created_at: "02-05-2023",
+      coordinates: [25.7617, -80.1918],
+      address: "Creative District, FL",
+      title: "Urban Art Alley",
+      content: "A street full of urban art",
+      image: 0,
     },
   ]);
 
-  const note = notesData.find((note) => note.id === itemId);
+  const note = notesData.find((note) => note.note_id === itemId);
 
   const [isEditing, setIsEditing] = useState(false);
   const [editableNote, setEditableNote] = useState(note);
@@ -100,7 +84,7 @@ const NoteDetails: React.FC = ({ route }: any) => {
 
   const handleSave = () => {
     setNotesData((prev) =>
-      prev.map((n) => (n.id === itemId ? { ...n, ...editableNote } : n))
+      prev.map((n) => (n.note_id === itemId ? { ...n, ...editableNote } : n))
     );
     setIsEditing(false); // Exit editing mode
   };
@@ -152,20 +136,22 @@ const NoteDetails: React.FC = ({ route }: any) => {
             {/* Date */}
             {isEditing ? (
               <TextInput
-                value={editableNote.date}
+                value={editableNote?.created_at}
                 onChangeText={(text) =>
-                  setEditableNote({ ...editableNote, date: text })
+                  setEditableNote({ ...editableNote, created_at: text })
                 }
                 className="text-textBody text-base mb-1 border-b border-textBody"
               />
             ) : (
-              <Text className="text-textBody text-base mb-1">{note.date}</Text>
+              <Text className="text-textBody text-base mb-1">
+                {note.created_at}
+              </Text>
             )}
 
             {/* Title */}
             {isEditing ? (
               <TextInput
-                value={editableNote.title}
+                value={editableNote?.title}
                 onChangeText={(text) =>
                   setEditableNote({ ...editableNote, title: text })
                 }
@@ -187,7 +173,7 @@ const NoteDetails: React.FC = ({ route }: any) => {
               />
               {isEditing ? (
                 <TextInput
-                  value={editableNote.address}
+                  value={editableNote?.address}
                   onChangeText={(text) =>
                     setEditableNote({ ...editableNote, address: text })
                   }
@@ -201,7 +187,7 @@ const NoteDetails: React.FC = ({ route }: any) => {
             {/* Content */}
             {isEditing ? (
               <TextInput
-                value={editableNote.content}
+                value={editableNote?.content}
                 onChangeText={(text) =>
                   setEditableNote({ ...editableNote, content: text })
                 }
@@ -217,9 +203,7 @@ const NoteDetails: React.FC = ({ route }: any) => {
           <View className="flex-row justify-center w-full">
             <TouchableOpacity
               className="bg-buttonAccentRed rounded-3xl items-center justify-center w-1/2 px-5 py-3"
-              onPress={() =>
-                onPress(note.coordinates.latitude, note.coordinates.longitude)
-              }
+              onPress={() => onPress(note.coordinates[0], note.coordinates[1])}
             >
               <Text className="text-textWhite text-sm font-senSemiBold">
                 Go to Spot

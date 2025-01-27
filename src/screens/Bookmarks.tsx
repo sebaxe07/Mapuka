@@ -128,7 +128,7 @@ const BookmarksScreen: React.FC = () => {
     { key: "spots", label: "Spots" },
   ];
 
-  const goToDetails = (type: "note" | "spot", itemId: number) => {
+  const goToDetails = (type: "note" | "spot", itemId: string) => {
     if (type === "note") {
       navigation.navigate("NoteDetails", { itemId });
     } else {
@@ -292,7 +292,7 @@ const BookmarksScreen: React.FC = () => {
                 date={item.created_at}
                 address={item.address}
                 styleVariant={item.image}
-                onPress={() => console.log("Open Note")}
+                onPress={() => goToDetails("note", item.note_id)}
               />
             )}
           />
@@ -324,7 +324,7 @@ const BookmarksScreen: React.FC = () => {
                 title={item.title}
                 date={item.created_at}
                 address={item.address}
-                onPress={() => console.log("View Spot")}
+                onPress={() => goToDetails("spot", item.spot_id)}
               />
             )}
           />
