@@ -21,7 +21,7 @@ import BgDesign from "../../assets/images/loginBG.svg";
 import { AnimatePresence, MotiView } from "moti";
 import InputField from "../components/InputField";
 import Button from "../components/Button";
-import BackArrow from "../components/backArrow";
+import BackArrow from "../components/BackArrow";
 import { HeaderBackButton } from "@react-navigation/elements";
 import { Easing } from "react-native-reanimated";
 import { MotiPressable } from "moti/interactions";

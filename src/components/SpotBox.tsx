@@ -54,7 +54,7 @@ const SpotBox: React.FC<{
 
         <View className="flex-row justify-between w-full">
           <TouchableOpacity
-            className="bg-buttonOrange rounded-3xl items-center justify-center w-2/3 px-5 py-3"
+            className="bg-buttonAccentRed rounded-3xl items-center justify-center w-2/3 px-5 py-3"
             onPress={onPress}
           >
             <Text className="text-white text-sm font-senBold">View Spot</Text>

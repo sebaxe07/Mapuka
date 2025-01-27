@@ -6,7 +6,7 @@ import { useAppDispatch, useAppSelector } from "../contexts/hooks";
 import { clearUserData } from "../contexts/slices/userDataSlice";
 import { useNavigation } from "@react-navigation/native";
 import { colors } from "../../colors";
-import { supabase } from "../utils/supabase";
+import BackArrow from "../components/BackArrow";
 
 const Profile: React.FC = () => {
   const handleLogout = () => {
@@ -17,12 +17,18 @@ const Profile: React.FC = () => {
   };
 
   const dispatch = useAppDispatch();
-  const navigator = useNavigation();
+  const navigation = useNavigation();
   const logOut = async () => {
     console.log("User logged out");
     signOut();
     dispatch(clearUserData());
   };
+
+  useEffect(() => {
+    navigation.setOptions({
+      headerLeft: () => <BackArrow />,
+    });
+  }, [navigation]);
 
   const userData = useAppSelector((state) => state.userData);
   const [daysExplored, setDaysExplored] = useState<number>(0);

@@ -16,7 +16,6 @@ import BookmarksScreen from "./src/screens/Bookmarks";
 import NoteDetailsScreen from "./src/screens/NoteDetails";
 import LeaderboardScreen from "./src/screens/Leaderboard";
 import ProfileScreen from "./src/screens/Profile";
-import { BackArrow } from "./assets/icons/profile";
 import MapFog from "./src/screens/MapFog";
 import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
@@ -34,6 +33,7 @@ import { useFonts } from "expo-font";
 import * as React from "react";
 import { useAppDispatch, useAppSelector } from "./src/contexts/hooks";
 import { setAuth, setSession } from "./src/contexts/slices/userDataSlice";
+import BackArrow from "./src/components/BackArrow";
 
 function useIsSignedIn() {
   const isSignedIn = useAppSelector((state) => state.userData.auth);
@@ -52,6 +52,7 @@ const RootStack = createNativeStackNavigator({
     statusBarBackgroundColor: "transparent",
     navigationBarColor: "transparent",
     navigationBarTranslucent: true,
+    animation: "slide_from_right",
   },
   screens: {
     // Common screens
@@ -89,6 +90,12 @@ const RootStack = createNativeStackNavigator({
         },
         Bookmarks: {
           options: ({ navigation }) => ({
+            animation: "slide_from_left",
+          }),
+          screen: Achivements,
+        },
+        Bookmarks: {
+          options: () => ({
             headerShown: true,
             headerTitleAlign: "center",
             headerTitle: "",
@@ -110,6 +117,12 @@ const RootStack = createNativeStackNavigator({
             ),
           }),
           screen: BookmarksScreen,
+        },
+        Leaderboard: {
+          options: ({ navigation }) => ({
+            animation: "slide_from_left",
+          }),
+          screen: Leaderboard,
         },
         NoteDetails: {
           initialParams: { itemId: 0 },
@@ -176,6 +189,8 @@ const RootStack = createNativeStackNavigator({
               backgroundColor: colors.background,
               shadowColor: "transparent",
             },
+            headerShadowVisible: false,
+            headerBackVisible: false,
             headerLeft: () => (
               <BackArrow
                 color={colors.lightText}

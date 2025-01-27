@@ -55,7 +55,7 @@ const NoteBox: React.FC<{
         </View>
         <View className="">
           <TouchableOpacity
-            className="bg-buttonOrange items-center justify-center rounded-full px-3 py-3 w-1/3"
+            className="bg-buttonAccentRed items-center justify-center rounded-full px-3 py-3 w-1/3"
             onPress={onPress}
           >
             <Text className="text-textWhite text-sm font-senSemiBold">
