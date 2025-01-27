@@ -11,7 +11,6 @@ import {
 import NoteBox from "../components/NoteBox";
 import SpotBox from "../components/SpotBox";
 import { useNavigation } from "@react-navigation/native";
-import BackArrow from "../components/BackArrow";
 import { MotiView } from "moti";
 import { MotiPressable } from "moti/interactions";
 import { colors } from "../../colors";
@@ -76,13 +75,13 @@ const BookmarksScreen: React.FC = () => {
       image: 0,
     },
   ];
+
   const spotsData: Spot[] = [
     {
       spot_id: "1",
       created_at: "14-04-2024",
       coordinates: [37.7749, -122.4194],
       address: "San Francisco, CA",
-      coordinates: { latitude: 37.7694, longitude: -122.4862 }, // Golden Gate Park
       title: "Golden Gate Park",
     },
     {
@@ -90,7 +89,6 @@ const BookmarksScreen: React.FC = () => {
       created_at: "09-06-2023",
       coordinates: [40.7831, -73.9712],
       address: "Skyline Boulevard, NY",
-      coordinates: { latitude: 40.7306, longitude: -73.9352 }, // Placeholder for Skyline Boulevard, NY
       title: "Rooftop Cafe",
     },
     {
@@ -98,7 +96,6 @@ const BookmarksScreen: React.FC = () => {
       created_at: "27-09-2024",
       coordinates: [46.7296, -94.6859],
       address: "Lakeview Crescent, MN",
-      coordinates: { latitude: 46.7296, longitude: -94.6859 }, // Placeholder for Minnesota
       title: "Crystal Lake Dock",
     },
     {
@@ -106,7 +103,6 @@ const BookmarksScreen: React.FC = () => {
       created_at: "19-03-2025",
       coordinates: [30.2672, -97.7431],
       address: "Downtown Square, TX",
-      coordinates: { latitude: 29.7604, longitude: -95.3698 }, // Houston, TX (as an example for Downtown Square)
       title: "Vintage Market Plaza",
     },
     {
@@ -114,7 +110,6 @@ const BookmarksScreen: React.FC = () => {
       created_at: "31-08-2024",
       coordinates: [44.0521, -121.3153],
       address: "Cascade Hills, OR",
-      coordinates: { latitude: 44.0582, longitude: -121.3153 }, // Placeholder for Cascade Hills, OR
       title: "Secluded Waterfall",
     },
     {
@@ -122,7 +117,6 @@ const BookmarksScreen: React.FC = () => {
       created_at: "02-05-2023",
       coordinates: [25.7617, -80.1918],
       address: "Creative District, FL",
-      coordinates: { latitude: 25.7617, longitude: -80.1918 }, // Miami, FL (as an example for Creative District)
       title: "Urban Art Alley",
     },
   ];
@@ -139,7 +133,7 @@ const BookmarksScreen: React.FC = () => {
       navigation.navigate("NoteDetails", { itemId });
     } else {
       // Replace `notesData` with `spotsData` when accessing spots
-      const spot = spotsData.find((spot) => spot.id === itemId);
+      const spot = spotsData.find((spot) => spot.spot_id === itemId);
 
       if (!spot) {
         console.error("Spot not found with id:", itemId);
@@ -156,40 +150,8 @@ const BookmarksScreen: React.FC = () => {
       try {
         navigation.navigate("Home", {
           externalCoordinates: {
-            latitude: coordinates.latitude,
-            longitude: coordinates.longitude,
-          },
-        });
-      } catch (error) {
-        console.error("Navigation error:", error);
-      }
-    }
-  };
-
-  const goToDetails = (type: "note" | "spot", itemId: number) => {
-    if (type === "note") {
-      navigation.navigate("NoteDetails", { itemId });
-    } else {
-      // Replace `notesData` with `spotsData` when accessing spots
-      const spot = spotsData.find((spot) => spot.id === itemId);
-
-      if (!spot) {
-        console.error("Spot not found with id:", itemId);
-        return;
-      }
-
-      const { coordinates } = spot;
-
-      if (!coordinates) {
-        console.error("Coordinates not available for spot:", itemId);
-        return;
-      }
-
-      try {
-        navigation.navigate("Home", {
-          externalCoordinates: {
-            latitude: coordinates.latitude,
-            longitude: coordinates.longitude,
+            latitude: coordinates[0],
+            longitude: coordinates[1],
           },
         });
       } catch (error) {
@@ -369,8 +331,8 @@ const BookmarksScreen: React.FC = () => {
         </MotiView>
       </View>
 
-        {/* Content */}
-        {/*       <ScrollView showsVerticalScrollIndicator={false}>
+      {/* Content */}
+      {/*       <ScrollView showsVerticalScrollIndicator={false}>
           <MotiView animate={{ opacity: activeTab === "notes" ? 1 : 0 }}>
             {notesData.map((note) => (
               <NoteBox
@@ -396,7 +358,6 @@ const BookmarksScreen: React.FC = () => {
             ))}
           </MotiView>
       </ScrollView> */}
-      </View>
     </View>
   );
 };

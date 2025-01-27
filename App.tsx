@@ -45,6 +45,8 @@ function useIsSignedOut() {
   return isSignedIn === false || isSignedIn === null;
 }
 
+const navigate = useNavigation();
+
 const RootStack = createNativeStackNavigator({
   screenOptions: {
     headerShown: false,
@@ -66,6 +68,7 @@ const RootStack = createNativeStackNavigator({
         Map: MapScreen,
         Achivements: {
           options: ({ navigation }) => ({
+            animation: "slide_from_left",
             headerShown: true,
             headerTitleAlign: "center",
             headerTitle: "",
@@ -79,23 +82,13 @@ const RootStack = createNativeStackNavigator({
             headerStyle: {
               backgroundColor: colors.background,
             },
-            headerLeft: () => (
-              <BackArrow
-                color={colors.lightText}
-                onPress={() => navigation.goBack()}
-              />
-            ),
+            headerLeft: () => <BackArrow />,
           }),
           screen: AchivementsScreen,
         },
         Bookmarks: {
           options: ({ navigation }) => ({
             animation: "slide_from_left",
-          }),
-          screen: Achivements,
-        },
-        Bookmarks: {
-          options: () => ({
             headerShown: true,
             headerTitleAlign: "center",
             headerTitle: "",
@@ -109,20 +102,9 @@ const RootStack = createNativeStackNavigator({
             headerStyle: {
               backgroundColor: colors.background,
             },
-            headerLeft: () => (
-              <BackArrow
-                color={colors.lightText}
-                onPress={() => navigation.goBack()}
-              />
-            ),
+            headerLeft: () => <BackArrow />,
           }),
           screen: BookmarksScreen,
-        },
-        Leaderboard: {
-          options: ({ navigation }) => ({
-            animation: "slide_from_left",
-          }),
-          screen: Leaderboard,
         },
         NoteDetails: {
           initialParams: { itemId: 0 },
@@ -140,17 +122,13 @@ const RootStack = createNativeStackNavigator({
             headerStyle: {
               backgroundColor: colors.background,
             },
-            headerLeft: () => (
-              <BackArrow
-                color={colors.lightText}
-                onPress={() => navigation.goBack()}
-              />
-            ),
+            headerLeft: () => <BackArrow />,
           }),
           screen: NoteDetailsScreen,
         },
         Leaderboard: {
           options: ({ navigation }) => ({
+            animation: "slide_from_left",
             headerShown: true,
             headerTitleAlign: "center",
             headerTitle: "",
@@ -164,17 +142,13 @@ const RootStack = createNativeStackNavigator({
             headerStyle: {
               backgroundColor: colors.background,
             },
-            headerLeft: () => (
-              <BackArrow
-                color={colors.lightText}
-                onPress={() => navigation.goBack()}
-              />
-            ),
+            headerLeft: () => <BackArrow />,
           }),
           screen: LeaderboardScreen,
         },
         Profile: {
           options: ({ navigation }) => ({
+            animation: "slide_from_left",
             headerShown: true,
             headerTitleAlign: "center",
             headerTitle: "Profile",
@@ -191,12 +165,7 @@ const RootStack = createNativeStackNavigator({
             },
             headerShadowVisible: false,
             headerBackVisible: false,
-            headerLeft: () => (
-              <BackArrow
-                color={colors.lightText}
-                onPress={() => navigation.goBack()}
-              />
-            ),
+            headerLeft: () => <BackArrow />,
           }),
           screen: ProfileScreen,
         },
@@ -206,80 +175,6 @@ const RootStack = createNativeStackNavigator({
     SignedOut: {
       if: useIsSignedOut,
       screens: {
-        /* Home: HomeScreen,
-        Achivements: {
-          options: ({ navigation }) => ({
-            headerShown: true,
-            headerTitleAlign: "center",
-            headerTitle: "",
-            headerLargeTitle: true,
-            headerTitleStyle: {
-              color: colors.lightText,
-            },
-            headerLargeTitleStyle: {
-              color: colors.lightText,
-            },
-            headerStyle: {
-              backgroundColor: colors.background,
-            },
-            headerLeft: () => (
-              <BackArrow
-                color={colors.lightText}
-                onPress={() => navigation.goBack()}
-              />
-            ),
-          }),
-          screen: AchivementsScreen,
-        },
-        Bookmarks: {
-          options: ({ navigation }) => ({
-            headerShown: true,
-            headerTitleAlign: "center",
-            headerTitle: "",
-            headerLargeTitle: true,
-            headerTitleStyle: {
-              color: colors.lightText,
-            },
-            headerLargeTitleStyle: {
-              color: colors.lightText,
-            },
-            headerStyle: {
-              backgroundColor: colors.background,
-            },
-            headerLeft: () => (
-              <BackArrow
-                color={colors.lightText}
-                onPress={() => navigation.goBack()}
-              />
-            ),
-          }),
-          screen: BookmarksScreen,
-        },
-        NoteDetails: {
-          options: ({ navigation }) => ({
-            headerShown: true,
-            headerTitleAlign: "center",
-            headerTitle: "",
-            headerLargeTitle: true,
-            headerTitleStyle: {
-              color: colors.lightText,
-            },
-            headerLargeTitleStyle: {
-              color: colors.lightText,
-            },
-            headerStyle: {
-              backgroundColor: colors.background,
-            },
-            headerLeft: () => (
-              <BackArrow
-                color={colors.lightText}
-                onPress={() => navigation.goBack()}
-              />
-            ),
-          }),
-          screen: NoteDetailsScreen,
-          initialParams: { itemId: 0 },
-        }, */
         Login: {
           options: {
             headerShown: false,
