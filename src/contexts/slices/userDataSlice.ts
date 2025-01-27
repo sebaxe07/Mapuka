@@ -100,6 +100,9 @@ export const userDataSlice = createSlice({
     setAchievements: (state, action: PayloadAction<string>) => {
       state.achievements = action.payload;
     },
+    setPic: (state, action: PayloadAction<Photo | null>) => {
+      state.pic = action.payload;
+    },
     setNotes: (state, action: PayloadAction<Note[]>) => {
       state.notes = action.payload;
     },
@@ -150,6 +153,7 @@ export const {
   setDiscoveredArea,
   setDiscoveredPolygon,
   setAchievements,
+  setPic,
   setNotes,
   setSpots,
   setUserData,
