@@ -16,14 +16,16 @@ export interface Note {
   note_id: string;
   created_at: string;
   coordinates: number[];
+  address: string;
   title: string;
   content: string;
-  image: Photo;
+  image: number;
 }
 export interface Spot {
   spot_id: string;
   created_at: string;
   coordinates: number[];
+  address: string;
   title: string;
 }
 
@@ -39,6 +41,7 @@ export interface UserDataState {
   discovered_polygon: Feature<Polygon | MultiPolygon, GeoJsonProperties> | null;
   achievements: string;
   created_at: string;
+  pic: Photo | null;
   notes: Note[];
   spots: Spot[];
 }
@@ -55,6 +58,7 @@ const initialState = {
   discovered_polygon: null,
   achievements: "",
   created_at: "",
+  pic: null,
   notes: [],
   spots: [],
 } as UserDataState;
@@ -96,6 +100,9 @@ export const userDataSlice = createSlice({
     setAchievements: (state, action: PayloadAction<string>) => {
       state.achievements = action.payload;
     },
+    setPic: (state, action: PayloadAction<Photo | null>) => {
+      state.pic = action.payload;
+    },
     setNotes: (state, action: PayloadAction<Note[]>) => {
       state.notes = action.payload;
     },
@@ -113,6 +120,7 @@ export const userDataSlice = createSlice({
       state.discovered_polygon = action.payload.discovered_polygon;
       state.achievements = action.payload.achievements;
       state.created_at = action.payload.created_at;
+      state.pic = action.payload.pic;
       state.notes = action.payload.notes;
       state.spots = action.payload.spots;
     },
@@ -126,6 +134,8 @@ export const userDataSlice = createSlice({
       state.discovered_area = 0;
       state.discovered_polygon = null;
       state.achievements = "";
+      state.created_at = "";
+      state.pic = null;
       state.notes = [];
       state.spots = [];
     },
@@ -143,6 +153,7 @@ export const {
   setDiscoveredArea,
   setDiscoveredPolygon,
   setAchievements,
+  setPic,
   setNotes,
   setSpots,
   setUserData,

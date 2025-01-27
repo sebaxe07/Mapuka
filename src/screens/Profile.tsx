@@ -1,11 +1,22 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, TouchableOpacity, Alert } from "react-native";
+import { View, Text, TouchableOpacity, Alert, Image } from "react-native";
+import * as ImagePicker from "expo-image-picker";
 import * as Icons from "../../assets/icons/profile/index";
 import { signOut } from "../utils/UserManagement";
 import { useAppDispatch, useAppSelector } from "../contexts/hooks";
 import { clearUserData } from "../contexts/slices/userDataSlice";
 import { useNavigation } from "@react-navigation/native";
 import { colors } from "../../colors";
+import BackArrow from "../components/BackArrow";
+import MaskedView from "@react-native-masked-view/masked-view";
+import Edit from "../../assets/icons/edit_icon.svg";
+import ProfileDefault from "../../assets/icons/profile/profile_default.svg";
+import { Photo, setPic } from "../contexts/slices/userDataSlice";
+import {
+  arrayBufferToBase64,
+  base64ToArrayBuffer,
+} from "../utils/photoManager";
+import { supabase } from "../utils/supabase";
 
 const Profile: React.FC = () => {
   const handleLogout = () => {
@@ -15,18 +26,27 @@ const Profile: React.FC = () => {
     ]);
   };
 
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const dispatch = useAppDispatch();
-  const navigator = useNavigation();
+  const navigation = useNavigation();
   const logOut = async () => {
     console.log("User logged out");
     signOut();
     dispatch(clearUserData());
   };
 
+  useEffect(() => {
+    navigation.setOptions({
+      headerLeft: () => <BackArrow />,
+    });
+  }, [navigation]);
+
   const userData = useAppSelector((state) => state.userData);
   const [daysExplored, setDaysExplored] = useState<number>(0);
   const [distanceExplored, setDistanceExplored] = useState<number>(0);
   const [achievementsCount, setAchievementsCount] = useState<number>(0);
+
+  const [image, setImage] = useState<Photo | null>(null);
 
   useEffect(() => {
     // limite the distance to 2 decimal places
@@ -44,7 +64,168 @@ const Profile: React.FC = () => {
     } else {
       setDaysExplored(0);
     }
+
+    // Check if the user has a picture
+    if (userData.pic) {
+      //console.log("User has a picture", userData.pic.pictureUrl);
+      setAvatarUrl(userData.pic.pictureUrl);
+    }
   }, [userData]);
+
+  async function uploadAvatar() {
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images, // Restrict to only images
+        allowsMultipleSelection: false, // Can only select one image
+        allowsEditing: true, // Allows the user to crop / rotate their photo before uploading it
+        quality: 1,
+        exif: false, // We don't want nor need that data.
+      });
+
+      if (result.canceled || !result.assets || result.assets.length === 0) {
+        console.log("User cancelled image picker.");
+        return;
+      }
+
+      const image = result.assets[0];
+      console.log("Got image", image);
+
+      if (!image.uri) {
+        throw new Error("No image uri!"); // Realistically, this should never happen, but just in case...
+      }
+
+      const arraybuffer = await fetch(image.uri).then((res) =>
+        res.arrayBuffer()
+      );
+
+      const fileExt = image.uri?.split(".").pop()?.toLowerCase() ?? "jpeg";
+      const path = `${Date.now()}.${fileExt}`;
+      console.log("path", path);
+      console.log("arraybuffer", arraybuffer);
+      console.log("image.mimeType", image.mimeType);
+      console.log("image.uri", image.uri);
+      console.log("fileExt", fileExt);
+      setAvatarUrl(image.uri);
+
+      const tempPhoto: Photo = {
+        pictureUrl: image.uri,
+        arrayBuffer: arrayBufferToBase64(arraybuffer),
+        path: path,
+        image: image,
+      };
+      setImage(tempPhoto);
+    } catch (error) {
+      if (error instanceof Error) {
+        Alert.alert(error.message);
+      } else {
+        throw error;
+      }
+    }
+  }
+
+  const uploadImage = async (
+    userId: string,
+    picturePath: string,
+    arraybuffer: ArrayBuffer | undefined,
+    image: ImagePicker.ImagePickerAsset | undefined
+  ) => {
+    const FinalPath = `${userId}/${picturePath}`;
+
+    // Check if there is a folder for the user and get the files in it
+    const { data: listdata, error } = await supabase.storage
+      .from("avatars")
+      .list(userData.profile_id);
+
+    if (error) {
+      console.error("Error fetching existing images:", error);
+      throw error;
+    } else {
+      if (listdata && listdata.length > 0) {
+        console.log("Existing images:", listdata);
+        // Delete all the images in the folder
+        for (const file of listdata) {
+          const deletePath = `${userData.profile_id}/${file.name}`;
+          console.log("\x1b[31m", "Deleting existing image:", deletePath);
+          const { error: deleteError } = await supabase.storage
+            .from("avatars")
+            .remove([deletePath]);
+          if (deleteError) {
+            console.error("Error deleting existing image:", deleteError);
+            throw deleteError;
+          }
+        }
+      }
+    }
+
+    const { data, error: uploadError } = await supabase.storage
+      .from("avatars")
+      .update(FinalPath, arraybuffer || new ArrayBuffer(0), {
+        contentType: image?.mimeType ?? "image/jpeg",
+        upsert: true,
+      });
+    if (uploadError) {
+      console.error("Error uploading image:", uploadError);
+      throw uploadError;
+    }
+
+    console.log("Uploaded image data: ", data);
+
+    const imageUrl = await supabase.storage
+      .from("avatars")
+      .getPublicUrl(FinalPath);
+
+    if (!imageUrl) {
+      console.error("Error fetching signed URL for photo:", FinalPath);
+      return;
+    }
+    if (!imageUrl.data) {
+      console.error("Error fetching signed URL for photo:", FinalPath);
+      return;
+    }
+    // Update the user's profile pic URL in the app
+    setAvatarUrl(imageUrl.data.publicUrl);
+    dispatch(
+      setPic({
+        pictureUrl: imageUrl.data.publicUrl,
+        arrayBuffer: "",
+        path: FinalPath,
+        image: {} as ImagePicker.ImagePickerAsset,
+      })
+    );
+
+    setImage(null);
+
+    // save the image URL to the database
+    const { error: dbError } = await supabase
+      .from("profiles")
+      .update({ pic_url: imageUrl.data.publicUrl })
+      .eq("profile_id", userData.profile_id);
+
+    if (dbError) {
+      console.error("Error updating image URL in the database:", dbError);
+      throw dbError;
+    }
+
+    console.log("Uploaded image URL: ", imageUrl);
+    return;
+  };
+
+  useEffect(() => {
+    console.log("userdata ", userData.pic?.pictureUrl);
+  }, [userData]);
+
+  useEffect(() => {
+    console.log("Image changed", image?.path);
+    if (image) {
+      console.log("Uploading image");
+      uploadImage(
+        userData.profile_id,
+        image.path,
+        base64ToArrayBuffer(image.arrayBuffer),
+        image.image
+      );
+    }
+  }, [image]);
 
   return (
     <View className="flex-1 bg-bgMain px-5 py-5 pt-10 justify-around w-full ">
@@ -53,8 +234,38 @@ const Profile: React.FC = () => {
         {/* User Info Card */}
         <View className="flex-[0.55] bg-boxContainer rounded-3xl p-3 mr-3   ">
           <View className="flex-1 items-center justify-center">
-            <Icons.UserIcon color={colors.lightText} />
-            <View className="mt-3 items-center gap-3">
+            <View className="flex-[0.60]  size-full items-center justify-center">
+              <TouchableOpacity
+                onPress={uploadAvatar}
+                style={{
+                  aspectRatio: 1,
+                }}
+              >
+                <View className=" rounded-full border-4 border-textInput bg-textInput aspect-square items-center justify-center">
+                  <MaskedView
+                    maskElement={
+                      <View className="size-full items-center justify-center rounded-full  aspect-square bg-green-400" />
+                    }
+                  >
+                    {avatarUrl ? (
+                      <Image
+                        source={{ uri: avatarUrl }}
+                        accessibilityLabel="Avatar"
+                        style={[{ height: 120, width: 120 }]}
+                      />
+                    ) : (
+                      <ProfileDefault width={120} height={120} />
+                    )}
+                  </MaskedView>
+                </View>
+                <Edit
+                  style={{ position: "absolute", top: 0, right: 0 }}
+                  width={40}
+                  height={40}
+                />
+              </TouchableOpacity>
+            </View>
+            <View className=" flex-[0.40] mt-3 items-center gap-3">
               <Text className="text-boxMenu text-3xl font-senSemiBold flex-wrap">
                 Hello, {userData.name}!
               </Text>

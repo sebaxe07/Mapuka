@@ -35,8 +35,10 @@ const NoteBox: React.FC<{
       )}
       <View className="flex-1 justify-around px-4 py-2">
         <View className="">
-          <Text className="text-textBody text-base mb-1">{date}</Text>
-          <Text className="text-boxContainer text-4xl font-medium mb-1">
+          <Text className="text-textBody font-senRegular text-base mb-1">
+            {date}
+          </Text>
+          <Text className="text-boxContainer text-4xl font-senMedium mb-1">
             {title}
           </Text>
           <View className="flex-row items-center mb-4">
@@ -46,15 +48,19 @@ const NoteBox: React.FC<{
               color={"--color-text-body"}
               style={{ marginRight: 8 }}
             />
-            <Text className="text-textBody text-base">{address}</Text>
+            <Text className="text-textBody font-senRegular text-base">
+              {address}
+            </Text>
           </View>
         </View>
         <View className="">
           <TouchableOpacity
-            className="bg-buttonOrange items-center justify-center rounded-full px-3 py-3 w-1/3"
+            className="bg-buttonAccentRed items-center justify-center rounded-full px-3 py-3 w-1/3"
             onPress={onPress}
           >
-            <Text className="text-textWhite text-sm font-bold">Open Note</Text>
+            <Text className="text-textWhite text-sm font-senSemiBold">
+              Open Note
+            </Text>
           </TouchableOpacity>
         </View>
       </View>

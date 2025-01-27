@@ -122,7 +122,7 @@ const SaveBox: React.FC<SaveBoxProps> = ({ type, onClose, coordinates }) => {
       />
       <View className="">
         <TouchableOpacity
-          className="bg-textBody items-center justify-center rounded-full px-3 pb-2 py-3 w-1/3"
+          className="bg-textBody items-center justify-center rounded-full px-3 py-4 w-1/2"
           onPress={handleSave}
         >
           <Text className="text-textWhite font-senSemiBold">

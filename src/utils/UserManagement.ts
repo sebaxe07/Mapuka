@@ -1,8 +1,13 @@
 import { Alert } from "react-native";
 import { supabase } from "./supabase";
 import { useAppDispatch } from "../contexts/hooks";
-import { setUserData, clearUserData } from "../contexts/slices/userDataSlice";
+import {
+  setUserData,
+  clearUserData,
+  Photo,
+} from "../contexts/slices/userDataSlice";
 import { Feature, Polygon, MultiPolygon, GeoJsonProperties } from "geojson";
+import * as ImagePicker from "expo-image-picker";
 import { AuthError, PostgrestError } from "@supabase/supabase-js";
 
 interface signInWithEmailProps {
@@ -50,6 +55,44 @@ export async function signInWithEmail({
       discoveredPolygon = JSON.parse(profiles.discovered_polygon);
     }
 
+    let pic: Photo | null = null;
+    // Fetch the user's profile pic from the 'avatars' bucket
+    const { data: listdata, error: listerror } = await supabase.storage
+      .from("avatars")
+      .list(profiles.profile_id);
+
+    if (listerror) {
+      console.error("Error fetching list of photos:", listerror.message);
+      throw listerror;
+    } else if (listdata && listdata.length > 0) {
+      console.log("List of photos:", listdata);
+
+      const imageUrl = await supabase.storage
+        .from("avatars")
+        .getPublicUrl(profiles.profile_id + "/" + listdata[0].name);
+
+      if (!imageUrl) {
+        console.error(
+          "Error fetching Public URL for photo:",
+          profiles.profile_id + ".jpeg"
+        );
+      } else if (!imageUrl.data) {
+        console.error(
+          "Error fetching Public URL for photo:",
+          profiles.profile_id + ".jpeg"
+        );
+      } else {
+        // Update the user's profile pic URL in the app
+        pic = {
+          pictureUrl: imageUrl.data.publicUrl,
+          arrayBuffer: "",
+          path: profiles.profile_id,
+          image: {} as ImagePicker.ImagePickerAsset,
+        };
+        console.log("\x1b[32m", "pic URL:", pic.pictureUrl);
+      }
+    }
+
     // Fetch user spots
     const { data: spotsData, error: spotsError } = await supabase.from("spots").select("*").eq("profile_id", profiles.profile_id);
     if (spotsError) {
@@ -77,6 +120,7 @@ export async function signInWithEmail({
         discovered_polygon: discoveredPolygon,
         achievements: profiles?.achievements ?? "",
         created_at: profiles?.created_at ?? "",
+        pic: pic ?? null,
         notes: notesData ?? [],
         spots: spotsData ?? [],
       })

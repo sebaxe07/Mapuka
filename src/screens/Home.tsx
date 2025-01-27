@@ -6,21 +6,47 @@ import FloatingNavbar from "../components/FloatingNavbar";
 import * as Location from "expo-location";
 import { MAPBOX_ACCESS_TOKEN } from "@env";
 import SearchBar from "../components/SearchBar";
-import Map from "./MapFog";
-import { MotiView, MotiTransitionProp } from "moti";
 import Compass from "../components/Compass";
 import MaskedView from "@react-native-masked-view/masked-view";
 import NavbarBase from "../../assets/images/navbarbase.svg";
 import { colors } from "../../colors";
 import { Easing } from "react-native-reanimated";
+import { MotiView } from "moti";
 
 MapboxGL.setAccessToken(MAPBOX_ACCESS_TOKEN);
 
-const Home: React.FC = () => {
-  const [text, setText] = useState("");
-  const [searchText, setSearchText] = useState("");
-  const [triggerAction, setTriggerAction] = useState("");
-  const [bearing, setBearing] = useState(0);
+const Home: React.FC = ({ route }: any) => {
+  const [text, setText] = useState(""); // Text entered in the search bar
+  const [searchText, setSearchText] = useState(""); // Trigger for search
+  const [triggerAction, setTriggerAction] = useState(""); // Action triggers (e.g., GPS)
+  const [bearing, setBearing] = useState(0); // Compass bearing
+  const [externalCoords, setExternalCoords] = useState(null); // State to store external coordinates
+
+  // Check for external coordinates passed via `route`
+  useEffect(() => {
+    if (route?.params?.externalCoordinates) {
+      const newCoords = route.params.externalCoordinates;
+
+      // Log the new coordinates
+      console.log("Received External Coordinates:", newCoords);
+
+      // Update state with new coordinates
+      setExternalCoords(newCoords);
+
+      // Optionally, display an alert to the user
+      Alert.alert(
+        "New Coordinates Received",
+        `Latitude: ${newCoords.latitude}, Longitude: ${newCoords.longitude}`
+      );
+    }
+  }, [route?.params?.externalCoordinates]);
+
+  // Handle clearing coordinates if new ones are received later
+  useEffect(() => {
+    if (externalCoords) {
+      console.log("External coordinates updated. Clearing old register...");
+    }
+  }, [externalCoords]);
   const [[latitude, longitude], setCoordinates] = useState<[number, number]>([
     0,
     0,
@@ -29,7 +55,7 @@ const Home: React.FC = () => {
   const [changeTheme, setChangeTheme] = useState(false);
 
   const handleSearch = () => {
-    setSearchText(text);
+    setSearchText(text); // Trigger the search action
   };
 
   type MapType = "custom" | "dark" | "light";
@@ -117,8 +143,8 @@ const Home: React.FC = () => {
 
   return (
     <View className="flex-1">
-      {/* Full-screen Map */}
-      <Map
+      {/* Full-screen Map */
+      /* <Map
         searchText={searchText}
         triggerAction={triggerAction}
         setTriggerAction={setTriggerAction}
@@ -161,10 +187,10 @@ const Home: React.FC = () => {
 
             <View className=" gap-4 items-end">
               <TouchableOpacity
-                className="bg-buttonAqua  rounded-full items-center justify-center size-14"
+                className="bg-buttonAqua rounded-full items-center justify-center size-14"
                 onPress={() => setTriggerAction("gps")}
               >
-                <Icons.Focus color="white" />
+                <Icons.Focus color={colors.white} />
               </TouchableOpacity>
 
               {memoizedCompass}
