@@ -1,13 +1,14 @@
-import React from "react";
-import { View, Text, TouchableOpacity } from "react-native";
+import React, { useState } from "react";
+import { View, Text, TouchableOpacity, TextInput } from "react-native";
 import Settings from "../../assets/icons/bookmarks/settings.svg";
 import Place from "../../assets/icons/bookmarks/place.svg"; // Assuming Place is your location icon
 import { colors } from "../../colors";
+import { useNavigation } from "@react-navigation/native";
 
 const NoteDetails: React.FC = ({ route }: any) => {
   const { itemId } = route.params;
 
-  const notesData = [
+  const [notesData, setNotesData] = useState([
     {
       id: 1,
       title: "Mystical Riverbend Spot",
@@ -80,9 +81,14 @@ const NoteDetails: React.FC = ({ route }: any) => {
       content:
         "Etiam vitae augue ultrices, efficitur lectus et, malesuada nulla. Aliquam porttitor in est eget dapibus. Ut ac mi ac urna condimentum molestie vel non ex. Vestibulum dictum purus vulputate diam congue luctus vel ac eros. Vivamus convallis pretium diam, eu volutpat justo cursus id. Suspendisse fermentum venenatis eros nec interdum. Aliquam at pretium erat. Aliquam facilisis consectetur purus, a susc. elementum mauris, ut ornare elit euismod in. Proin et massa nisi. Suspendisse ipsum augue, viverra iaculis tincidunt laoreet, feugiat vulputate massa. ",
     },
-  ];
+  ]);
 
   const note = notesData.find((note) => note.id === itemId);
+
+  const [isEditing, setIsEditing] = useState(false);
+  const [editableNote, setEditableNote] = useState(note);
+
+  const navigation = useNavigation();
 
   if (!note) {
     return (
@@ -92,11 +98,21 @@ const NoteDetails: React.FC = ({ route }: any) => {
     );
   }
 
-  const { title, date, address, coordinates, content } = note;
+  const handleSave = () => {
+    setNotesData((prev) =>
+      prev.map((n) => (n.id === itemId ? { ...n, ...editableNote } : n))
+    );
+    setIsEditing(false); // Exit editing mode
+  };
 
-  const onPress = () => {
-    console.log(`Viewing spot: ${title}, located at ${address}`);
-    // Add further navigation or actions based on the note's coordinates
+  const onPress = (latitude: number, longitude: number) => {
+    try {
+      navigation.navigate("Home", {
+        externalCoordinates: { latitude, longitude },
+      });
+    } catch (error) {
+      console.error("Navigation error:", error);
+    }
   };
 
   return (
@@ -110,23 +126,58 @@ const NoteDetails: React.FC = ({ route }: any) => {
 
       {/* Content */}
       <View className="flex-4 h-3/4 gap-3">
-        {/* Settings */}
+        {/* Edit / Save Button */}
         <View className="w-full pt-6 items-end px-5">
-          <View className="flex-row items-center">
-            <Settings />
-            <Text className="text-textInput text-xl font-senRegular mb-1 ml-4">
-              Edit
-            </Text>
-          </View>
+          <TouchableOpacity
+            onPress={() => {
+              if (isEditing) {
+                handleSave();
+              } else {
+                setIsEditing(true);
+              }
+            }}
+          >
+            <View className="flex-row items-center">
+              <Settings />
+              <Text className="text-textInput text-xl font-senRegular mb-1 ml-4">
+                {isEditing ? "Save" : "Edit"}
+              </Text>
+            </View>
+          </TouchableOpacity>
         </View>
 
         {/* Note Details */}
         <View className="flex-1 h-[80%] justify-around rounded-3xl bg-boxMenu px-6 py-4">
           <View>
-            <Text className="text-textBody text-base mb-1">{date}</Text>
-            <Text className="text-boxContainer text-4xl font-senMedium mb-4">
-              {title}
-            </Text>
+            {/* Date */}
+            {isEditing ? (
+              <TextInput
+                value={editableNote.date}
+                onChangeText={(text) =>
+                  setEditableNote({ ...editableNote, date: text })
+                }
+                className="text-textBody text-base mb-1 border-b border-textBody"
+              />
+            ) : (
+              <Text className="text-textBody text-base mb-1">{note.date}</Text>
+            )}
+
+            {/* Title */}
+            {isEditing ? (
+              <TextInput
+                value={editableNote.title}
+                onChangeText={(text) =>
+                  setEditableNote({ ...editableNote, title: text })
+                }
+                className="text-boxContainer text-4xl font-senMedium mb-4 border-b border-boxContainer"
+              />
+            ) : (
+              <Text className="text-boxContainer text-4xl font-senMedium mb-4">
+                {note.title}
+              </Text>
+            )}
+
+            {/* Address */}
             <View className="flex-row items-center mb-4">
               <Place
                 width={16}
@@ -134,16 +185,41 @@ const NoteDetails: React.FC = ({ route }: any) => {
                 color={colors.bodyText}
                 style={{ marginRight: 8 }}
               />
-              <Text className="text-textBody text-base">{address}</Text>
+              {isEditing ? (
+                <TextInput
+                  value={editableNote.address}
+                  onChangeText={(text) =>
+                    setEditableNote({ ...editableNote, address: text })
+                  }
+                  className="text-textBody text-base border-b border-textBody"
+                />
+              ) : (
+                <Text className="text-textBody text-base">{note.address}</Text>
+              )}
             </View>
-            <View className="flex-wrap px-6 py-4 items-center mb-4">
-              <Text className="text-textBody text-base">{content}</Text>
-            </View>
+
+            {/* Content */}
+            {isEditing ? (
+              <TextInput
+                value={editableNote.content}
+                onChangeText={(text) =>
+                  setEditableNote({ ...editableNote, content: text })
+                }
+                multiline
+                className="text-textBody text-base border-b border-textBody"
+              />
+            ) : (
+              <Text className="text-textBody text-base">{note.content}</Text>
+            )}
           </View>
+
+          {/* Go to Spot Button */}
           <View className="flex-row justify-center w-full">
             <TouchableOpacity
-              className="bg-buttonOrange rounded-3xl items-center justify-center w-1/2 px-5 py-3"
-              onPress={onPress}
+              className="bg-buttonAccentRed rounded-3xl items-center justify-center w-1/2 px-5 py-3"
+              onPress={() =>
+                onPress(note.coordinates.latitude, note.coordinates.longitude)
+              }
             >
               <Text className="text-textWhite text-sm font-senSemiBold">
                 Go to Spot

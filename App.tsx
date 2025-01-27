@@ -13,6 +13,7 @@ import DetailsScreen from "./src/screens/Details";
 import MapScreen from "./src/screens/Map";
 import AchivementsScreen from "./src/screens/Achivements";
 import BookmarksScreen from "./src/screens/Bookmarks";
+import NoteDetailsScreen from "./src/screens/NoteDetails";
 import LeaderboardScreen from "./src/screens/Leaderboard";
 import ProfileScreen from "./src/screens/Profile";
 import { BackArrow } from "./assets/icons/profile";
@@ -89,8 +90,18 @@ const RootStack = createNativeStackNavigator({
         Bookmarks: {
           options: ({ navigation }) => ({
             headerShown: true,
+            headerTitleAlign: "center",
             headerTitle: "",
-            headerTransparent: true,
+            headerLargeTitle: true,
+            headerTitleStyle: {
+              color: colors.lightText,
+            },
+            headerLargeTitleStyle: {
+              color: colors.lightText,
+            },
+            headerStyle: {
+              backgroundColor: colors.background,
+            },
             headerLeft: () => (
               <BackArrow
                 color={colors.lightText}
@@ -99,6 +110,31 @@ const RootStack = createNativeStackNavigator({
             ),
           }),
           screen: BookmarksScreen,
+        },
+        NoteDetails: {
+          initialParams: { itemId: 0 },
+          options: ({ navigation }) => ({
+            headerShown: true,
+            headerTitleAlign: "center",
+            headerTitle: "",
+            headerLargeTitle: true,
+            headerTitleStyle: {
+              color: colors.lightText,
+            },
+            headerLargeTitleStyle: {
+              color: colors.lightText,
+            },
+            headerStyle: {
+              backgroundColor: colors.background,
+            },
+            headerLeft: () => (
+              <BackArrow
+                color={colors.lightText}
+                onPress={() => navigation.goBack()}
+              />
+            ),
+          }),
+          screen: NoteDetailsScreen,
         },
         Leaderboard: {
           options: ({ navigation }) => ({
@@ -155,12 +191,22 @@ const RootStack = createNativeStackNavigator({
     SignedOut: {
       if: useIsSignedOut,
       screens: {
-        /*  Home: HomeScreen,
+        /* Home: HomeScreen,
         Achivements: {
           options: ({ navigation }) => ({
             headerShown: true,
+            headerTitleAlign: "center",
             headerTitle: "",
-            headerTransparent: true,
+            headerLargeTitle: true,
+            headerTitleStyle: {
+              color: colors.lightText,
+            },
+            headerLargeTitleStyle: {
+              color: colors.lightText,
+            },
+            headerStyle: {
+              backgroundColor: colors.background,
+            },
             headerLeft: () => (
               <BackArrow
                 color={colors.lightText}
@@ -169,6 +215,55 @@ const RootStack = createNativeStackNavigator({
             ),
           }),
           screen: AchivementsScreen,
+        },
+        Bookmarks: {
+          options: ({ navigation }) => ({
+            headerShown: true,
+            headerTitleAlign: "center",
+            headerTitle: "",
+            headerLargeTitle: true,
+            headerTitleStyle: {
+              color: colors.lightText,
+            },
+            headerLargeTitleStyle: {
+              color: colors.lightText,
+            },
+            headerStyle: {
+              backgroundColor: colors.background,
+            },
+            headerLeft: () => (
+              <BackArrow
+                color={colors.lightText}
+                onPress={() => navigation.goBack()}
+              />
+            ),
+          }),
+          screen: BookmarksScreen,
+        },
+        NoteDetails: {
+          options: ({ navigation }) => ({
+            headerShown: true,
+            headerTitleAlign: "center",
+            headerTitle: "",
+            headerLargeTitle: true,
+            headerTitleStyle: {
+              color: colors.lightText,
+            },
+            headerLargeTitleStyle: {
+              color: colors.lightText,
+            },
+            headerStyle: {
+              backgroundColor: colors.background,
+            },
+            headerLeft: () => (
+              <BackArrow
+                color={colors.lightText}
+                onPress={() => navigation.goBack()}
+              />
+            ),
+          }),
+          screen: NoteDetailsScreen,
+          initialParams: { itemId: 0 },
         }, */
         Login: {
           options: {

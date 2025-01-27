@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity } from "react-native";
 import Place from "../../assets/icons/bookmarks/place.svg";
 import SpotDefault from "../../assets/images/bookmarks/spotDefault.svg";
 import { colors } from "../../colors";
+import { useNavigation } from "@react-navigation/native";
 
 const SpotBox: React.FC<{
   title: string;
@@ -11,6 +12,10 @@ const SpotBox: React.FC<{
   onPress: () => void;
   image?: string;
 }> = ({ title, date: created_at, address: coordinates, onPress, image }) => {
+  const navigation = useNavigation();
+
+  const externalCoordinates = (latitude: number, longitude: number) => {};
+
   return (
     <View
       className="flex-row items-center rounded-3xl p-4 px-2 mb-4 bg-boxContainer"

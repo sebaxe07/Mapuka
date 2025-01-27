@@ -71,12 +71,14 @@ const BookmarksScreen: React.FC = () => {
       title: "Golden Gate Park",
       date: "14-04-2024",
       address: "San Francisco, CA",
+      coordinates: { latitude: 37.7694, longitude: -122.4862 }, // Golden Gate Park
     },
     {
       id: 2,
       title: "Rooftop Cafe",
       date: "09-06-2023",
       address: "Skyline Boulevard, NY",
+      coordinates: { latitude: 40.7306, longitude: -73.9352 }, // Placeholder for Skyline Boulevard, NY
     },
     {
       id: 3,
@@ -84,12 +86,14 @@ const BookmarksScreen: React.FC = () => {
       title: "Crystal Lake Dock",
       date: "27-09-2024",
       address: "Lakeview Crescent, MN",
+      coordinates: { latitude: 46.7296, longitude: -94.6859 }, // Placeholder for Minnesota
     },
     {
       id: 4,
       title: "Vintage Market Plaza",
       date: "19-03-2025",
       address: "Downtown Square, TX",
+      coordinates: { latitude: 29.7604, longitude: -95.3698 }, // Houston, TX (as an example for Downtown Square)
     },
     {
       id: 5,
@@ -97,12 +101,14 @@ const BookmarksScreen: React.FC = () => {
       title: "Secluded Waterfall",
       date: "31-08-2024",
       address: "Cascade Hills, OR",
+      coordinates: { latitude: 44.0582, longitude: -121.3153 }, // Placeholder for Cascade Hills, OR
     },
     {
       id: 6,
       title: "Urban Art Alley",
       date: "02-05-2023",
       address: "Creative District, FL",
+      coordinates: { latitude: 25.7617, longitude: -80.1918 }, // Miami, FL (as an example for Creative District)
     },
   ];
 
@@ -117,7 +123,31 @@ const BookmarksScreen: React.FC = () => {
     if (type === "note") {
       navigation.navigate("NoteDetails", { itemId });
     } else {
-      navigation.navigate("Home");
+      // Replace `notesData` with `spotsData` when accessing spots
+      const spot = spotsData.find((spot) => spot.id === itemId);
+
+      if (!spot) {
+        console.error("Spot not found with id:", itemId);
+        return;
+      }
+
+      const { coordinates } = spot;
+
+      if (!coordinates) {
+        console.error("Coordinates not available for spot:", itemId);
+        return;
+      }
+
+      try {
+        navigation.navigate("Home", {
+          externalCoordinates: {
+            latitude: coordinates.latitude,
+            longitude: coordinates.longitude,
+          },
+        });
+      } catch (error) {
+        console.error("Navigation error:", error);
+      }
     }
   };
 
