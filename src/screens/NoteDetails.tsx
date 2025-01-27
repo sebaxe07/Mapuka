@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { View, Text, TouchableOpacity, TextInput } from "react-native";
 import Settings from "../../assets/icons/bookmarks/settings.svg";
-import Place from "../../assets/icons/bookmarks/place.svg"; // Assuming Place is your location icon
+import Place from "../../assets/icons/bookmarks/place.svg";
+import Edit from "../../assets/icons/profile/edit.svg";
 import { colors } from "../../colors";
 import { useNavigation } from "@react-navigation/native";
 
@@ -70,7 +71,15 @@ const NoteDetails: React.FC = ({ route }: any) => {
   const note = notesData.find((note) => note.note_id === itemId);
 
   const [isEditing, setIsEditing] = useState(false);
-  const [editableNote, setEditableNote] = useState(note);
+  const [editableNote, setEditableNote] = useState<Note | undefined>({
+    created_at: "",
+    note_id: "",
+    coordinates: [],
+    address: "",
+    title: "",
+    content: "",
+    image: 0,
+  });
 
   const navigation = useNavigation();
 
@@ -112,6 +121,7 @@ const NoteDetails: React.FC = ({ route }: any) => {
       <View className="flex-4 h-3/4 gap-3">
         {/* Edit / Save Button */}
         <View className="w-full pt-6 items-end px-5">
+          <Settings />
           <TouchableOpacity
             onPress={() => {
               if (isEditing) {
@@ -122,7 +132,7 @@ const NoteDetails: React.FC = ({ route }: any) => {
             }}
           >
             <View className="flex-row items-center">
-              <Settings />
+              <Edit />
               <Text className="text-textInput text-xl font-senRegular mb-1 ml-4">
                 {isEditing ? "Save" : "Edit"}
               </Text>
@@ -136,9 +146,15 @@ const NoteDetails: React.FC = ({ route }: any) => {
             {/* Date */}
             {isEditing ? (
               <TextInput
-                value={editableNote?.created_at}
+                value={editableNote?.created_at || ""}
                 onChangeText={(text) =>
-                  setEditableNote({ ...editableNote, created_at: text })
+                  setEditableNote(
+                    (prev) =>
+                      ({
+                        ...prev,
+                        created_at: text,
+                      }) as Note
+                  )
                 }
                 className="text-textBody text-base mb-1 border-b border-textBody"
               />
@@ -151,9 +167,15 @@ const NoteDetails: React.FC = ({ route }: any) => {
             {/* Title */}
             {isEditing ? (
               <TextInput
-                value={editableNote?.title}
+                value={editableNote?.title || ""}
                 onChangeText={(text) =>
-                  setEditableNote({ ...editableNote, title: text })
+                  setEditableNote(
+                    (prev) =>
+                      ({
+                        ...prev,
+                        title: text,
+                      }) as Note
+                  )
                 }
                 className="text-boxContainer text-4xl font-senMedium mb-4 border-b border-boxContainer"
               />
@@ -173,9 +195,15 @@ const NoteDetails: React.FC = ({ route }: any) => {
               />
               {isEditing ? (
                 <TextInput
-                  value={editableNote?.address}
+                  value={editableNote?.address || ""}
                   onChangeText={(text) =>
-                    setEditableNote({ ...editableNote, address: text })
+                    setEditableNote(
+                      (prev) =>
+                        ({
+                          ...prev,
+                          address: text,
+                        }) as Note
+                    )
                   }
                   className="text-textBody text-base border-b border-textBody"
                 />
@@ -187,9 +215,15 @@ const NoteDetails: React.FC = ({ route }: any) => {
             {/* Content */}
             {isEditing ? (
               <TextInput
-                value={editableNote?.content}
+                value={editableNote?.content || ""}
                 onChangeText={(text) =>
-                  setEditableNote({ ...editableNote, content: text })
+                  setEditableNote(
+                    (prev) =>
+                      ({
+                        ...prev,
+                        content: text,
+                      }) as Note
+                  )
                 }
                 multiline
                 className="text-textBody text-base border-b border-textBody"

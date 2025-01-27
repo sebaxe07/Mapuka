@@ -62,11 +62,14 @@ const RootStack = createNativeStackNavigator({
     SignedIn: {
       if: useIsSignedIn,
       screens: {
-        Home: HomeScreen,
+        Home: {
+          initialParams: { externalCoordinates: { latitude: 0, longitude: 0 } },
+          screen: HomeScreen,
+        },
         Details: DetailsScreen,
         Map: MapScreen,
         Achivements: {
-          options: ({ navigation }) => ({
+          options: ({}) => ({
             animation: "slide_from_left",
             headerShown: true,
             headerTitleAlign: "center",
@@ -86,7 +89,7 @@ const RootStack = createNativeStackNavigator({
           screen: AchivementsScreen,
         },
         Bookmarks: {
-          options: ({ navigation }) => ({
+          options: ({}) => ({
             animation: "slide_from_left",
             headerShown: true,
             headerTitleAlign: "center",
@@ -106,8 +109,7 @@ const RootStack = createNativeStackNavigator({
           screen: BookmarksScreen,
         },
         NoteDetails: {
-          initialParams: { itemId: 0 },
-          options: ({ navigation }) => ({
+          options: ({}) => ({
             headerShown: true,
             headerTitleAlign: "center",
             headerTitle: "",
@@ -123,10 +125,11 @@ const RootStack = createNativeStackNavigator({
             },
             headerLeft: () => <BackArrow />,
           }),
+          initialParams: { itemId: "0" },
           screen: NoteDetailsScreen,
         },
         Leaderboard: {
-          options: ({ navigation }) => ({
+          options: ({}) => ({
             animation: "slide_from_left",
             headerShown: true,
             headerTitleAlign: "center",
@@ -146,7 +149,7 @@ const RootStack = createNativeStackNavigator({
           screen: LeaderboardScreen,
         },
         Profile: {
-          options: ({ navigation }) => ({
+          options: ({}) => ({
             animation: "slide_from_left",
             headerShown: true,
             headerTitleAlign: "center",
