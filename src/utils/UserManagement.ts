@@ -50,6 +50,20 @@ export async function signInWithEmail({
       discoveredPolygon = JSON.parse(profiles.discovered_polygon);
     }
 
+    // Fetch user spots
+    const { data: spotsData, error: spotsError } = await supabase.from("spots").select("*").eq("profile_id", profiles.profile_id);
+    if (spotsError) {
+      console.error("Failed to fetch spots:", spotsError.message);
+      return;
+    }
+
+    // Fetch user notes
+    const { data: notesData, error: notesError } = await supabase.from("notes").select("*").eq("profile_id", profiles.profile_id);
+    if (notesError) {
+      console.error("Failed to fetch notes:", notesError.message);
+      return;
+    }
+
     // Dispatch the action to set user data in Redux state
     dispatch(
       setUserData({
@@ -63,8 +77,8 @@ export async function signInWithEmail({
         discovered_polygon: discoveredPolygon,
         achievements: profiles?.achievements ?? "",
         created_at: profiles?.created_at ?? "",
-        notes: profiles?.notes ?? [],
-        spots: profiles?.spots ?? [],
+        notes: notesData ?? [],
+        spots: spotsData ?? [],
       })
     );
 
@@ -85,6 +99,13 @@ export const signOut = async () => {
     return;
   }
   console.log("Logged out");
+
+  const dispatch = useAppDispatch();
+  dispatch(clearUserData());
+
+  console.log("User data cleared")
+
+  
 };
 
 interface SignUpUserProps {
