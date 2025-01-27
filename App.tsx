@@ -63,7 +63,9 @@ const RootStack = createNativeStackNavigator({
       if: useIsSignedIn,
       screens: {
         Home: {
-          initialParams: { externalCoordinates: { latitude: 0, longitude: 0 } },
+          /* initialParams: {
+            externalCoordinates: { latitude: null, longitude: null },
+          }, */
           screen: HomeScreen,
         },
         Details: DetailsScreen,
