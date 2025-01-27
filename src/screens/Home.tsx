@@ -12,7 +12,6 @@ import NavbarBase from "../../assets/images/navbarbase.svg";
 import { colors } from "../../colors";
 import { Easing } from "react-native-reanimated";
 import { MotiView } from "moti";
-import Map from "./MapFog";
 
 MapboxGL.setAccessToken(MAPBOX_ACCESS_TOKEN);
 
@@ -57,7 +56,6 @@ const Home: React.FC = ({ route }: any) => {
 
   const handleSearch = () => {
     setSearchText(text); // Trigger the search action
-    setSearchText(text); // Trigger the search action
   };
 
   type MapType = "custom" | "dark" | "light";
@@ -80,7 +78,7 @@ const Home: React.FC = ({ route }: any) => {
     () => (
       <>
         <MotiView
-          animate={{ translateY: changeTheme ? 0 : -60, scale: 0.8 }}
+          animate={{ translateY: changeTheme ? 0 : -60, scale: 0.9 }}
           transition={
             {
               type: "timing",
@@ -93,11 +91,11 @@ const Home: React.FC = ({ route }: any) => {
             className="bg-[#1a1b3f] rounded-full items-center justify-center size-14"
             onPress={handleMapCustom}
           >
-            <Icons.Layers fill={"#E8EBFF"} />
+            <Icons.Layers color={colors.white} />
           </TouchableOpacity>
         </MotiView>
         <MotiView
-          animate={{ translateY: changeTheme ? 0 : -120, scale: 0.8 }}
+          animate={{ translateY: changeTheme ? 0 : -120, scale: 0.9 }}
           transition={
             {
               type: "timing",
@@ -110,12 +108,12 @@ const Home: React.FC = ({ route }: any) => {
             className="bg-[#292929]  rounded-full items-center justify-center size-14"
             onPress={handleMapDark}
           >
-            <Icons.Layers fill={"#5E5E5E"} />
+            <Icons.Layers color={colors.white} />
           </TouchableOpacity>
         </MotiView>
 
         <MotiView
-          animate={{ translateY: changeTheme ? 0 : -180, scale: 0.8 }}
+          animate={{ translateY: changeTheme ? 0 : -180, scale: 0.9 }}
           transition={
             {
               type: "timing",
@@ -128,7 +126,7 @@ const Home: React.FC = ({ route }: any) => {
             className="bg-white  rounded-full items-center justify-center size-14"
             onPress={handleMapLight}
           >
-            <Icons.Layers fill={"#AEAEAE"} />
+            <Icons.Layers color={colors.white} />
           </TouchableOpacity>
         </MotiView>
       </>
@@ -173,7 +171,7 @@ const Home: React.FC = ({ route }: any) => {
                 className="bg-buttonPurple  rounded-full items-center justify-center size-14 z-10"
                 onPress={() => setChangeTheme(!changeTheme)}
               >
-                <Icons.Layers fill={"#E8EBFF"} />
+                <Icons.Layers color={colors.white} />
               </TouchableOpacity>
 
               {memoizedTheme}
@@ -190,10 +188,8 @@ const Home: React.FC = ({ route }: any) => {
             <View className=" gap-4 items-end">
               <TouchableOpacity
                 className="bg-buttonAqua rounded-full items-center justify-center size-14"
-                className="bg-buttonAqua rounded-full items-center justify-center size-14"
                 onPress={() => setTriggerAction("gps")}
               >
-                <Icons.Focus color={colors.white} />
                 <Icons.Focus color={colors.white} />
               </TouchableOpacity>
 

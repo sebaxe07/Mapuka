@@ -87,6 +87,7 @@ const RootStack = createNativeStackNavigator({
         },
         Bookmarks: {
           options: ({ navigation }) => ({
+            animation: "slide_from_left",
             headerShown: true,
             headerTitleAlign: "center",
             headerTitle: "",
@@ -146,6 +147,7 @@ const RootStack = createNativeStackNavigator({
         },
         Profile: {
           options: ({ navigation }) => ({
+            animation: "slide_from_left",
             headerShown: true,
             headerTitleAlign: "center",
             headerTitle: "Profile",
@@ -166,6 +168,7 @@ const RootStack = createNativeStackNavigator({
           }),
           screen: ProfileScreen,
         },
+        /* MapFog: MapFog, */
       },
     },
     SignedOut: {
