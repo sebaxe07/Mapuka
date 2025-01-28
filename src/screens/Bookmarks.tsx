@@ -126,6 +126,17 @@ const BookmarksScreen: React.FC = () => {
   const spotsData = useAppSelector((state) => state.userData.spots);
   const notesData = useAppSelector((state) => state.userData.notes);
 
+  const formatDate = (dateString: string) => {
+    const options: Intl.DateTimeFormatOptions = {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    };
+    return new Date(dateString).toLocaleDateString(undefined, options);
+  };
+
   const navigation = useNavigation();
 
   const tabs = [
@@ -294,7 +305,7 @@ const BookmarksScreen: React.FC = () => {
             renderItem={({ item }) => (
               <NoteBox
                 title={item.title}
-                date={item.created_at}
+                date={formatDate(item.created_at)}
                 address={item.address}
                 styleVariant={item.image}
                 onPress={() => goToDetails("note", item.note_id)}
@@ -327,7 +338,7 @@ const BookmarksScreen: React.FC = () => {
               <SpotBox
                 image={require("../../assets/images/bookmarks/spotDefault.svg")}
                 title={item.title}
-                date={item.created_at}
+                date={formatDate(item.created_at)}
                 address={item.address}
                 onPress={() => goToDetails("spot", item.spot_id)}
               />
