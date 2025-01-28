@@ -1,12 +1,13 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, TouchableOpacity, TextInput } from "react-native";
 import Settings from "../../assets/icons/bookmarks/settings.svg";
 import Place from "../../assets/icons/bookmarks/place.svg"; // Assuming Place is your location icon
 import { colors } from "../../colors";
 import { useNavigation } from "@react-navigation/native";
 
-import { Note } from "../contexts/slices/userDataSlice";
-import { useAppSelector } from "../contexts/hooks";
+import { Note, setNotes } from "../contexts/slices/userDataSlice";
+import { useAppDispatch, useAppSelector } from "../contexts/hooks";
+import { supabase } from "../utils/supabase";
 
 const NoteDetails: React.FC = ({ route }: any) => {
   const { itemId } = route.params;
@@ -86,8 +87,9 @@ const NoteDetails: React.FC = ({ route }: any) => {
 
   const [isEditing, setIsEditing] = useState(false);
   const [editableNote, setEditableNote] = useState(note);
-
+  
   const navigation = useNavigation();
+  const dispatch = useAppDispatch();
 
   if (!note) {
     return (
@@ -96,13 +98,39 @@ const NoteDetails: React.FC = ({ route }: any) => {
       </View>
     );
   }
+  
+  // TODO: REFLECT CHANGES IN THE DATABASE. How to choose what data to update specifically?
+  const updateNote = async () => {
+    if (editableNote) {
+      const { data, error } = await supabase
+        .from("notes")
+        .update({
+          title: editableNote.title,
+          content: editableNote.content,
+          address: editableNote.address
+        })
+        .eq("note_id", note.note_id);
+
+      if (error) {
+        console.error("Error saving edited note: ", error.message);
+        return;
+      }
+    }
+  };
 
   const handleSave = () => {
     setNotesData((prev) =>
       prev.map((n) => (n.note_id === itemId ? { ...n, ...editableNote } : n))
-    );
+    );    
+    updateNote();
+
     setIsEditing(false); // Exit editing mode
   };
+
+  useEffect(() => {
+    dispatch(setNotes(notesData));
+    
+  }, [notesData, dispatch]);
 
   const onPress = (latitude: number, longitude: number) => {
     try {
