@@ -122,7 +122,6 @@ const BookmarksScreen: React.FC = () => {
   //   },
   // ];
 
-  // TODO: FIX TIMESTAMPS
   const spotsData = useAppSelector((state) => state.userData.spots);
   const notesData = useAppSelector((state) => state.userData.notes);
 
@@ -304,6 +303,7 @@ const BookmarksScreen: React.FC = () => {
             keyExtractor={(item) => item.note_id}
             renderItem={({ item }) => (
               <NoteBox
+                key={item.note_id}
                 title={item.title}
                 date={formatDate(item.created_at)}
                 address={item.address}
@@ -336,6 +336,7 @@ const BookmarksScreen: React.FC = () => {
             keyExtractor={(item) => item.spot_id}
             renderItem={({ item }) => (
               <SpotBox
+                key={item.spot_id}
                 image={require("../../assets/images/bookmarks/spotDefault.svg")}
                 title={item.title}
                 date={formatDate(item.created_at)}
