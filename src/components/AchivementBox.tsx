@@ -50,9 +50,11 @@ const AchievementBox: React.FC<ContentBoxProps> = ({
 
   return (
     <View
-      className={`rounded-3xl items-center justify-center w-full h-full ${boxStyles}`}
+      className={`rounded-3xl items-center justify-center w-full h-full ${boxStyles} bg-boxMenu`}
       style={{
-        backgroundColor: unlocked ? randomColor : colors.menus,
+        /* backgroundColor: unlocked ? randomColor : colors.menus, */
+        //Out of service pretty colors
+        opacity: unlocked ? 1 : 0.5, // Apply opacity when locked
       }}
     >
       {/* SVG Icon */}
@@ -73,14 +75,16 @@ const AchievementBox: React.FC<ContentBoxProps> = ({
           layout === "horizontal" ? "flex-1 gap-2 px-4" : "  py-2"
         } justify-center items-center`}
       >
-        <Text
-          className={`font-senBold text-sm text-center ${unlocked ? "text-textWhite" : "text-bgMain"}`}
-        >
+        <Text className={`font-senBold text-sm text-center text-bgMain`}>
           {title}
         </Text>
         <Text
-          className="font-senRegular text-xs text-center"
-          style={{ color: textColor }}
+          className={`font-senRegular text-xs text-center ${unlocked ? "text-textBody" : "text-bgMain"}`}
+          style={
+            {
+              /* color: textColor */
+            }
+          }
         >
           {description},
         </Text>
