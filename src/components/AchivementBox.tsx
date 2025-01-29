@@ -50,13 +50,17 @@ const AchievementBox: React.FC<ContentBoxProps> = ({
 
   return (
     <View
-      className={`rounded-3xl items-center w-full h-full ${boxStyles}`}
+      className={`rounded-3xl items-center justify-center w-full h-full ${boxStyles}`}
       style={{
         backgroundColor: unlocked ? randomColor : colors.menus,
       }}
     >
       {/* SVG Icon */}
-      <View className="flex flex-1 items-center justify-center">
+      <View
+        className={`${
+          layout === "horizontal" ? "flex-1 " : " "
+        }flex items-center justify-center`}
+      >
         <Icon
           width={layout === "horizontal" ? 50 : 70}
           height={layout === "horizontal" ? 80 : 50}
@@ -66,8 +70,8 @@ const AchievementBox: React.FC<ContentBoxProps> = ({
       {/* Text Content */}
       <View
         className={`${
-          layout === "horizontal" ? "gap-2 px-4" : "items-center py-2"
-        } flex-1 justify-center`}
+          layout === "horizontal" ? "flex-1 gap-2 px-4" : "  py-2"
+        } justify-center items-center`}
       >
         <Text
           className={`font-senBold text-sm text-center ${unlocked ? "text-textWhite" : "text-bgMain"}`}
@@ -78,7 +82,7 @@ const AchievementBox: React.FC<ContentBoxProps> = ({
           className="font-senRegular text-xs text-center"
           style={{ color: textColor }}
         >
-          {description}
+          {description},
         </Text>
       </View>
     </View>
