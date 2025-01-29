@@ -7,6 +7,7 @@ import {
   Dimensions,
   FlatList,
   PanResponder,
+  Alert,
 } from "react-native";
 import NoteBox from "../components/NoteBox";
 import SpotBox from "../components/SpotBox";
@@ -76,7 +77,7 @@ const BookmarksScreen: React.FC = () => {
     },
   ];
 
-  const spotsData: Spot[] = [
+  const [spotsData, setSpotsData] = useState<Spot[]>([
     {
       spot_id: "1",
       created_at: "14-04-2024",
@@ -119,7 +120,7 @@ const BookmarksScreen: React.FC = () => {
       address: "Creative District, FL",
       title: "Urban Art Alley",
     },
-  ];
+  ]);
 
   const navigation = useNavigation();
 
@@ -320,6 +321,7 @@ const BookmarksScreen: React.FC = () => {
             keyExtractor={(item) => item.spot_id}
             renderItem={({ item }) => (
               <SpotBox
+                spot_id={item.spot_id}
                 image={require("../../assets/images/bookmarks/spotDefault.svg")}
                 title={item.title}
                 date={item.created_at}
