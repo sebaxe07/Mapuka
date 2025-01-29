@@ -69,8 +69,27 @@ const NoteDetails: React.FC = ({ route }: any) => {
     // },
   // ]);
 
+  // All notes are kept in this state
   const fetch = useAppSelector((state) => state.userData.notes);
   const [notesData, setNotesData] = useState<Note[]>(fetch)
+
+  
+  const note = notesData.find((note) => note.note_id === itemId);
+  
+  const [isEditing, setIsEditing] = useState(false);
+  const [editableNote, setEditableNote] = useState(note);
+  
+  const navigation = useNavigation();
+  const dispatch = useAppDispatch();
+  
+  
+  if (!note) {
+    return (
+      <View className="flex-1 bg-bgMain h-full px-5 justify-center items-center">
+        <Text className="text-textWhite text-xl">Note not found.</Text>
+      </View>
+    );
+  }
 
   const formatDate = (dateString: string) => {
     const options: Intl.DateTimeFormatOptions = {
@@ -82,39 +101,21 @@ const NoteDetails: React.FC = ({ route }: any) => {
     };
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
-
-  const note = notesData.find((note) => note.note_id === itemId);
-
-  const [isEditing, setIsEditing] = useState(false);
-  const [editableNote, setEditableNote] = useState(note);
   
-  const navigation = useNavigation();
-  const dispatch = useAppDispatch();
-
-  if (!note) {
-    return (
-      <View className="flex-1 bg-bgMain h-full px-5 justify-center items-center">
-        <Text className="text-textWhite text-xl">Note not found.</Text>
-      </View>
-    );
-  }
-  
-  // TODO: REFLECT CHANGES IN THE DATABASE. How to choose what data to update specifically?
+  // Update note in database
   const updateNote = async () => {
-    if (editableNote) {
-      const { data, error } = await supabase
-        .from("notes")
-        .update({
-          title: editableNote.title,
-          content: editableNote.content,
-          address: editableNote.address
-        })
-        .eq("note_id", note.note_id);
+    const { data, error } = await supabase
+      .from("notes")
+      .update({
+        title: editableNote?.title,
+        content: editableNote?.content,
+        address: editableNote?.address
+      })
+      .eq("note_id", note.note_id);
 
-      if (error) {
-        console.error("Error saving edited note: ", error.message);
-        return;
-      }
+    if (error) {
+      console.error("Error saving edited note: ", error.message);
+      return;
     }
   };
 
@@ -127,6 +128,7 @@ const NoteDetails: React.FC = ({ route }: any) => {
     setIsEditing(false); // Exit editing mode
   };
 
+  // Edit notes in global context, if a note changes
   useEffect(() => {
     dispatch(setNotes(notesData));
     
