@@ -7,6 +7,7 @@ import {
   Dimensions,
   FlatList,
   PanResponder,
+  Alert,
 } from "react-native";
 import NoteBox from "../components/NoteBox";
 import SpotBox from "../components/SpotBox";
@@ -335,6 +336,7 @@ const BookmarksScreen: React.FC = () => {
             keyExtractor={(item) => item.spot_id}
             renderItem={({ item }) => (
               <SpotBox
+                spot_id={item.spot_id}
                 image={require("../../assets/images/bookmarks/spotDefault.svg")}
                 title={item.title}
                 date={formatDate(item.created_at)}
