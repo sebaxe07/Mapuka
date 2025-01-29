@@ -138,7 +138,7 @@ const NoteDetails: React.FC = ({ route }: any) => {
               <TextInput
                 value={editableNote?.created_at}
                 onChangeText={(text) =>
-                  setEditableNote({ ...editableNote, created_at: text })
+                  setEditableNote({ ...editableNote, created_at: text } as any)
                 }
                 className="text-textBody text-base mb-1 border-b border-textBody"
               />
@@ -153,7 +153,7 @@ const NoteDetails: React.FC = ({ route }: any) => {
               <TextInput
                 value={editableNote?.title}
                 onChangeText={(text) =>
-                  setEditableNote({ ...editableNote, title: text })
+                  setEditableNote({ ...editableNote, title: text } as any)
                 }
                 className="text-boxContainer text-4xl font-senMedium mb-4 border-b border-boxContainer"
               />
@@ -175,7 +175,7 @@ const NoteDetails: React.FC = ({ route }: any) => {
                 <TextInput
                   value={editableNote?.address}
                   onChangeText={(text) =>
-                    setEditableNote({ ...editableNote, address: text })
+                    setEditableNote({ ...editableNote, address: text } as any)
                   }
                   className="text-textBody text-base border-b border-textBody"
                 />
@@ -189,7 +189,7 @@ const NoteDetails: React.FC = ({ route }: any) => {
               <TextInput
                 value={editableNote?.content}
                 onChangeText={(text) =>
-                  setEditableNote({ ...editableNote, content: text })
+                  setEditableNote({ ...editableNote, content: text } as any)
                 }
                 multiline
                 className="text-textBody text-base border-b border-textBody"

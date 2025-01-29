@@ -42,11 +42,10 @@ const Home: React.FC = ({ route }: any) => {
       // Update state with new coordinates
       setExternalCoords(newCoordsTuple);
 
-      // Optionally, display an alert to the user
-      Alert.alert(
+      /*       Alert.alert(
         "New Coordinates Received",
         `Latitude: ${newCoords.latitude}, Longitude: ${newCoords.longitude}`
-      );
+      ); */
     }
   }, [route?.params?.externalCoordinates]);
 

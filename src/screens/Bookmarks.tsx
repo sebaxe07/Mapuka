@@ -82,9 +82,9 @@ const BookmarksScreen: React.FC = () => {
     {
       spot_id: "1",
       created_at: "14-04-2024",
-      coordinates: [37.7749, -122.4194],
+      coordinates: [9.228134, 45.478124],
       address: "San Francisco, CA",
-      title: "Golden Gate Park",
+      title: "Polimi",
     },
     {
       spot_id: "2",
@@ -152,8 +152,8 @@ const BookmarksScreen: React.FC = () => {
       try {
         navigation.navigate("Home", {
           externalCoordinates: {
-            latitude: coordinates[0],
-            longitude: coordinates[1],
+            longitude: coordinates[0],
+            latitude: coordinates[1],
           },
         } as any);
       } catch (error) {

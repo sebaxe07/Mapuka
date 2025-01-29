@@ -46,14 +46,14 @@ interface MapProps {
 const debouncedSaveDiscoveredAreas = debounce(
   async (discoveredPolygons, profileId, dispatch) => {
     try {
-      console.log("\x1b[34m Saving discovered areas: ", discoveredPolygons);
+      // console.log("\x1b[34m Saving discovered areas: ", discoveredPolygons);
       const discoveredPolygonsJson = JSON.stringify(discoveredPolygons);
       const areadiscovered = turf.convertArea(
         turf.area(discoveredPolygons),
         "meters",
         "kilometers"
       );
-      console.log("\x1b[31m", "saving on user " + profileId);
+      // console.log("\x1b[31m", "saving on user " + profileId);
       const { data, error } = await supabase
         .from("profiles")
         .update({
@@ -63,14 +63,14 @@ const debouncedSaveDiscoveredAreas = debounce(
         .eq("profile_id", profileId);
 
       if (error) {
-        console.error("Error saving discovered areas: ", error.message);
+        // console.error("Error saving discovered areas: ", error.message);
         return;
       }
 
       dispatch(setDiscStorage(discoveredPolygons));
-      console.log("\x1b[33m Saved discovered areas: ", data);
+      // console.log("\x1b[33m Saved discovered areas: ", data);
     } catch (error) {
-      console.error("Error saving discovered areas: ", error);
+      // console.error("Error saving discovered areas: ", error);
     }
   },
   1000
@@ -91,7 +91,9 @@ const Map: React.FC<MapProps> = ({
 
   const dispatch = useAppDispatch();
   const userData = useAppSelector((state) => state.userData);
-
+  const [markerLocation, setMarkerLocation] = useState<[number, number] | null>(
+    null
+  );
   const mapTypes = {
     custom: "mapbox://styles/codekatabattle/cm55m9p3i003b01po2yh31h59/draft",
     dark: "mapbox://styles/mapbox/dark-v11",
@@ -114,16 +116,14 @@ const Map: React.FC<MapProps> = ({
       console.log("\x1b[32m", "Spot coordinates received: ", SpotCoordinates);
       setMarkerLocation(SpotCoordinates);
       // Clear the spot coordinates
-      setSpotCoordinates(null);
+
+      // Disabling auto-focus on user location
+      setFocused(false);
 
       // Focus the camera on the spot location
-      if (cameraRef.current) {
-        cameraRef.current.setCamera({
-          centerCoordinate: SpotCoordinates,
-          zoomLevel: 16,
-          animationDuration: 1000, // Smooth transition
-        });
-      }
+      console.log("\x1b[33m", "Focusing camera on spot location...");
+
+      setSpotCoordinates(null);
     }
   }, [SpotCoordinates]);
 
@@ -151,16 +151,16 @@ const Map: React.FC<MapProps> = ({
         );
         return;
       }
-      console.log("\x1b[32m", "Starting to watch position...");
+      // console.log("\x1b[32m", "Starting to watch position...");
 
       Location.watchPositionAsync(
         {
           accuracy: Location.Accuracy.Highest,
-          timeInterval: 1000,
+          timeInterval: 1500,
           distanceInterval: 1,
         },
         (location) => {
-          console.log("\x1b[33m", "Location received: ", location);
+          // console.log("\x1b[33m", "Location received: ", location);
           const { latitude, longitude } = location.coords;
           const coordinates: [number, number] = [longitude, latitude];
           setUserLocation(coordinates);
@@ -171,23 +171,30 @@ const Map: React.FC<MapProps> = ({
             turf.distance(turf.point(userLocation), turf.point(coordinates)) <
               0.01
           ) {
-            console.log("Location change is not significant");
+            // console.log("Location change is not significant");
             return;
           }
-          console.log("\x1b[31m", "Location change is significant");
+          // console.log("\x1b[31m", "Location change is significant");
 
           discoverArea(coordinates, 0.1);
 
-          if (focused) {
-            // Focus camera on the user's location
-            if (cameraRef.current) {
-              cameraRef.current.setCamera({
-                centerCoordinate: coordinates,
-                zoomLevel: 16,
-                animationDuration: 1000, // Smooth transition
-              });
+          setFocused((prevFocused) => {
+            if (prevFocused) {
+              console.log(
+                "\x1b[34m",
+                "Focusing camera on user location... " + prevFocused
+              );
+              // Focus camera on the user's location
+              if (cameraRef.current) {
+                cameraRef.current.setCamera({
+                  centerCoordinate: coordinates,
+                  zoomLevel: 16,
+                  animationDuration: 1000, // Smooth transition
+                });
+              }
             }
-          }
+            return prevFocused;
+          });
         }
       );
     } catch (error) {
@@ -206,22 +213,38 @@ const Map: React.FC<MapProps> = ({
     GeoJsonProperties
   > | null>(initialDiscovery);
 
-  const discoverArea = (center: [number, number], radius: number) => {
-    const newDiscovery = turf.circle(center, radius, { units: "kilometers" });
-    console.log("\x1b[32m", "New discovery: ");
+  const updateDiscoveredPolygons = debounce((newPolygon) => {
     setDiscoveredPolygons((prevPolygons) => {
       if (!prevPolygons || turf.coordAll(prevPolygons).length === 0) {
-        console.log("No discovered area yet");
-        return newDiscovery;
+        return newPolygon;
       }
-      console.log("Combining discovered areas...");
-      const combined = turf.union(
-        turf.featureCollection([prevPolygons, newDiscovery])
-      );
-      console.log("\x1b[34m", "Combined: ");
-      return combined;
+      return turf.union(turf.featureCollection([prevPolygons, newPolygon]));
     });
+  }, 1000); // Runs at most once every 300ms
+
+  const discoverArea = (center: [number, number], radius: number) => {
+    const newDiscovery = turf.circle(center, radius, { units: "kilometers" });
+    updateDiscoveredPolygons(newDiscovery);
   };
+
+  /*   const discoverArea = (center: [number, number], radius: number) => {
+    const newDiscovery = turf.circle(center, radius, { units: "kilometers" });
+    // console.log("\x1b[32m", "New discovery: ");
+    requestIdleCallback(() => {
+      setDiscoveredPolygons((prevPolygons) => {
+        if (!prevPolygons || turf.coordAll(prevPolygons).length === 0) {
+          // console.log("No discovered area yet");
+          return newDiscovery;
+        }
+        // console.log("Combining discovered areas...");
+        const combined = turf.union(
+          turf.featureCollection([prevPolygons, newDiscovery])
+        );
+        // console.log("\x1b[34m", "Combined: ");
+        return combined;
+      });
+    });
+  }; */
 
   const [fogMask, setFogMask] = useState<Feature<
     Polygon | MultiPolygon
@@ -229,19 +252,19 @@ const Map: React.FC<MapProps> = ({
 
   useEffect(() => {
     if (discoveredPolygons) {
-      console.log("\x1b[35m", "discoveredPolygons");
+      // console.log("\x1b[35m", "discoveredPolygons");
       setFogMask(
         turf.difference(
           turf.featureCollection([fullMaskPolygon, discoveredPolygons])
         )
       );
-      console.log("\x1b[36m", "Fog mask updated");
+      // console.log("\x1b[36m", "Fog mask updated");
       saveDiscoveredAreas();
     } else setFogMask(fullMaskPolygon);
   }, [discoveredPolygons]);
 
   const saveDiscoveredAreas = useCallback(() => {
-    console.log("\x1b[32m", "Saving discovered areas...");
+    // console.log("\x1b[32m", "Saving discovered areas...");
     debouncedSaveDiscoveredAreas(
       discoveredPolygons,
       userData.profile_id,
@@ -261,21 +284,36 @@ const Map: React.FC<MapProps> = ({
         .eq("profile_id", userData.profile_id);
 
       if (error) {
-        console.error("Error clearing discovered areas: ", error.message);
+        // console.error("Error clearing discovered areas: ", error.message);
         return;
       }
       dispatch(setDiscStorage(null));
-      console.log("Cleared discovered areas: ", data);
+      // console.log("Cleared discovered areas: ", data);
     } catch (error) {
-      console.error("Error clearing discovered areas: ", error);
+      // console.error("Error clearing discovered areas: ", error);
     }
   };
 
-  const [markerLocation, setMarkerLocation] = useState<[number, number] | null>(
-    null
-  );
   const [text, setText] = useState("");
   const [routeCoords, setRouteCoords] = useState<number[][] | null>(null);
+
+  useEffect(() => {
+    console.log(
+      "\x1b[31m",
+      "markerLocation location received: ",
+      markerLocation
+    );
+    if (markerLocation && cameraRef.current) {
+      console.log("\x1b[32m", "Setting camera: ", markerLocation);
+      if (cameraRef.current) {
+        cameraRef.current.setCamera({
+          centerCoordinate: markerLocation,
+          zoomLevel: 16,
+          animationDuration: 1000,
+        });
+      }
+    }
+  }, [markerLocation]);
 
   const useSearch = () => {
     searchLocation({
@@ -289,10 +327,10 @@ const Map: React.FC<MapProps> = ({
 
   useEffect(() => {
     if (searchText) {
-      console.log("Setting text: ", searchText);
+      // console.log("Setting text: ", searchText);
       setText(searchText);
     } else {
-      console.log("Clearing text");
+      // console.log("Clearing text");
       setText("");
     }
   }, [searchText]);
@@ -308,6 +346,7 @@ const Map: React.FC<MapProps> = ({
 
   useEffect(() => {
     if (triggerAction === "gps") {
+      console.log("\x1b[32m", "Triggering GPS action...");
       // Focus the map on the user's location
       if (cameraRef.current && userLocation) {
         setFocused(true);
@@ -331,11 +370,15 @@ const Map: React.FC<MapProps> = ({
   const handleTouchMove = useMemo(
     () =>
       debounce(() => {
-        console.log("Touch move detected");
+        // console.log("Touch move detected");
         if (focused) setFocused(false);
       }, 300),
     [focused]
   );
+
+  useEffect(() => {
+    console.log("\x1b[31m", "Focused: ", focused);
+  }, [focused]);
 
   return (
     <View className="size-full flex-1  justify-center items-center">
@@ -415,7 +458,7 @@ const Map: React.FC<MapProps> = ({
               zIndex: 100,
             }}
           >
-            <View className="size-4 bg-buttonAccentRed z-50" />
+            <View className="size-4 bg-buttonAccentRed z-50 rounded-full" />
           </MapboxGL.PointAnnotation>
         )}
 
