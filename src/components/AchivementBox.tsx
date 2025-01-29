@@ -1,9 +1,7 @@
 import React from "react";
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, Text } from "react-native";
 import { colors } from "../../colors";
-import HolderV from "../../assets/icons/bookmarks/holder.svg";
-import HolderH from "../../assets/icons/bookmarks/holderH.svg";
-import * as Icons from "../../assets/icons/leaderboard/index";
+import { SvgProps } from "react-native-svg";
 
 // Define the array of unlocked colors
 const unlockedColors = [
@@ -14,14 +12,25 @@ const unlockedColors = [
   "#9C65E8", // Purple
 ];
 
+// Define corresponding text colors for each background color
+const textColors: Record<string, string> = {
+  "#9B3637": "#E86C56", // Light Pink for contrast with Dark Red
+  "#E86C56": "#9B3637", // Light Cream for contrast with Orange
+  "#668DEF": "#11112D", // Light Blue for contrast with Blue
+  "#5FB5C9": "#5D6F9D", // Light Cyan for contrast with Aqua
+  "#9C65E8": "#27284E", // Light Lavender for contrast with Purple
+};
+
 interface ContentBoxProps {
+  icon: React.FC<SvgProps>;
   title: string;
   description: string;
   unlocked?: boolean;
   layout?: "vertical" | "horizontal";
 }
 
-const AchivementBox: React.FC<ContentBoxProps> = ({
+const AchievementBox: React.FC<ContentBoxProps> = ({
+  icon: Icon,
   title,
   description,
   unlocked,
@@ -31,37 +40,44 @@ const AchivementBox: React.FC<ContentBoxProps> = ({
   const randomColor =
     unlockedColors[Math.floor(Math.random() * unlockedColors.length)];
 
+  // Determine text color based on background
+  const textColor = unlocked ? textColors[randomColor] : colors.bodyText;
+
   const boxStyles =
     layout === "horizontal"
-      ? "flex-row gap-1 px-2 py-5 "
+      ? "flex-row gap-1 px-2 py-5"
       : "flex-col gap-1 px-5 py-2";
 
   return (
     <View
-      className={`rounded-3xl items-center w-full h-full ${boxStyles} `}
+      className={`rounded-3xl items-center w-full h-full ${boxStyles}`}
       style={{
         backgroundColor: unlocked ? randomColor : colors.menus,
       }}
     >
-      {/* SVG Placeholder */}
-      <View className={`flex flex-1 items-center justify-center`}>
-        {layout === "horizontal" ? (
-          <HolderV width={50} height={80} preserveAspectRatio="none" />
-        ) : (
-          <HolderH width={70} height={50} preserveAspectRatio="none" />
-        )}
+      {/* SVG Icon */}
+      <View className="flex flex-1 items-center justify-center">
+        <Icon
+          width={layout === "horizontal" ? 50 : 70}
+          height={layout === "horizontal" ? 80 : 50}
+        />
       </View>
 
       {/* Text Content */}
       <View
         className={`${
-          layout === "horizontal" ? " gap-2 px-4 " : "items-center py-2"
+          layout === "horizontal" ? "gap-2 px-4" : "items-center py-2"
         } flex-1 justify-center`}
       >
-        <Text className="text-bgMain font-senBold text-sm text-wrap text-center">
+        <Text
+          className={`font-senBold text-sm text-center ${unlocked ? "text-textWhite" : "text-bgMain"}`}
+        >
           {title}
         </Text>
-        <Text className="text-textBody font-senRegular text-xs text-center flex-wrap">
+        <Text
+          className="font-senRegular text-xs text-center"
+          style={{ color: textColor }}
+        >
           {description}
         </Text>
       </View>
@@ -69,4 +85,4 @@ const AchivementBox: React.FC<ContentBoxProps> = ({
   );
 };
 
-export default AchivementBox;
+export default AchievementBox;
