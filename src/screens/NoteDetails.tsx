@@ -148,12 +148,19 @@ const NoteDetails: React.FC = ({ route }: any) => {
       onRequestClose={() => setIsModalVisible(false)}
     >
       <View className="flex-1 justify-end w-full h-full">
-        <View className="bg-boxContainer px-6 py-8 rounded-3xl">
+        <View
+          className="bg-boxContainer px-6 py-8"
+          style={{
+            borderTopLeftRadius: 20, // Rounded top-left corner
+            borderTopRightRadius: 20, // Rounded top-right corner
+          }}
+        >
           <Text className="text-textWhite text-lg font-senSemiBold mb-4">
             Change Note Background
           </Text>
           <FlatList
             data={Backgrounds}
+            showsHorizontalScrollIndicator={false}
             horizontal
             keyExtractor={(_, index) => index.toString()}
             renderItem={({ item: Background, index }) => (
@@ -167,7 +174,7 @@ const NoteDetails: React.FC = ({ route }: any) => {
                 }}
                 className="mr-4 w-24 h-24 rounded-lg items-center justify-center"
               >
-                <Background width={64} height={64} />
+                <Background width={85} height={85} />
               </TouchableOpacity>
             )}
           />
@@ -218,7 +225,7 @@ const NoteDetails: React.FC = ({ route }: any) => {
             </TouchableOpacity>
           </View>
           {/* Delete Note */}
-          <View className="justify-center items-center mr-10">
+          <View className="justify-center items-center ">
             <TouchableOpacity onPress={handleDelete}>
               <Trash />
             </TouchableOpacity>
