@@ -1,12 +1,21 @@
 import React, { useState } from "react";
-import { View, Text, TouchableOpacity, TextInput } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  TextInput,
+  Modal,
+  Alert,
+  FlatList,
+} from "react-native";
 import Settings from "../../assets/icons/bookmarks/settings.svg";
 import Place from "../../assets/icons/bookmarks/place.svg";
-import Edit from "../../assets/icons/profile/edit.svg";
+import Edit from "../../assets/icons/profile/edit_clean.svg";
+import Trash from "../../assets/icons/bookmarks/trash.svg";
 import { colors } from "../../colors";
 import { useNavigation } from "@react-navigation/native";
-
 import { Note } from "../contexts/slices/userDataSlice";
+import * as NoteBg from "../../assets/images/bookmarks/index";
 
 const NoteDetails: React.FC = ({ route }: any) => {
   const { itemId } = route.params;
@@ -68,18 +77,20 @@ const NoteDetails: React.FC = ({ route }: any) => {
     },
   ]);
 
+  const Backgrounds = [
+    NoteBg.Style1,
+    NoteBg.Style2,
+    NoteBg.Style3,
+    NoteBg.Style4,
+    NoteBg.Style5,
+    NoteBg.Style6,
+  ];
+
   const note = notesData.find((note) => note.note_id === itemId);
 
   const [isEditing, setIsEditing] = useState(false);
-  const [editableNote, setEditableNote] = useState<Note | undefined>({
-    created_at: "",
-    note_id: "",
-    coordinates: [],
-    address: "",
-    title: "",
-    content: "",
-    image: 0,
-  });
+  const [editableNote, setEditableNote] = useState<Note | undefined>(note);
+  const [isModalVisible, setIsModalVisible] = useState(false); // For the image picker modal
 
   const navigation = useNavigation();
 
@@ -91,13 +102,33 @@ const NoteDetails: React.FC = ({ route }: any) => {
     );
   }
 
+  // Handle Save
   const handleSave = () => {
     setNotesData((prev) =>
       prev.map((n) => (n.note_id === itemId ? { ...n, ...editableNote } : n))
     );
-    setIsEditing(false); // Exit editing mode
+    setIsEditing(false);
   };
 
+  // Handle Delete Note
+  const handleDelete = () => {
+    Alert.alert("Delete Note", "Are you sure you want to delete this note?", [
+      {
+        text: "Cancel",
+        style: "cancel",
+      },
+      {
+        text: "Delete",
+        style: "destructive",
+        onPress: () => {
+          setNotesData((prev) => prev.filter((n) => n.note_id !== itemId));
+          navigation.goBack(); // Go back to the previous screen
+        },
+      },
+    ]);
+  };
+
+  // Handle Navigation to Coordinates
   const onPress = (latitude: number, longitude: number) => {
     try {
       navigation.navigate("Home", {
@@ -107,6 +138,49 @@ const NoteDetails: React.FC = ({ route }: any) => {
       console.error("Navigation error:", error);
     }
   };
+
+  // Render SVG Image Picker Modal
+  const renderImagePickerModal = () => (
+    <Modal
+      visible={isModalVisible}
+      animationType="slide"
+      transparent
+      onRequestClose={() => setIsModalVisible(false)}
+    >
+      <View className="flex-1 justify-end w-full h-full">
+        <View className="bg-boxContainer px-6 py-8 rounded-3xl">
+          <Text className="text-textWhite text-lg font-senSemiBold mb-4">
+            Change Note Background
+          </Text>
+          <FlatList
+            data={Backgrounds}
+            horizontal
+            keyExtractor={(_, index) => index.toString()}
+            renderItem={({ item: Background, index }) => (
+              <TouchableOpacity
+                onPress={() => {
+                  setEditableNote((prev) => ({
+                    ...prev,
+                    image: index,
+                  }));
+                  setIsModalVisible(false);
+                }}
+                className="mr-4 w-24 h-24 rounded-lg items-center justify-center"
+              >
+                <Background width={64} height={64} />
+              </TouchableOpacity>
+            )}
+          />
+          <TouchableOpacity
+            className="bg-buttonAccentRed rounded-3xl items-center justify-center w-1/2 mt-6 px-5 py-3 self-center"
+            onPress={() => setIsModalVisible(false)}
+          >
+            <Text className="text-textWhite text-center">Cancel</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </Modal>
+  );
 
   return (
     <View className="flex bg-bgMain h-full px-5">
@@ -119,51 +193,44 @@ const NoteDetails: React.FC = ({ route }: any) => {
 
       {/* Content */}
       <View className="flex-4 h-3/4 gap-3">
-        {/* Edit / Save Button */}
-        <View className="w-full pt-6 items-end px-5">
-          <Settings />
-          <TouchableOpacity
-            onPress={() => {
-              if (isEditing) {
-                handleSave();
-              } else {
-                setIsEditing(true);
-              }
-            }}
-          >
-            <View className="flex-row items-center">
-              <Edit />
-              <Text className="text-textInput text-xl font-senRegular mb-1 ml-4">
-                {isEditing ? "Save" : "Edit"}
-              </Text>
-            </View>
-          </TouchableOpacity>
+        <View className="flex-row w-full justify-between px-6 items-center">
+          <View className="flex-row gap-5">
+            {/* Image Picker */}
+            <TouchableOpacity onPress={() => setIsModalVisible(true)}>
+              <Settings />
+            </TouchableOpacity>
+            {/* Edit / Save Button */}
+            <TouchableOpacity
+              onPress={() => {
+                if (isEditing) {
+                  handleSave();
+                } else {
+                  setIsEditing(true);
+                }
+              }}
+            >
+              <View className="flex-row items-center justify-center gap-2">
+                <Edit />
+                <Text className="text-textInput text-xl font-senRegular ">
+                  {isEditing ? "Save" : "Edit"}
+                </Text>
+              </View>
+            </TouchableOpacity>
+          </View>
+          {/* Delete Note */}
+          <View className="justify-center items-center mr-10">
+            <TouchableOpacity onPress={handleDelete}>
+              <Trash />
+            </TouchableOpacity>
+          </View>
         </View>
 
         {/* Note Details */}
         <View className="flex-1 h-[80%] justify-around rounded-3xl bg-boxMenu px-6 py-4">
           <View>
-            {/* Date */}
-            {isEditing ? (
-              <TextInput
-                value={editableNote?.created_at || ""}
-                onChangeText={(text) =>
-                  setEditableNote(
-                    (prev) =>
-                      ({
-                        ...prev,
-                        created_at: text,
-                      }) as Note
-                  )
-                }
-                className="text-textBody text-base mb-1 border-b border-textBody"
-              />
-            ) : (
-              <Text className="text-textBody text-base mb-1">
-                {note.created_at}
-              </Text>
-            )}
-
+            <Text className="text-textBody text-base mb-1">
+              {note.created_at}
+            </Text>
             {/* Title */}
             {isEditing ? (
               <TextInput
@@ -246,6 +313,9 @@ const NoteDetails: React.FC = ({ route }: any) => {
           </View>
         </View>
       </View>
+
+      {/* Render Modal */}
+      {renderImagePickerModal()}
     </View>
   );
 };

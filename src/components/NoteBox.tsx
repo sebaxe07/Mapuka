@@ -11,12 +11,12 @@ const NoteBox: React.FC<{
   styleVariant: number;
 }> = ({ title, date, address, onPress, styleVariant }) => {
   const Backgrounds = [
-    NoteBg.Style0,
     NoteBg.Style1,
     NoteBg.Style2,
     NoteBg.Style3,
     NoteBg.Style4,
     NoteBg.Style5,
+    NoteBg.Style6,
   ];
   const Background = Backgrounds[styleVariant];
 
