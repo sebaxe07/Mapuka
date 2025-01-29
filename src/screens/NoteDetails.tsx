@@ -14,7 +14,7 @@ const NoteDetails: React.FC = ({ route }: any) => {
     {
       note_id: "1",
       created_at: "14-04-2024",
-      coordinates: [37.7749, -122.4194],
+      coordinates: [9.189988, 45.463702],
       address: "San Francisco, CA",
       title: "Golden Gate Park",
       content: "A beautiful park in the heart of San Francisco",
@@ -89,11 +89,11 @@ const NoteDetails: React.FC = ({ route }: any) => {
     setIsEditing(false); // Exit editing mode
   };
 
-  const onPress = (latitude: number, longitude: number) => {
+  const onPress = (longitude: number, latitude: number) => {
     try {
       navigation.navigate("Home", {
-        externalCoordinates: { latitude, longitude },
-      });
+        externalCoordinates: { longitude, latitude },
+      } as any);
     } catch (error) {
       console.error("Navigation error:", error);
     }
