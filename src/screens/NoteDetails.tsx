@@ -28,19 +28,18 @@ const NoteDetails: React.FC = ({ route }: any) => {
     NoteBg.Style5,
     NoteBg.Style6,
   ];
-  
+
   const { itemId } = route.params;
   const notesData = useAppSelector((state) => state.userData.notes);
   const note = notesData.find((note) => note.note_id === itemId);
-  
+
   const [isEditing, setIsEditing] = useState(false);
   const [editableNote, setEditableNote] = useState<Note | undefined>(note);
   const [isModalVisible, setIsModalVisible] = useState(false); // For the image picker modal
-  
+
   const navigation = useNavigation();
   const dispatch = useAppDispatch();
-  
-  
+
   if (!note) {
     return (
       <View className="flex-1 bg-bgMain h-full px-5 justify-center items-center">
@@ -59,7 +58,7 @@ const NoteDetails: React.FC = ({ route }: any) => {
     };
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
-  
+
   // Update note in database
   const updateNote = async () => {
     const { data, error } = await supabase
@@ -67,7 +66,7 @@ const NoteDetails: React.FC = ({ route }: any) => {
       .update({
         title: editableNote?.title,
         content: editableNote?.content,
-        address: editableNote?.address
+        address: editableNote?.address,
       })
       .eq("note_id", note.note_id);
 
@@ -83,7 +82,6 @@ const NoteDetails: React.FC = ({ route }: any) => {
       .delete()
       .eq("note_id", note.note_id);
 
-
     if (error) {
       console.error("Error deleting note: ", error.message);
       return;
@@ -95,13 +93,13 @@ const NoteDetails: React.FC = ({ route }: any) => {
     try {
       // Update database first
       await updateNote();
-      
+
       // Update Redux state directly (global context)
-      const updatedNotes = notesData.map((n) => 
+      const updatedNotes = notesData.map((n) =>
         n.note_id === itemId ? { ...n, ...editableNote } : n
       );
       dispatch(setNotes(updatedNotes));
-      
+
       setIsEditing(false);
     } catch (error) {
       console.error("Error updating note:", error);
@@ -122,11 +120,11 @@ const NoteDetails: React.FC = ({ route }: any) => {
           try {
             // Delete from database first
             await deleteNote();
-            
+
             // Update Redux state directly (global state)
             const filteredNotes = notesData.filter((n) => n.note_id !== itemId);
             dispatch(setNotes(filteredNotes));
-            
+
             // Navigate back only after state updates
             navigation.goBack();
           } catch (error) {
@@ -136,7 +134,7 @@ const NoteDetails: React.FC = ({ route }: any) => {
       },
     ]);
   };
-  
+
   // Handle Navigation to Coordinates
   const onPress = (longitude: number, latitude: number) => {
     try {
@@ -175,10 +173,13 @@ const NoteDetails: React.FC = ({ route }: any) => {
             renderItem={({ item: Background, index }) => (
               <TouchableOpacity
                 onPress={() => {
-                  setEditableNote((prev) => ({
-                    ...prev,
-                    image: index,
-                  }));
+                  setEditableNote(
+                    (prev) =>
+                      ({
+                        ...prev,
+                        image: index,
+                      }) as any
+                  );
                   setIsModalVisible(false);
                 }}
                 className="mr-4 w-24 h-24 rounded-lg items-center justify-center"
