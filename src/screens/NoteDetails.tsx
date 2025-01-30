@@ -16,6 +16,7 @@ import { colors } from "../../colors";
 import { useNavigation } from "@react-navigation/native";
 import { Note } from "../contexts/slices/userDataSlice";
 import * as NoteBg from "../../assets/images/bookmarks/index";
+import AlertModal from "../components/AlertModal";
 
 const NoteDetails: React.FC = ({ route }: any) => {
   const { itemId } = route.params;
@@ -77,6 +78,12 @@ const NoteDetails: React.FC = ({ route }: any) => {
     },
   ]);
 
+  const [loading, setLoading] = useState(false);
+  const [isAlertSaveVisible, setIsAlertSaveVisible] = useState(false);
+  const [isAlertCancelVisible, setIsAlerCancelVisible] = useState(false);
+
+  const [isAlertDeleteVisible, setIsAlertDeleteVisible] = useState(false);
+
   const Backgrounds = [
     NoteBg.Style1,
     NoteBg.Style2,
@@ -112,20 +119,8 @@ const NoteDetails: React.FC = ({ route }: any) => {
 
   // Handle Delete Note
   const handleDelete = () => {
-    Alert.alert("Delete Note", "Are you sure you want to delete this note?", [
-      {
-        text: "Cancel",
-        style: "cancel",
-      },
-      {
-        text: "Delete",
-        style: "destructive",
-        onPress: () => {
-          setNotesData((prev) => prev.filter((n) => n.note_id !== itemId));
-          navigation.goBack(); // Go back to the previous screen
-        },
-      },
-    ]);
+    setNotesData((prev) => prev.filter((n) => n.note_id !== itemId));
+    navigation.goBack(); // Go back to the previous screen
   };
 
   // Handle Navigation to Coordinates
@@ -210,7 +205,7 @@ const NoteDetails: React.FC = ({ route }: any) => {
             <TouchableOpacity
               onPress={() => {
                 if (isEditing) {
-                  handleSave();
+                  setIsAlerCancelVisible(true);
                 } else {
                   setIsEditing(true);
                 }
@@ -219,14 +214,18 @@ const NoteDetails: React.FC = ({ route }: any) => {
               <View className="flex-row items-center justify-center gap-2">
                 <Edit />
                 <Text className="text-textInput text-xl font-senRegular ">
-                  {isEditing ? "Save" : "Edit"}
+                  {isEditing ? "Cancel" : "Edit"}
                 </Text>
               </View>
             </TouchableOpacity>
           </View>
           {/* Delete Note */}
           <View className="justify-center items-center ">
-            <TouchableOpacity onPress={handleDelete}>
+            <TouchableOpacity
+              onPress={() => {
+                setIsAlertDeleteVisible(true);
+              }}
+            >
               <Trash />
             </TouchableOpacity>
           </View>
@@ -307,22 +306,78 @@ const NoteDetails: React.FC = ({ route }: any) => {
             )}
           </View>
 
-          {/* Go to Spot Button */}
+          {/* Go to Note Button/Save */}
           <View className="flex-row justify-center w-full">
-            <TouchableOpacity
-              className="bg-buttonAccentRed rounded-3xl items-center justify-center w-1/2 px-5 py-3"
-              onPress={() => onPress(note.coordinates[0], note.coordinates[1])}
-            >
-              <Text className="text-textWhite text-sm font-senSemiBold">
-                Go to Spot
-              </Text>
-            </TouchableOpacity>
+            {isEditing ? (
+              <TouchableOpacity
+                className="bg-buttonAccentRed rounded-3xl items-center justify-center w-1/2 px-5 py-3"
+                onPress={() => setIsAlertSaveVisible(true)}
+              >
+                <Text className="text-textWhite text-sm font-senSemiBold">
+                  Save
+                </Text>
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity
+                className="bg-buttonAccentRed rounded-3xl items-center justify-center w-1/2 px-5 py-3"
+                onPress={() =>
+                  onPress(note.coordinates[0], note.coordinates[1])
+                }
+              >
+                <Text className="text-textWhite text-sm font-senSemiBold">
+                  Go to Note
+                </Text>
+              </TouchableOpacity>
+            )}
           </View>
         </View>
       </View>
 
       {/* Render Modal */}
       {renderImagePickerModal()}
+
+      {/* Save Confirmation Modal */}
+      <AlertModal
+        isVisible={isAlertSaveVisible}
+        onBackdropPress={() => setIsAlertSaveVisible(false)}
+        message="Want to save the changes?"
+        onCancel={() => setIsAlertSaveVisible(false)}
+        onConfirm={() => {
+          handleSave();
+          setIsAlertSaveVisible(false);
+        }}
+        confirmText="Yes"
+        cancelText="Cancel"
+        loading={loading}
+      />
+
+      {/* Cancel Confirmation Modal */}
+      <AlertModal
+        isVisible={isAlertCancelVisible}
+        onBackdropPress={() => setIsAlerCancelVisible(false)}
+        message={`Want to cancel the changes?\nAll unsaved changes will be lost.`}
+        onCancel={() => setIsAlerCancelVisible(false)}
+        onConfirm={() => {
+          setEditableNote(note); // Restore original note
+          setIsEditing(false);
+          setIsAlerCancelVisible(false);
+        }}
+        confirmText="Yes"
+        cancelText="Cancel"
+        loading={loading}
+      />
+
+      {/* Delete Confirmation Modal */}
+      <AlertModal
+        isVisible={isAlertDeleteVisible}
+        onBackdropPress={() => setIsAlertDeleteVisible(false)}
+        message={`Are you sure you want to delete this note?\nThis action cannot be undone.`}
+        onCancel={() => setIsAlertDeleteVisible(false)}
+        onConfirm={handleDelete}
+        confirmText="Delete"
+        cancelText="Cancel"
+        loading={loading}
+      />
     </View>
   );
 };
