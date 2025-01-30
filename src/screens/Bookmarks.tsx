@@ -21,6 +21,7 @@ import { useAppSelector } from "../contexts/hooks";
 
 const BookmarksScreen: React.FC = () => {
   const [activeTab, setActiveTab] = useState("notes");
+  const [loading, setLoading] = useState(true);
 
   const spotsData = useAppSelector((state) => state.userData.spots);
   const notesData = useAppSelector((state) => state.userData.notes);

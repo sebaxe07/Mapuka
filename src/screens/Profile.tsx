@@ -7,7 +7,7 @@ import { useAppDispatch, useAppSelector } from "../contexts/hooks";
 import { clearUserData } from "../contexts/slices/userDataSlice";
 import { useNavigation } from "@react-navigation/native";
 import { colors } from "../../colors";
-import BackArrow from "../components/BackArrow";
+import BackArrow from "../components/backArrow";
 import MaskedView from "@react-native-masked-view/masked-view";
 import Edit from "../../assets/icons/edit_icon.svg";
 import ProfileDefault from "../../assets/icons/profile/profile_default.svg";

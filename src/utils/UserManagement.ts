@@ -103,53 +103,21 @@ export async function signInWithEmail({
       achievements = await defaultAchievements(profiles.profile_id);
     } */
 
-    let pic: Photo | null = null;
-    // Fetch the user's profile pic from the 'avatars' bucket
-    const { data: listdata, error: listerror } = await supabase.storage
-      .from("avatars")
-      .list(profiles.profile_id);
-
-    if (listerror) {
-      console.error("Error fetching list of photos:", listerror.message);
-      throw listerror;
-    } else if (listdata && listdata.length > 0) {
-      console.log("List of photos:", listdata);
-
-      const imageUrl = await supabase.storage
-        .from("avatars")
-        .getPublicUrl(profiles.profile_id + "/" + listdata[0].name);
-
-      if (!imageUrl) {
-        console.error(
-          "Error fetching Public URL for photo:",
-          profiles.profile_id + ".jpeg"
-        );
-      } else if (!imageUrl.data) {
-        console.error(
-          "Error fetching Public URL for photo:",
-          profiles.profile_id + ".jpeg"
-        );
-      } else {
-        // Update the user's profile pic URL in the app
-        pic = {
-          pictureUrl: imageUrl.data.publicUrl,
-          arrayBuffer: "",
-          path: profiles.profile_id,
-          image: {} as ImagePicker.ImagePickerAsset,
-        };
-        console.log("\x1b[32m", "pic URL:", pic.pictureUrl);
-      }
-    }
-
     // Fetch user spots
-    const { data: spotsData, error: spotsError } = await supabase.from("spots").select("*").eq("profile_id", profiles.profile_id);
+    const { data: spotsData, error: spotsError } = await supabase
+      .from("spots")
+      .select("*")
+      .eq("profile_id", profiles.profile_id);
     if (spotsError) {
       console.error("Failed to fetch spots:", spotsError.message);
       return;
     }
 
     // Fetch user notes
-    const { data: notesData, error: notesError } = await supabase.from("notes").select("*").eq("profile_id", profiles.profile_id);
+    const { data: notesData, error: notesError } = await supabase
+      .from("notes")
+      .select("*")
+      .eq("profile_id", profiles.profile_id);
     if (notesError) {
       console.error("Failed to fetch notes:", notesError.message);
       return;
@@ -168,7 +136,6 @@ export async function signInWithEmail({
         discovered_polygon: discoveredPolygon,
         achievements: achievements ?? [],
         created_at: profiles?.created_at ?? "",
-        pic: pic ?? null,
         pic: pic ?? null,
         notes: notesData ?? [],
         spots: spotsData ?? [],
@@ -227,9 +194,7 @@ export const signOut = async () => {
   const dispatch = useAppDispatch();
   dispatch(clearUserData());
 
-  console.log("User data cleared")
-
-  
+  console.log("User data cleared");
 };
 
 interface SignUpUserProps {

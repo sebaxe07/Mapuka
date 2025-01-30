@@ -57,14 +57,12 @@ const Home: React.FC = ({ route }: any) => {
     }
   }, [externalCoords]);
   const [[latitude, longitude], setCoordinates] = useState<[number, number]>([
-    0,
-    0,
+    0, 0,
   ]);
 
   const [changeTheme, setChangeTheme] = useState(false);
 
   const handleSearch = () => {
-    setSearchText(text); // Trigger the search action
     setSearchText(text); // Trigger the search action
   };
 
@@ -153,8 +151,8 @@ const Home: React.FC = ({ route }: any) => {
 
   return (
     <View className="flex-1">
-      {/* Full-screen Map */
-      /* <Map
+      {/* Full-screen Map */}
+      <Map
         searchText={searchText}
         triggerAction={triggerAction}
         setTriggerAction={setTriggerAction}
@@ -162,6 +160,7 @@ const Home: React.FC = ({ route }: any) => {
         mapType={mapType}
         SpotCoordinates={externalCoords}
         setSpotCoordinates={setExternalCoords}
+        onCoordinatesChange={setCoordinates}
       />
 
       {/* Search Bar */}
@@ -199,10 +198,8 @@ const Home: React.FC = ({ route }: any) => {
             <View className=" gap-4 items-end">
               <TouchableOpacity
                 className="bg-buttonAqua rounded-full items-center justify-center size-14"
-                className="bg-buttonAqua rounded-full items-center justify-center size-14"
                 onPress={() => setTriggerAction("gps")}
               >
-                <Icons.Focus color={colors.white} />
                 <Icons.Focus color={colors.white} />
               </TouchableOpacity>
 
@@ -210,9 +207,7 @@ const Home: React.FC = ({ route }: any) => {
             </View>
 
             {/* Bottom Floating Menu */}
-            <FloatingNavbar 
-              coordinates = {[latitude, longitude]}
-            />
+            <FloatingNavbar coordinates={[latitude, longitude]} />
           </View>
         </View>
       </View>

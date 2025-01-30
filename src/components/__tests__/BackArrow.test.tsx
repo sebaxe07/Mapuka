@@ -2,7 +2,7 @@
 
 import React from "react";
 import { render, fireEvent, act } from "@testing-library/react-native";
-import BackArrow from "../BackArrow";
+import BackArrow from "../backArrow";
 import { useNavigation } from "@react-navigation/native";
 
 // Mock the useNavigation hook
