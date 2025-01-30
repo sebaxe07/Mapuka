@@ -29,52 +29,6 @@ const SpotBox: React.FC<{
   const externalCoordinates = (latitude: number, longitude: number) => {};
   const spotsData = useAppSelector((state) => state.userData.spots);
   const dispatch = useAppDispatch();
-  
-  
-  // const [spotsData, setSpotsData] = useState<Spot[]>([
-  //   {
-  //     spot_id: "1",
-  //     created_at: "14-04-2024",
-  //     coordinates: [37.7749, -122.4194],
-  //     address: "San Francisco, CA",
-  //     title: "Golden Gate Park",
-  //   },
-  //   {
-  //     spot_id: "2",
-  //     created_at: "09-06-2023",
-  //     coordinates: [40.7831, -73.9712],
-  //     address: "Skyline Boulevard, NY",
-  //     title: "Rooftop Cafe",
-  //   },
-  //   {
-  //     spot_id: "3",
-  //     created_at: "27-09-2024",
-  //     coordinates: [46.7296, -94.6859],
-  //     address: "Lakeview Crescent, MN",
-  //     title: "Crystal Lake Dock",
-  //   },
-  //   {
-  //     spot_id: "4",
-  //     created_at: "19-03-2025",
-  //     coordinates: [30.2672, -97.7431],
-  //     address: "Downtown Square, TX",
-  //     title: "Vintage Market Plaza",
-  //   },
-  //   {
-  //     spot_id: "5",
-  //     created_at: "31-08-2024",
-  //     coordinates: [44.0521, -121.3153],
-  //     address: "Cascade Hills, OR",
-  //     title: "Secluded Waterfall",
-  //   },
-  //   {
-  //     spot_id: "6",
-  //     created_at: "02-05-2023",
-  //     coordinates: [25.7617, -80.1918],
-  //     address: "Creative District, FL",
-  //     title: "Urban Art Alley",
-  //   },
-  // ]);
 
   
   const deleteSpot = async (spotId: string) => {

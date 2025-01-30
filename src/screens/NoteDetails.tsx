@@ -20,73 +20,6 @@ import { supabase } from "../utils/supabase";
 import * as NoteBg from "../../assets/images/bookmarks/index";
 
 const NoteDetails: React.FC = ({ route }: any) => {
-  const { itemId } = route.params;
-
-  // const [notesData, setNotesData] = useState<Note[]>([
-    // {
-    //   note_id: "1",
-    //   created_at: "14-04-2024",
-    //   coordinates: [37.7749, -122.4194],
-    //   address: "San Francisco, CA",
-    //   title: "Golden Gate Park",
-    //   content: "A beautiful park in the heart of San Francisco",
-    //   image: 1,
-    // },
-    // {
-    //   note_id: "2",
-    //   created_at: "09-06-2023",
-    //   coordinates: [40.7831, -73.9712],
-    //   address: "Skyline Boulevard, NY",
-    //   title: "Rooftop Cafe",
-    //   content: "A nice place to have a coffee",
-    //   image: 2,
-    // },
-    // {
-    //   note_id: "3",
-    //   created_at: "27-09-2024",
-    //   coordinates: [46.7296, -94.6859],
-    //   address: "Lakeview Crescent, MN",
-    //   title: "Crystal Lake Dock",
-    //   content: "A dock with a beautiful view",
-    //   image: 3,
-    // },
-    // {
-    //   note_id: "4",
-    //   created_at: "19-03-2025",
-    //   coordinates: [30.2672, -97.7431],
-    //   address: "Downtown Square, TX",
-    //   title: "Vintage Market Plaza",
-    //   content: "A plaza with a lot of vintage stuff",
-    //   image: 4,
-    // },
-    // {
-    //   note_id: "5",
-    //   created_at: "31-08-2024",
-    //   coordinates: [44.0521, -121.3153],
-    //   address: "Cascade Hills, OR",
-    //   title: "Secluded Waterfall",
-    //   content: "A hidden waterfall in the hills",
-    //   image: 5,
-    // },
-    // {
-    //   note_id: "6",
-    //   created_at: "02-05-2023",
-    //   coordinates: [25.7617, -80.1918],
-    //   address: "Creative District, FL",
-    //   title: "Urban Art Alley",
-    //   content: "A street full of urban art",
-    //   image: 0,
-    // },
-  // ]);
-
-  // All notes are kept in this state
-  
-  // const fetch = useAppSelector((state) => state.userData.notes);
-  // const [notesData, setNotesData] = useState<Note[]>(fetch)
-
-  const notesData = useAppSelector((state) => state.userData.notes);
-
-  
   const Backgrounds = [
     NoteBg.Style1,
     NoteBg.Style2,
@@ -95,7 +28,9 @@ const NoteDetails: React.FC = ({ route }: any) => {
     NoteBg.Style5,
     NoteBg.Style6,
   ];
-
+  
+  const { itemId } = route.params;
+  const notesData = useAppSelector((state) => state.userData.notes);
   const note = notesData.find((note) => note.note_id === itemId);
   
   const [isEditing, setIsEditing] = useState(false);
@@ -201,13 +136,6 @@ const NoteDetails: React.FC = ({ route }: any) => {
       },
     ]);
   };
-
-  // Edit notes in global context, if a note changes
-  // useEffect(() => {
-  //   dispatch(setNotes(notesData));
-  //   console.log("notesData after changes: ", notesData)
-    
-  // }, [notesData, handleDelete, dispatch]);
   
   // Handle Navigation to Coordinates
   const onPress = (latitude: number, longitude: number) => {
