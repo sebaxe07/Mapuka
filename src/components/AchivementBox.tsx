@@ -54,7 +54,7 @@ const AchievementBox: React.FC<ContentBoxProps> = ({
       style={{
         /* backgroundColor: unlocked ? randomColor : colors.menus, */
         //Out of service pretty colors
-        opacity: unlocked ? 1 : 0.5, // Apply opacity when locked
+        opacity: unlocked ? 1 : 0.4, // Apply opacity when locked
       }}
     >
       {/* SVG Icon */}
