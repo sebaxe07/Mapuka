@@ -4,7 +4,6 @@ import Place from "../../assets/icons/bookmarks/place.svg";
 import Trash from "../../assets/icons/bookmarks/trash.svg";
 import SpotDefault from "../../assets/images/bookmarks/spotDefault.svg";
 import { colors } from "../../colors";
-import { useNavigation } from "@react-navigation/native";
 import { setSpots, Spot } from "../contexts/slices/userDataSlice";
 import { useAppDispatch, useAppSelector } from "../contexts/hooks";
 import { supabase } from "../utils/supabase";
@@ -24,8 +23,6 @@ const SpotBox: React.FC<{
   onPress,
   image,
 }) => {
-  const navigation = useNavigation();
-
   const externalCoordinates = (latitude: number, longitude: number) => {};
   const spotsData = useAppSelector((state) => state.userData.spots);
   const dispatch = useAppDispatch();
@@ -62,9 +59,6 @@ const SpotBox: React.FC<{
             // Update Redux state directly (global state)
             const filteredSpots = spotsData.filter((n) => n.spot_id !== spotId);
             dispatch(setSpots(filteredSpots));
-
-            // Navigate back only after state updates
-            navigation.goBack();
           } catch (error) {
             console.error("Error deleting spot:", error);
           }
