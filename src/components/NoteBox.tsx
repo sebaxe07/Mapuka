@@ -43,6 +43,7 @@ const NoteBox: React.FC<{
           </Text>
           <View className="flex-row items-center mb-4">
             <Place
+              testID="place-icon"
               width={16}
               height={16}
               color={"--color-text-body"}

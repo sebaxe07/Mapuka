@@ -3,13 +3,18 @@ import { View, Text, TouchableOpacity, TextInput } from "react-native";
 import Close from "../../assets/icons/home/close_clean.svg";
 import Divider from "./utils/Divider";
 import AlertModal from "./AlertModal";
+import { supabase } from "../utils/supabase";
+import { useAppDispatch, useAppSelector } from "../contexts/hooks";
+import { setSpots, setNotes } from "../contexts/slices/userDataSlice";
+import { MAPBOX_ACCESS_TOKEN } from "@env";
 
 interface SaveBoxProps {
   type: "note" | "spot";
   onClose: () => void;
+  coordinates: [number, number];
 }
 
-const SaveBox: React.FC<SaveBoxProps> = ({ type, onClose }) => {
+const SaveBox: React.FC<SaveBoxProps> = ({ type, onClose, coordinates }) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [showModal, setShowModal] = useState(false);
@@ -23,6 +28,84 @@ const SaveBox: React.FC<SaveBoxProps> = ({ type, onClose }) => {
     console.log("Description:", description);
     setShowModal(false);
     onClose(); // Close the modal after saving
+  };
+
+  const userData = useAppSelector((state) => state.userData);
+  const dispatch = useAppDispatch();
+
+  const currentSpots = userData.spots;
+  const currentNotes = userData.notes;
+  const profileid = userData.profile_id;
+  console.log("COORDINATES AT SAVEBOX:", coordinates);
+
+  const handleSave = async () => {
+    // Get actual name address from Mapbox API
+    const response = await fetch(
+      `https://api.mapbox.com/search/geocode/v6/reverse?longitude=${coordinates[0]}&latitude=${coordinates[1]}&access_token=${MAPBOX_ACCESS_TOKEN}`
+    );
+    const addressData = await response.json();
+    const address =
+      addressData.features[0]?.properties?.name || "Unknown address";
+
+    if (type == "spot") {
+      console.log("Adding spot:", { title, coordinates, address, profileid });
+
+      // Add spot to database
+      const { data, error } = await supabase
+        .from("spots")
+        .insert([
+          {
+            profile_id: profileid,
+            coordinates: coordinates,
+            title: title,
+            address: address,
+          },
+        ])
+        .select();
+
+      if (error) {
+        console.error("Failed to add spot:", error.message);
+        return;
+      }
+      console.log("Spot added successfully:", data);
+
+      // Add spot to local context
+      dispatch(setSpots([...currentSpots, ...data]));
+
+      onClose(); // Close the modal after saving
+    } else if (type == "note") {
+      console.log("Adding spot:", {
+        title,
+        description,
+        coordinates,
+        address,
+        profileid,
+      });
+
+      // Add note to database
+      const { data, error } = await supabase
+        .from("notes")
+        .insert([
+          {
+            profile_id: profileid,
+            coordinates: coordinates,
+            address: address,
+            title: title,
+            content: description,
+          },
+        ])
+        .select();
+
+      if (error) {
+        console.error("Failed to add note:", error.message);
+        return;
+      }
+      console.log("Note added successfully:", data);
+
+      dispatch(setNotes([...currentNotes, ...data]));
+
+      onClose(); // Close the modal after saving
+    }
   };
 
   return (

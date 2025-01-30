@@ -105,6 +105,7 @@ const InputField = forwardRef(
                     ...leftIcon,
                     color: color.bodyText,
                     size: 20,
+                    testID: "input-left-icon",
                   }
                 : undefined
             }
@@ -135,6 +136,7 @@ const InputField = forwardRef(
             rightIcon={
               (leftIcon.name === "lock" && (
                 <Icon
+                  testID="input-right-icon"
                   name={secureEntry ? "eye-off" : "eye"}
                   type="feather"
                   onPress={() => setSecureEntry(!secureEntry)}
@@ -143,6 +145,7 @@ const InputField = forwardRef(
               )) ||
               (rightIconProp && (
                 <Icon
+                  testID="input-right-icon"
                   name={rightIconProp.name}
                   type={rightIconProp.type}
                   onPress={rightIconProp.onPress}

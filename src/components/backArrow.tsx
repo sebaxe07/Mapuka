@@ -23,6 +23,7 @@ const BackArrow: React.FC<BackArrowProps> = ({
 
   return (
     <Pressable
+      testID="back-arrow"
       onPress={onpress || defaultPress}
       hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
       style={{

@@ -48,6 +48,7 @@ const Compass = ({ bearing, onPress }: CompassProps) => {
 
   return (
     <TouchableOpacity
+      testID="compass"
       className="bg-buttonBlue rounded-full items-center justify-center size-14"
       onPress={onPress}
     >

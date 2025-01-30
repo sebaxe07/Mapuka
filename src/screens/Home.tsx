@@ -12,6 +12,7 @@ import NavbarBase from "../../assets/images/navbarbase.svg";
 import { colors } from "../../colors";
 import { Easing } from "react-native-reanimated";
 import { MotiView } from "moti";
+import Map from "./MapFog";
 
 MapboxGL.setAccessToken(MAPBOX_ACCESS_TOKEN);
 
@@ -20,7 +21,9 @@ const Home: React.FC = ({ route }: any) => {
   const [searchText, setSearchText] = useState(""); // Trigger for search
   const [triggerAction, setTriggerAction] = useState(""); // Action triggers (e.g., GPS)
   const [bearing, setBearing] = useState(0); // Compass bearing
-  const [externalCoords, setExternalCoords] = useState(null); // State to store external coordinates
+  const [externalCoords, setExternalCoords] = useState<[number, number] | null>(
+    null
+  ); // State to store external coordinates
 
   // Check for external coordinates passed via `route`
   useEffect(() => {
@@ -29,24 +32,33 @@ const Home: React.FC = ({ route }: any) => {
 
       // Log the new coordinates
       console.log("Received External Coordinates:", newCoords);
+      // Convert to a tuple
+
+      const newCoordsTuple: [number, number] = [
+        newCoords.longitude,
+        newCoords.latitude,
+      ];
 
       // Update state with new coordinates
-      setExternalCoords(newCoords);
+      setExternalCoords(newCoordsTuple);
 
-      // Optionally, display an alert to the user
-      Alert.alert(
+      /*       Alert.alert(
         "New Coordinates Received",
         `Latitude: ${newCoords.latitude}, Longitude: ${newCoords.longitude}`
-      );
+      ); */
     }
   }, [route?.params?.externalCoordinates]);
 
   // Handle clearing coordinates if new ones are received later
   useEffect(() => {
     if (externalCoords) {
+      console.log("externalCoords:", externalCoords);
       console.log("External coordinates updated. Clearing old register...");
     }
   }, [externalCoords]);
+  const [[latitude, longitude], setCoordinates] = useState<[number, number]>([
+    0, 0,
+  ]);
 
   const [changeTheme, setChangeTheme] = useState(false);
 
@@ -74,7 +86,7 @@ const Home: React.FC = ({ route }: any) => {
     () => (
       <>
         <MotiView
-          animate={{ translateY: changeTheme ? 0 : -60, scale: 0.9 }}
+          animate={{ translateY: changeTheme ? 0 : -60, scale: 0.8 }}
           transition={
             {
               type: "timing",
@@ -87,11 +99,11 @@ const Home: React.FC = ({ route }: any) => {
             className="bg-[#1a1b3f] rounded-full items-center justify-center size-14"
             onPress={handleMapCustom}
           >
-            <Icons.Layers color={colors.white} />
+            <Icons.Layers fill={"#E8EBFF"} />
           </TouchableOpacity>
         </MotiView>
         <MotiView
-          animate={{ translateY: changeTheme ? 0 : -120, scale: 0.9 }}
+          animate={{ translateY: changeTheme ? 0 : -120, scale: 0.8 }}
           transition={
             {
               type: "timing",
@@ -104,12 +116,12 @@ const Home: React.FC = ({ route }: any) => {
             className="bg-[#292929]  rounded-full items-center justify-center size-14"
             onPress={handleMapDark}
           >
-            <Icons.Layers color={colors.white} />
+            <Icons.Layers fill={"#5E5E5E"} />
           </TouchableOpacity>
         </MotiView>
 
         <MotiView
-          animate={{ translateY: changeTheme ? 0 : -180, scale: 0.9 }}
+          animate={{ translateY: changeTheme ? 0 : -180, scale: 0.8 }}
           transition={
             {
               type: "timing",
@@ -122,7 +134,7 @@ const Home: React.FC = ({ route }: any) => {
             className="bg-white  rounded-full items-center justify-center size-14"
             onPress={handleMapLight}
           >
-            <Icons.Layers color={colors.white} />
+            <Icons.Layers fill={"#AEAEAE"} />
           </TouchableOpacity>
         </MotiView>
       </>
@@ -139,13 +151,16 @@ const Home: React.FC = ({ route }: any) => {
 
   return (
     <View className="flex-1">
-      {/* Full-screen Map */
-      /* <Map
+      {/* Full-screen Map */}
+      <Map
         searchText={searchText}
         triggerAction={triggerAction}
         setTriggerAction={setTriggerAction}
         onBearingChange={setBearing}
         mapType={mapType}
+        SpotCoordinates={externalCoords}
+        setSpotCoordinates={setExternalCoords}
+        onCoordinatesChange={setCoordinates}
       />
 
       {/* Search Bar */}
@@ -166,7 +181,7 @@ const Home: React.FC = ({ route }: any) => {
                 className="bg-buttonPurple  rounded-full items-center justify-center size-14 z-10"
                 onPress={() => setChangeTheme(!changeTheme)}
               >
-                <Icons.Layers color={colors.white} />
+                <Icons.Layers fill={"#E8EBFF"} />
               </TouchableOpacity>
 
               {memoizedTheme}
@@ -192,7 +207,7 @@ const Home: React.FC = ({ route }: any) => {
             </View>
 
             {/* Bottom Floating Menu */}
-            <FloatingNavbar />
+            <FloatingNavbar coordinates={[latitude, longitude]} />
           </View>
         </View>
       </View>

@@ -34,7 +34,7 @@ import * as React from "react";
 import { useAppDispatch, useAppSelector } from "./src/contexts/hooks";
 import { setAuth, setSession } from "./src/contexts/slices/userDataSlice";
 
-import BackArrow from "./src/components/BackArrow";
+import BackArrow from "./src/components/backArrow";
 
 function useIsSignedIn() {
   const isSignedIn = useAppSelector((state) => state.userData.auth);
@@ -173,7 +173,6 @@ const RootStack = createNativeStackNavigator({
           }),
           screen: ProfileScreen,
         },
-        /* MapFog: MapFog, */
       },
     },
     SignedOut: {

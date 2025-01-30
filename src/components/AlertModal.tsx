@@ -53,9 +53,24 @@ const AlertModal: React.FC<CustomModalProps> = ({
               onPress={onConfirm}
               disabled={loading}
             />
-          )}
-        </View>
-        {loading && <ActivityIndicator size="small" color={colors.accentRed} />}
+          </View>
+        ) : (
+          <View className="w-full flex-row items-center justify-center px-6">
+            <Button
+              label={cancelText}
+              width={"w-80"}
+              onPress={onCancel}
+              disabled={loading}
+            />
+          </View>
+        )}
+        {loading && (
+          <ActivityIndicator
+            testID="ActivityIndicator"
+            size="small"
+            color="bg-buttonAccentRed"
+          />
+        )}
       </View>
     </Modal>
   );

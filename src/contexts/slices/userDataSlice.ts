@@ -29,6 +29,10 @@ export interface Spot {
   title: string;
 }
 
+export interface Achievement {
+  id: number;
+  unlocked: boolean;
+}
 // Define a type for the slice state
 export interface UserDataState {
   session: Session | null;
@@ -39,7 +43,7 @@ export interface UserDataState {
   lastname: string;
   discovered_area: number;
   discovered_polygon: Feature<Polygon | MultiPolygon, GeoJsonProperties> | null;
-  achievements: string;
+  achievements: Achievement[];
   created_at: string;
   pic: Photo | null;
   notes: Note[];
@@ -56,7 +60,7 @@ const initialState = {
   lastname: "",
   discovered_area: 0,
   discovered_polygon: null,
-  achievements: "",
+  achievements: [],
   created_at: "",
   pic: null,
   notes: [],
@@ -97,8 +101,11 @@ export const userDataSlice = createSlice({
     ) => {
       state.discovered_polygon = action.payload;
     },
-    setAchievements: (state, action: PayloadAction<string>) => {
+    setAchievements: (state, action: PayloadAction<Achievement[]>) => {
       state.achievements = action.payload;
+    },
+    setPic: (state, action: PayloadAction<Photo | null>) => {
+      state.pic = action.payload;
     },
     setNotes: (state, action: PayloadAction<Note[]>) => {
       state.notes = action.payload;
@@ -130,7 +137,7 @@ export const userDataSlice = createSlice({
       state.lastname = "";
       state.discovered_area = 0;
       state.discovered_polygon = null;
-      state.achievements = "";
+      state.achievements = [];
       state.created_at = "";
       state.pic = null;
       state.notes = [];
@@ -150,6 +157,7 @@ export const {
   setDiscoveredArea,
   setDiscoveredPolygon,
   setAchievements,
+  setPic,
   setNotes,
   setSpots,
   setUserData,

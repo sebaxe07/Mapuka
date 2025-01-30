@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -14,76 +14,13 @@ import Edit from "../../assets/icons/profile/edit_clean.svg";
 import Trash from "../../assets/icons/bookmarks/trash.svg";
 import { colors } from "../../colors";
 import { useNavigation } from "@react-navigation/native";
-import { Note } from "../contexts/slices/userDataSlice";
+import { Note, setNotes } from "../contexts/slices/userDataSlice";
+import { useAppDispatch, useAppSelector } from "../contexts/hooks";
+import { supabase } from "../utils/supabase";
 import * as NoteBg from "../../assets/images/bookmarks/index";
 import AlertModal from "../components/AlertModal";
 
 const NoteDetails: React.FC = ({ route }: any) => {
-  const { itemId } = route.params;
-
-  const [notesData, setNotesData] = useState<Note[]>([
-    {
-      note_id: "1",
-      created_at: "14-04-2024",
-      coordinates: [37.7749, -122.4194],
-      address: "San Francisco, CA",
-      title: "Golden Gate Park",
-      content: "A beautiful park in the heart of San Francisco",
-      image: 1,
-    },
-    {
-      note_id: "2",
-      created_at: "09-06-2023",
-      coordinates: [40.7831, -73.9712],
-      address: "Skyline Boulevard, NY",
-      title: "Rooftop Cafe",
-      content: "A nice place to have a coffee",
-      image: 2,
-    },
-    {
-      note_id: "3",
-      created_at: "27-09-2024",
-      coordinates: [46.7296, -94.6859],
-      address: "Lakeview Crescent, MN",
-      title: "Crystal Lake Dock",
-      content: "A dock with a beautiful view",
-      image: 3,
-    },
-    {
-      note_id: "4",
-      created_at: "19-03-2025",
-      coordinates: [30.2672, -97.7431],
-      address: "Downtown Square, TX",
-      title: "Vintage Market Plaza",
-      content: "A plaza with a lot of vintage stuff",
-      image: 4,
-    },
-    {
-      note_id: "5",
-      created_at: "31-08-2024",
-      coordinates: [44.0521, -121.3153],
-      address: "Cascade Hills, OR",
-      title: "Secluded Waterfall",
-      content: "A hidden waterfall in the hills",
-      image: 5,
-    },
-    {
-      note_id: "6",
-      created_at: "02-05-2023",
-      coordinates: [25.7617, -80.1918],
-      address: "Creative District, FL",
-      title: "Urban Art Alley",
-      content: "A street full of urban art",
-      image: 0,
-    },
-  ]);
-
-  const [loading, setLoading] = useState(false);
-  const [isAlertSaveVisible, setIsAlertSaveVisible] = useState(false);
-  const [isAlertCancelVisible, setIsAlerCancelVisible] = useState(false);
-
-  const [isAlertDeleteVisible, setIsAlertDeleteVisible] = useState(false);
-
   const Backgrounds = [
     NoteBg.Style1,
     NoteBg.Style2,
@@ -93,6 +30,14 @@ const NoteDetails: React.FC = ({ route }: any) => {
     NoteBg.Style6,
   ];
 
+  const [loading, setLoading] = useState(false);
+  const [isAlertSaveVisible, setIsAlertSaveVisible] = useState(false);
+  const [isAlertCancelVisible, setIsAlerCancelVisible] = useState(false);
+
+  const [isAlertDeleteVisible, setIsAlertDeleteVisible] = useState(false);
+
+  const { itemId } = route.params;
+  const notesData = useAppSelector((state) => state.userData.notes);
   const note = notesData.find((note) => note.note_id === itemId);
 
   const [isEditing, setIsEditing] = useState(false);
@@ -100,6 +45,7 @@ const NoteDetails: React.FC = ({ route }: any) => {
   const [isModalVisible, setIsModalVisible] = useState(false); // For the image picker modal
 
   const navigation = useNavigation();
+  const dispatch = useAppDispatch();
 
   if (!note) {
     return (
@@ -109,26 +55,89 @@ const NoteDetails: React.FC = ({ route }: any) => {
     );
   }
 
+  const formatDate = (dateString: string) => {
+    const options: Intl.DateTimeFormatOptions = {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    };
+    return new Date(dateString).toLocaleDateString(undefined, options);
+  };
+
+  // Update note in database
+  const updateNote = async () => {
+    const { data, error } = await supabase
+      .from("notes")
+      .update({
+        title: editableNote?.title,
+        content: editableNote?.content,
+        address: editableNote?.address,
+      })
+      .eq("note_id", note.note_id);
+
+    if (error) {
+      console.error("Error saving edited note: ", error.message);
+      return;
+    }
+  };
+
+  const deleteNote = async () => {
+    const { data, error } = await supabase
+      .from("notes")
+      .delete()
+      .eq("note_id", note.note_id);
+
+    if (error) {
+      console.error("Error deleting note: ", error.message);
+      return;
+    }
+  };
+
   // Handle Save
-  const handleSave = () => {
-    setNotesData((prev) =>
-      prev.map((n) => (n.note_id === itemId ? { ...n, ...editableNote } : n))
-    );
-    setIsEditing(false);
+  const handleSave = async () => {
+    try {
+      // Update database first
+      await updateNote();
+
+      // Update Redux state directly (global context)
+      const updatedNotes = notesData.map((n) =>
+        n.note_id === itemId ? { ...n, ...editableNote } : n
+      );
+      dispatch(setNotes(updatedNotes));
+
+      setIsEditing(false);
+    } catch (error) {
+      console.error("Error updating note:", error);
+    }
   };
 
   // Handle Delete Note
   const handleDelete = () => {
-    setNotesData((prev) => prev.filter((n) => n.note_id !== itemId));
-    navigation.goBack(); // Go back to the previous screen
+    async () => {
+      try {
+        // Delete from database first
+        await deleteNote();
+
+        // Update Redux state directly (global state)
+        const filteredNotes = notesData.filter((n) => n.note_id !== itemId);
+        dispatch(setNotes(filteredNotes));
+
+        // Navigate back only after state updates
+        navigation.goBack();
+      } catch (error) {
+        console.error("Error deleting note:", error);
+      }
+    };
   };
 
   // Handle Navigation to Coordinates
-  const onPress = (latitude: number, longitude: number) => {
+  const onPress = (longitude: number, latitude: number) => {
     try {
       navigation.navigate("Home", {
-        externalCoordinates: { latitude, longitude },
-      });
+        externalCoordinates: { longitude, latitude },
+      } as any);
     } catch (error) {
       console.error("Navigation error:", error);
     }
@@ -161,10 +170,13 @@ const NoteDetails: React.FC = ({ route }: any) => {
             renderItem={({ item: Background, index }) => (
               <TouchableOpacity
                 onPress={() => {
-                  setEditableNote((prev) => ({
-                    ...prev,
-                    image: index,
-                  }));
+                  setEditableNote(
+                    (prev) =>
+                      ({
+                        ...prev,
+                        image: index,
+                      }) as any
+                  );
                   setIsModalVisible(false);
                 }}
                 className="mr-4 w-24 h-24 rounded-lg items-center justify-center"
@@ -234,21 +246,27 @@ const NoteDetails: React.FC = ({ route }: any) => {
         {/* Note Details */}
         <View className="flex-1 h-[80%] justify-around rounded-3xl bg-boxMenu px-6 py-4">
           <View>
-            <Text className="text-textBody text-base mb-1">
-              {note.created_at}
-            </Text>
+            {/* Date */}
+            {isEditing ? (
+              <TextInput
+                value={editableNote?.created_at}
+                onChangeText={(text) =>
+                  setEditableNote({ ...editableNote, created_at: text } as any)
+                }
+                className="text-textBody text-base mb-1 border-b border-textBody"
+              />
+            ) : (
+              <Text className="text-textBody text-base mb-1">
+                {formatDate(note.created_at)}
+              </Text>
+            )}
+
             {/* Title */}
             {isEditing ? (
               <TextInput
                 value={editableNote?.title || ""}
                 onChangeText={(text) =>
-                  setEditableNote(
-                    (prev) =>
-                      ({
-                        ...prev,
-                        title: text,
-                      }) as Note
-                  )
+                  setEditableNote({ ...editableNote, title: text } as any)
                 }
                 className="text-boxContainer text-4xl font-senMedium mb-4 border-b border-boxContainer"
               />
@@ -270,13 +288,7 @@ const NoteDetails: React.FC = ({ route }: any) => {
                 <TextInput
                   value={editableNote?.address || ""}
                   onChangeText={(text) =>
-                    setEditableNote(
-                      (prev) =>
-                        ({
-                          ...prev,
-                          address: text,
-                        }) as Note
-                    )
+                    setEditableNote({ ...editableNote, address: text } as any)
                   }
                   className="text-textBody text-base border-b border-textBody"
                 />
@@ -290,13 +302,7 @@ const NoteDetails: React.FC = ({ route }: any) => {
               <TextInput
                 value={editableNote?.content || ""}
                 onChangeText={(text) =>
-                  setEditableNote(
-                    (prev) =>
-                      ({
-                        ...prev,
-                        content: text,
-                      }) as Note
-                  )
+                  setEditableNote({ ...editableNote, content: text } as any)
                 }
                 multiline
                 className="text-textBody text-base border-b border-textBody"

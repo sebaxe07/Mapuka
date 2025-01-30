@@ -2,12 +2,16 @@ import React, { useEffect, useMemo, useState } from "react";
 import { View, TouchableOpacity } from "react-native";
 import * as Icons from "../../assets/icons/home"; // Adjust the path based on your project structure
 import { useNavigation } from "@react-navigation/native";
+
 import SaveBox from "./SaveBoxModal"; // Import the ContentBox
 import NavbarBase from "../../assets/images/navbarbase.svg";
 import MaskedView from "@react-native-masked-view/masked-view";
 import { MotiView } from "moti";
 
-const FloatingNavbar: React.FC = () => {
+
+const FloatingNavbar: React.FC<{
+  coordinates: [number, number];
+}> = ({ coordinates }) => {
   const [menuExpanded, setMenuExpanded] = useState(false);
   const [activeBox, setActiveBox] = useState<"note" | "spot" | null>(null);
   const navigation = useNavigation();
@@ -15,7 +19,7 @@ const FloatingNavbar: React.FC = () => {
   const handleOptionSelect = (option: "note" | "spot") => {
     setActiveBox(option);
     setMenuExpanded(false); // Collapse the menu
-  };
+}
 
   const memoizedMiddle = useMemo(
     () => (
@@ -57,7 +61,7 @@ const FloatingNavbar: React.FC = () => {
   );
 
   return (
-    <View className="  justify-center items-center ">
+    <View testID="floating-navbar" className="  justify-center items-center ">
       {/* Main Navbar */}
       <MaskedView
         style={{ width: "auto" }}
@@ -102,6 +106,7 @@ const FloatingNavbar: React.FC = () => {
 
       {/* Middle Button */}
       <TouchableOpacity
+        testID="middle-button"
         className="w-16 h-16 items-center justify-center shadow-lg  absolute -top-8 left-1/2 transform -translate-x-1/2"
         onPress={() => setMenuExpanded(!menuExpanded)}
       >
@@ -111,7 +116,11 @@ const FloatingNavbar: React.FC = () => {
       {memoizedExpandable}
       {/* Content Box */}
       {activeBox && (
-        <SaveBox type={activeBox} onClose={() => setActiveBox(null)} />
+        <SaveBox 
+        type={activeBox} 
+        onClose={() => setActiveBox(null)}
+        coordinates={coordinates} 
+        />
       )}
     </View>
   );

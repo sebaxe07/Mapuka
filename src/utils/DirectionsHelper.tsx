@@ -1,14 +1,7 @@
 import React, { Component, useEffect, useRef, useState } from "react";
 import { Alert, StyleSheet, View, Text, Image } from "react-native";
 import MapboxGL, { UserLocation } from "@rnmapbox/maps";
-import * as Location from "expo-location";
 import { MAPBOX_ACCESS_TOKEN } from "@env";
-import { BlurView } from "expo-blur";
-import { Button, Input } from "react-native-elements";
-import * as turf from "@turf/turf";
-import { Point, Feature, GeoJsonProperties, Polygon } from "geojson";
-import { Units } from "@turf/turf";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 interface SearchLocationProps {
   text: string;
