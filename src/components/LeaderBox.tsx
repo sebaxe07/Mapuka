@@ -86,7 +86,8 @@ const LeaderBox: React.FC<ContentBoxProps> = ({
 
   return (
     <View
-      className={`flex rounded-3xl  ${top == "1" ? "items-center justify-around" : ""} w-full h-full ${boxStyles}`}
+      testID="leader-box"
+      className={`flex rounded-3xl  ${top == "1" ? "items-center justify-center " : " items-center justify-center"} w-full h-full ${boxStyles}`}
       style={{
         backgroundColor: renderColor(top),
       }}

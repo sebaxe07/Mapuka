@@ -29,6 +29,7 @@ yarn-error.*
 .DS_Store
 *.pem
 
+coverage/**/*
 
 # typescript
 *.tsbuildinfo

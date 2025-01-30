@@ -58,7 +58,11 @@ const AlertModal: React.FC<CustomModalProps> = ({
           </View>
         )}
         {loading && (
-          <ActivityIndicator size="small" color="bg-buttonAccentRed" />
+          <ActivityIndicator
+            testID="ActivityIndicator"
+            size="small"
+            color="bg-buttonAccentRed"
+          />
         )}
       </View>
     </Modal>

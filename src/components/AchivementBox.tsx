@@ -3,7 +3,6 @@ import { View, Text, TouchableOpacity } from "react-native";
 import { colors } from "../../colors";
 import HolderV from "../../assets/icons/bookmarks/holder.svg";
 import HolderH from "../../assets/icons/bookmarks/holderH.svg";
-import * as Icons from "../../assets/icons/leaderboard/index";
 
 // Define the array of unlocked colors
 const unlockedColors = [
