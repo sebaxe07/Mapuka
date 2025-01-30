@@ -70,6 +70,19 @@ const Profile: React.FC = () => {
       //console.log("User has a picture", userData.pic.pictureUrl);
       setAvatarUrl(userData.pic.pictureUrl);
     }
+
+    // Calculate the percentage of achievements unlocked
+    if (userData.achievements) {
+      const unlockedAchievements = userData.achievements.filter(
+        (achievement) => achievement.unlocked
+      );
+      const achievementsPercentage =
+        (unlockedAchievements.length / userData.achievements.length) * 100;
+
+      const clampedAchievements =
+        Math.floor(achievementsPercentage * 100) / 100;
+      setAchievementsCount(clampedAchievements);
+    }
   }, [userData]);
 
   async function uploadAvatar() {

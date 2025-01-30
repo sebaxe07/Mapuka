@@ -42,7 +42,6 @@ interface MapProps {
   SpotCoordinates: [number, number] | null;
   setSpotCoordinates: (coordinates: [number, number] | null) => void;
   onCoordinatesChange: (coordinates: [number, number]) => void;
-  
 }
 
 const debouncedSaveDiscoveredAreas = debounce(
@@ -134,6 +133,7 @@ const Map: React.FC<MapProps> = ({
   const [mapStyle, setMapStyle] = useState(mapTypes[mapType]);
   useEffect(() => {
     setMapStyle(mapTypes[mapType]);
+    setFogColor(fogTypes[mapType]);
   }, [mapType]);
 
   useEffect(() => {

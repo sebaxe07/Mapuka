@@ -173,7 +173,6 @@ const RootStack = createNativeStackNavigator({
           }),
           screen: ProfileScreen,
         },
-        /* MapFog: MapFog, */
       },
     },
     SignedOut: {
