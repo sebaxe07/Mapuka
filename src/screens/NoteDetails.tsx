@@ -180,6 +180,15 @@ const NoteDetails: React.FC = ({ route }: any) => {
                   setIsModalVisible(false);
                 }}
                 className="mr-4 w-24 h-24 rounded-lg items-center justify-center"
+                style={
+                  editableNote?.image === index
+                    ? {
+                        borderWidth: 2,
+                        borderColor: colors.accentRed,
+                        borderRadius: 20,
+                      }
+                    : {}
+                }
               >
                 <Background width={85} height={85} />
               </TouchableOpacity>
@@ -247,19 +256,9 @@ const NoteDetails: React.FC = ({ route }: any) => {
         <View className="flex-1 h-[80%] justify-around rounded-3xl bg-boxMenu px-6 py-4">
           <View>
             {/* Date */}
-            {isEditing ? (
-              <TextInput
-                value={editableNote?.created_at}
-                onChangeText={(text) =>
-                  setEditableNote({ ...editableNote, created_at: text } as any)
-                }
-                className="text-textBody text-base mb-1 border-b border-textBody"
-              />
-            ) : (
-              <Text className="text-textBody text-base mb-1">
-                {formatDate(note.created_at)}
-              </Text>
-            )}
+            <Text className="text-textBody text-base mb-1">
+              {formatDate(note.created_at)}
+            </Text>
 
             {/* Title */}
             {isEditing ? (
