@@ -255,7 +255,7 @@ const NoteDetails: React.FC = ({ route }: any) => {
               />
             ) : (
               <Text className="text-textBody text-base mb-1">
-                {note.created_at}
+                {formatDate(note.created_at)}
               </Text>
             )}
 
