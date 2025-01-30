@@ -53,8 +53,8 @@ const BookmarksScreen: React.FC = () => {
       try {
         navigation.navigate("Home", {
           externalCoordinates: {
-            latitude: coordinates[0],
-            longitude: coordinates[1],
+            longitude: coordinates[0],
+            latitude: coordinates[1],
           },
         });
       } catch (error) {

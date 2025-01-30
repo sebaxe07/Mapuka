@@ -20,7 +20,9 @@ const Home: React.FC = ({ route }: any) => {
   const [searchText, setSearchText] = useState(""); // Trigger for search
   const [triggerAction, setTriggerAction] = useState(""); // Action triggers (e.g., GPS)
   const [bearing, setBearing] = useState(0); // Compass bearing
-  const [externalCoords, setExternalCoords] = useState(null); // State to store external coordinates
+  const [externalCoords, setExternalCoords] = useState<[number, number] | null>(
+    null
+  ); // State to store external coordinates
 
   // Check for external coordinates passed via `route`
   useEffect(() => {
@@ -29,21 +31,27 @@ const Home: React.FC = ({ route }: any) => {
 
       // Log the new coordinates
       console.log("Received External Coordinates:", newCoords);
+      // Convert to a tuple
+
+      const newCoordsTuple: [number, number] = [
+        newCoords.longitude,
+        newCoords.latitude,
+      ];
 
       // Update state with new coordinates
-      setExternalCoords(newCoords);
+      setExternalCoords(newCoordsTuple);
 
-      // Optionally, display an alert to the user
-      Alert.alert(
+      /*       Alert.alert(
         "New Coordinates Received",
         `Latitude: ${newCoords.latitude}, Longitude: ${newCoords.longitude}`
-      );
+      ); */
     }
   }, [route?.params?.externalCoordinates]);
 
   // Handle clearing coordinates if new ones are received later
   useEffect(() => {
     if (externalCoords) {
+      console.log("externalCoords:", externalCoords);
       console.log("External coordinates updated. Clearing old register...");
     }
   }, [externalCoords]);
@@ -150,7 +158,8 @@ const Home: React.FC = ({ route }: any) => {
         setTriggerAction={setTriggerAction}
         onBearingChange={setBearing}
         mapType={mapType}
-        onCoordinatesChange={setCoordinates}
+        SpotCoordinates={externalCoords}
+        setSpotCoordinates={setExternalCoords}
       />
 
       {/* Search Bar */}

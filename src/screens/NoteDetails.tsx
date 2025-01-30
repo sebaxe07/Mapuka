@@ -138,11 +138,11 @@ const NoteDetails: React.FC = ({ route }: any) => {
   };
   
   // Handle Navigation to Coordinates
-  const onPress = (latitude: number, longitude: number) => {
+  const onPress = (longitude: number, latitude: number) => {
     try {
       navigation.navigate("Home", {
-        externalCoordinates: { latitude, longitude },
-      });
+        externalCoordinates: { longitude, latitude },
+      } as any);
     } catch (error) {
       console.error("Navigation error:", error);
     }
@@ -244,21 +244,27 @@ const NoteDetails: React.FC = ({ route }: any) => {
         {/* Note Details */}
         <View className="flex-1 h-[80%] justify-around rounded-3xl bg-boxMenu px-6 py-4">
           <View>
-            <Text className="text-textBody text-base mb-1">
-              {note.created_at}
-            </Text>
+            {/* Date */}
+            {isEditing ? (
+              <TextInput
+                value={editableNote?.created_at}
+                onChangeText={(text) =>
+                  setEditableNote({ ...editableNote, created_at: text } as any)
+                }
+                className="text-textBody text-base mb-1 border-b border-textBody"
+              />
+            ) : (
+              <Text className="text-textBody text-base mb-1">
+                {note.created_at}
+              </Text>
+            )}
+
             {/* Title */}
             {isEditing ? (
               <TextInput
                 value={editableNote?.title || ""}
                 onChangeText={(text) =>
-                  setEditableNote(
-                    (prev) =>
-                      ({
-                        ...prev,
-                        title: text,
-                      }) as Note
-                  )
+                  setEditableNote({ ...editableNote, title: text } as any)
                 }
                 className="text-boxContainer text-4xl font-senMedium mb-4 border-b border-boxContainer"
               />
@@ -280,13 +286,7 @@ const NoteDetails: React.FC = ({ route }: any) => {
                 <TextInput
                   value={editableNote?.address || ""}
                   onChangeText={(text) =>
-                    setEditableNote(
-                      (prev) =>
-                        ({
-                          ...prev,
-                          address: text,
-                        }) as Note
-                    )
+                    setEditableNote({ ...editableNote, address: text } as any)
                   }
                   className="text-textBody text-base border-b border-textBody"
                 />
@@ -300,13 +300,7 @@ const NoteDetails: React.FC = ({ route }: any) => {
               <TextInput
                 value={editableNote?.content || ""}
                 onChangeText={(text) =>
-                  setEditableNote(
-                    (prev) =>
-                      ({
-                        ...prev,
-                        content: text,
-                      }) as Note
-                  )
+                  setEditableNote({ ...editableNote, content: text } as any)
                 }
                 multiline
                 className="text-textBody text-base border-b border-textBody"
