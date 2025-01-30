@@ -80,8 +80,11 @@ const NoteDetails: React.FC = ({ route }: any) => {
   // ]);
 
   // All notes are kept in this state
-  const fetch = useAppSelector((state) => state.userData.notes);
-  const [notesData, setNotesData] = useState<Note[]>(fetch)
+  
+  // const fetch = useAppSelector((state) => state.userData.notes);
+  // const [notesData, setNotesData] = useState<Note[]>(fetch)
+
+  const notesData = useAppSelector((state) => state.userData.notes);
 
   
   const Backgrounds = [
@@ -139,14 +142,35 @@ const NoteDetails: React.FC = ({ route }: any) => {
     }
   };
 
-  // Handle Save
-  const handleSave = () => {
-    setNotesData((prev) =>
-      prev.map((n) => (n.note_id === itemId ? { ...n, ...editableNote } : n))
-    );    
-    updateNote();
+  const deleteNote = async () => {
+    const { data, error } = await supabase
+      .from("notes")
+      .delete()
+      .eq("note_id", note.note_id);
 
-    setIsEditing(false);
+
+    if (error) {
+      console.error("Error deleting note: ", error.message);
+      return;
+    }
+  };
+
+  // Handle Save
+  const handleSave = async () => {
+    try {
+      // Update database first
+      await updateNote();
+      
+      // Update Redux state directly (global context)
+      const updatedNotes = notesData.map((n) => 
+        n.note_id === itemId ? { ...n, ...editableNote } : n
+      );
+      dispatch(setNotes(updatedNotes));
+      
+      setIsEditing(false);
+    } catch (error) {
+      console.error("Error updating note:", error);
+    }
   };
 
   // Handle Delete Note
@@ -159,21 +183,33 @@ const NoteDetails: React.FC = ({ route }: any) => {
       {
         text: "Delete",
         style: "destructive",
-        onPress: () => {
-          setNotesData((prev) => prev.filter((n) => n.note_id !== itemId));
-          navigation.goBack(); // Go back to the previous screen
+        onPress: async () => {
+          try {
+            // Delete from database first
+            await deleteNote();
+            
+            // Update Redux state directly (global state)
+            const filteredNotes = notesData.filter((n) => n.note_id !== itemId);
+            dispatch(setNotes(filteredNotes));
+            
+            // Navigate back only after state updates
+            navigation.goBack();
+          } catch (error) {
+            console.error("Error deleting note:", error);
+          }
         },
       },
     ]);
   };
 
-  // Handle Navigation to Coordinates
   // Edit notes in global context, if a note changes
-  useEffect(() => {
-    dispatch(setNotes(notesData));
+  // useEffect(() => {
+  //   dispatch(setNotes(notesData));
+  //   console.log("notesData after changes: ", notesData)
     
-  }, [notesData, dispatch]);
-
+  // }, [notesData, handleDelete, dispatch]);
+  
+  // Handle Navigation to Coordinates
   const onPress = (latitude: number, longitude: number) => {
     try {
       navigation.navigate("Home", {
