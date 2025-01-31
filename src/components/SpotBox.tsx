@@ -100,7 +100,7 @@ const SpotBox: React.FC<{
       <AlertModal
         isVisible={isAlertDeleteVisible}
         onBackdropPress={() => setIsAlertDeleteVisible(false)}
-        message={`Are you sure you want to delete this note?\nThis action cannot be undone.`}
+        message={`Are you sure you want to delete this note?`}
         onCancel={() => setIsAlertDeleteVisible(false)}
         onConfirm={async () => {
           try {

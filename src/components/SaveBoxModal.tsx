@@ -25,6 +25,7 @@ const SaveBox: React.FC<SaveBoxProps> = ({ type, onClose, coordinates }) => {
   const currentSpots = userData.spots;
   const currentNotes = userData.notes;
   const profileid = userData.profile_id;
+
   console.log("COORDINATES AT SAVEBOX:", coordinates);
 
   const [showModal, setShowModal] = useState(false);
@@ -190,7 +191,7 @@ const SaveBox: React.FC<SaveBoxProps> = ({ type, onClose, coordinates }) => {
               : "bg-textInput"
           }`}
           onPress={handleSaveAttempt}
-          disabled={!title.trim() || (type === "note" && !description.trim())}
+          /* disabled={!title.trim() || (type === "note" && !description.trim())} */
         >
           <Text className="text-textWhite font-senSemiBold">
             {type === "note" ? "Save Note" : "Save Spot"}

@@ -89,19 +89,21 @@ const NoteDetails: React.FC = ({ route }: any) => {
 
   // Handle Save
   const handleSave = async () => {
-    try {
-      // Update database first
-      await updateNote();
+    if (validateInputs()) {
+      try {
+        // Update database first
+        await updateNote();
 
-      // Update Redux state directly (global context)
-      const updatedNotes = notesData.map((n) =>
-        n.note_id === itemId ? { ...n, ...editableNote } : n
-      );
-      dispatch(setNotes(updatedNotes));
+        // Update Redux state directly (global context)
+        const updatedNotes = notesData.map((n) =>
+          n.note_id === itemId ? { ...n, ...editableNote } : n
+        );
+        dispatch(setNotes(updatedNotes));
 
-      setIsEditing(false);
-    } catch (error) {
-      console.error("Error updating note:", error);
+        setIsEditing(false);
+      } catch (error) {
+        console.error("Error updating note:", error);
+      }
     }
   };
 
@@ -139,6 +141,46 @@ const NoteDetails: React.FC = ({ route }: any) => {
     Keyboard.dismiss();
     setChangedBackground(currentBackground); // Reset selection on cancel
     setIsModalVisible(false);
+  };
+
+  const [titleError, setTitleError] = useState("");
+  const [contentError, setContentError] = useState("");
+  const [customAddressError, setCustomAddressError] = useState("");
+
+  const validateInputs = () => {
+    let valid = true;
+
+    if (!editableNote?.title.trim()) {
+      setTitleError("Title is required.");
+      valid = false;
+    } else if (editableNote?.title.length > 100) {
+      setTitleError("Title must be under 100 characters.");
+      valid = false;
+    } else {
+      setTitleError("");
+    }
+
+    if (!editableNote?.address.trim()) {
+      setCustomAddressError("Adress is required.");
+      valid = false;
+    } else if (editableNote?.address.length > 50) {
+      setCustomAddressError("Adress must be under 50 characters.");
+      valid = false;
+    } else {
+      setCustomAddressError("");
+    }
+
+    if (!editableNote?.content.trim()) {
+      setContentError("Description is required.");
+      valid = false;
+    } else if (editableNote?.content.length > 500) {
+      setContentError("Description must be under 500 characters.");
+      valid = false;
+    } else {
+      setContentError("");
+    }
+
+    return valid;
   };
 
   const renderImagePickerModal = () => (
@@ -285,6 +327,10 @@ const NoteDetails: React.FC = ({ route }: any) => {
             {/* Title */}
             {isEditing ? (
               <TextInput
+                placeholderClassName="text-buttonAccentRed text-4xl font-senMedium mb-4 border-b border-textBody"
+                placeholder={
+                  editableNote?.title.trim() ? "" : `${titleError}` // Error message
+                }
                 value={editableNote?.title || ""}
                 onChangeText={(text) =>
                   setEditableNote({ ...editableNote, title: text } as any)
@@ -307,29 +353,41 @@ const NoteDetails: React.FC = ({ route }: any) => {
               />
               {isEditing ? (
                 <TextInput
+                  placeholderClassName="text-buttonAccentRed text-base font-senRegular  border-b border-textBody"
+                  placeholder={
+                    editableNote?.address.trim() ? "" : `${customAddressError}` // Error message
+                  }
                   value={editableNote?.address || ""}
                   onChangeText={(text) =>
                     setEditableNote({ ...editableNote, address: text } as any)
                   }
-                  className="text-textBody text-base border-b border-textBody"
+                  className="text-textBody text-base font-senRegular border-b border-textBody"
                 />
               ) : (
-                <Text className="text-textBody text-base">{note.address}</Text>
+                <Text className="text-textBody font-senRegular text-base">
+                  {note.address}
+                </Text>
               )}
             </View>
 
             {/* Content */}
             {isEditing ? (
               <TextInput
+                placeholderClassName="text-buttonAccentRed text-base font-senMedium border-b border-textBody"
+                placeholder={
+                  editableNote?.content.trim() ? "" : `${contentError}` // Error message
+                }
                 value={editableNote?.content || ""}
                 onChangeText={(text) =>
                   setEditableNote({ ...editableNote, content: text } as any)
                 }
                 multiline
-                className="text-textBody text-base border-b border-textBody"
+                className="text-textBody text-base font-senMedium border-b border-textBody"
               />
             ) : (
-              <Text className="text-textBody text-base">{note.content}</Text>
+              <Text className="text-textBody font-senMedium text-base">
+                {note.content}
+              </Text>
             )}
           </View>
 
@@ -337,8 +395,15 @@ const NoteDetails: React.FC = ({ route }: any) => {
           <View className="flex-row justify-center w-full">
             {isEditing ? (
               <TouchableOpacity
-                className="bg-buttonAccentRed rounded-3xl items-center justify-center w-1/2 px-5 py-3"
+                className={`bg-buttonAccentRed rounded-3xl items-center justify-center w-1/2 px-5 py-3 ${
+                  editableNote?.title.trim() && editableNote?.content.trim()
+                    ? "bg-buttonAccentRed"
+                    : "bg-textInput"
+                }`}
                 onPress={() => setIsAlertSaveVisible(true)}
+                /* disabled={
+                  !editableNote?.title.trim() || !editableNote?.content.trim()
+                } */
               >
                 <Text className="text-textWhite text-sm font-senSemiBold">
                   Save
@@ -398,7 +463,7 @@ const NoteDetails: React.FC = ({ route }: any) => {
       <AlertModal
         isVisible={isAlertDeleteVisible}
         onBackdropPress={() => setIsAlertDeleteVisible(false)}
-        message={`Are you sure you want to delete this note?\nThis action cannot be undone.`}
+        message={`Are you sure you want to delete this note?`}
         onCancel={() => setIsAlertDeleteVisible(false)}
         onConfirm={async () => {
           try {
