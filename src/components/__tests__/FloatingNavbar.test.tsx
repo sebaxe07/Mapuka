@@ -6,9 +6,11 @@ import FloatingNavbar from "../FloatingNavbar";
 import { useNavigation } from "@react-navigation/native";
 import { MotiView } from "moti";
 
+const mockNavigate = jest.fn();
+
 jest.mock("@react-navigation/native", () => ({
   useNavigation: () => ({
-    navigate: jest.fn(),
+    navigate: mockNavigate,
   }),
 }));
 
@@ -125,5 +127,101 @@ describe("FloatingNavbar Component", () => {
     await waitFor(() => {
       expect(middleButton.props.children[0].props.animate.rotate).toBe("0deg");
     });
+  });
+
+  it("handles the option selected correctly for note", async () => {
+    const { getByTestId } = render(<FloatingNavbar coordinates={[0, 0]} />);
+    const middleButton = getByTestId("middle-button");
+
+    // First press to expand menu
+    act(() => {
+      fireEvent.press(middleButton);
+    });
+
+    act(() => {
+      jest.runAllTimers(); // Ensure the first animation is done
+    });
+
+    // Press the 'New Note' button
+    act(() => {
+      fireEvent.press(getByTestId("new-note"));
+    });
+
+    act(() => {
+      jest.runAllTimers(); // Ensure the second animation is done
+    });
+    await waitFor(() => {
+      expect(middleButton.props.children[0].props.animate.rotate).toBe("0deg");
+    });
+  });
+
+  it("handles the option selected correctly for spot", async () => {
+    const { getByTestId } = render(<FloatingNavbar coordinates={[0, 0]} />);
+    const middleButton = getByTestId("middle-button");
+
+    // First press to expand menu
+    act(() => {
+      fireEvent.press(middleButton);
+    });
+
+    act(() => {
+      jest.runAllTimers(); // Ensure the first animation is done
+    });
+
+    // Press the 'New Note' button
+    act(() => {
+      fireEvent.press(getByTestId("new-spot"));
+    });
+
+    act(() => {
+      jest.runAllTimers(); // Ensure the second animation is done
+    });
+    await waitFor(() => {
+      expect(middleButton.props.children[0].props.animate.rotate).toBe("0deg");
+    });
+  });
+
+  it("navigates to Achievements when the Achievements button is pressed", () => {
+    const { getByTestId } = render(<FloatingNavbar coordinates={[0, 0]} />);
+    const achievementsButton = getByTestId("achivements-button");
+
+    act(() => {
+      fireEvent.press(achievementsButton);
+    });
+
+    expect(useNavigation().navigate).toHaveBeenCalledWith("Achivements");
+  });
+
+  it("navigates to Leaderboard when the Leaderboard button is pressed", () => {
+    const { getByTestId } = render(<FloatingNavbar coordinates={[0, 0]} />);
+    const leaderboardButton = getByTestId("leaderboard-button");
+
+    act(() => {
+      fireEvent.press(leaderboardButton);
+    });
+
+    expect(useNavigation().navigate).toHaveBeenCalledWith("Leaderboard");
+  });
+
+  it("navigates to Bookmarks when the Bookmarks button is pressed", () => {
+    const { getByTestId } = render(<FloatingNavbar coordinates={[0, 0]} />);
+    const bookmarksButton = getByTestId("bookmarks-button");
+
+    act(() => {
+      fireEvent.press(bookmarksButton);
+    });
+
+    expect(useNavigation().navigate).toHaveBeenCalledWith("Bookmarks");
+  });
+
+  it("navigates to Profile when the Profile button is pressed", () => {
+    const { getByTestId } = render(<FloatingNavbar coordinates={[0, 0]} />);
+    const profileButton = getByTestId("profile-button");
+
+    act(() => {
+      fireEvent.press(profileButton);
+    });
+
+    expect(useNavigation().navigate).toHaveBeenCalledWith("Profile");
   });
 });

@@ -41,6 +41,7 @@ const FloatingNavbar: React.FC<{
         className="absolute bottom-24 self-center flex-row items-center space-x-12"
       >
         <TouchableOpacity
+          testID="new-note"
           disabled={!menuExpanded}
           className="p-3 rounded-full items-center justify-center "
           onPress={() => handleOptionSelect("note")}
@@ -48,6 +49,7 @@ const FloatingNavbar: React.FC<{
           <Icons.NewNote color="black" />
         </TouchableOpacity>
         <TouchableOpacity
+          testID="new-spot"
           disabled={!menuExpanded}
           className="p-3 rounded-full items-center justify-center "
           onPress={() => handleOptionSelect("spot")}
@@ -75,12 +77,14 @@ const FloatingNavbar: React.FC<{
         <View className="self-center mx-4 h-[4.5rem] bg-boxMenu rounded-3xl shadow-lg flex-row items-center justify-around<">
           {/* Left Buttons */}
           <TouchableOpacity
+            testID="achivements-button"
             className="flex-1 items-center justify-center"
             onPress={() => navigation.navigate("Achivements")}
           >
             <Icons.Achivements color="black" />
           </TouchableOpacity>
           <TouchableOpacity
+            testID="leaderboard-button"
             className="flex-1 items-center justify-center"
             onPress={() => navigation.navigate("Leaderboard")}
           >
@@ -89,12 +93,14 @@ const FloatingNavbar: React.FC<{
           <View className="size-20" />
           {/* Right Buttons */}
           <TouchableOpacity
+            testID="bookmarks-button"
             className="flex-1 items-center justify-center"
             onPress={() => navigation.navigate("Bookmarks")}
           >
             <Icons.Favorites color="black" />
           </TouchableOpacity>
           <TouchableOpacity
+            testID="profile-button"
             className="flex-1 items-center justify-center"
             onPress={() => navigation.navigate("Profile")}
           >
@@ -114,13 +120,13 @@ const FloatingNavbar: React.FC<{
       {/* Expandable Options */}
       {memoizedExpandable}
       {/* Content Box */}
-      {activeBox && (
+      {/* {activeBox && (
         <SaveBox
           type={activeBox}
           onClose={() => setActiveBox(null)}
           coordinates={coordinates}
         />
-      )}
+      )} */}
     </View>
   );
 };
