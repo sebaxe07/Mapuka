@@ -33,6 +33,7 @@ import { useFonts } from "expo-font";
 import * as React from "react";
 import { useAppDispatch, useAppSelector } from "./src/contexts/hooks";
 import { setAuth, setSession } from "./src/contexts/slices/userDataSlice";
+import Toast from "react-native-toast-message";
 
 import BackArrow from "./src/components/backArrow";
 
@@ -264,6 +265,7 @@ export function RootNavigator() {
         className="size-full"
       >
         <Navigation />
+        <Toast />
       </View>
     </GestureHandlerRootView>
   );

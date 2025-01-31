@@ -8,6 +8,7 @@ import { setSpots, Spot } from "../contexts/slices/userDataSlice";
 import { useAppDispatch, useAppSelector } from "../contexts/hooks";
 import { supabase } from "../utils/supabase";
 import AlertModal from "./AlertModal";
+import Toast from "react-native-toast-message";
 
 const SpotBox: React.FC<{
   spot_id: string;
@@ -37,6 +38,15 @@ const SpotBox: React.FC<{
       .from("spots")
       .delete()
       .eq("spot_id", spotId);
+
+    Toast.show({
+      autoHide: true,
+      position: "bottom",
+      visibilityTime: 2000,
+      type: "info",
+      text1: "Note deleted",
+      text2: "Note deleted successfully!",
+    });
 
     if (error) {
       console.error("Error deleting spot: ", error.message);

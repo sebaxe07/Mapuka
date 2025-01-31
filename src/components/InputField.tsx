@@ -10,6 +10,9 @@ interface InputFieldProps {
   label?: string;
   labelVisible?: boolean;
   placeholder?: string;
+  placeholderClassname?: string;
+  labelClassname?: string;
+  className?: string;
   keyboardType?:
     | "default"
     | "email-address"
@@ -73,6 +76,9 @@ const InputField = forwardRef(
       rowWidth,
       onBlur,
       onFocus,
+      labelClassname,
+      placeholderClassname,
+      className,
     }: InputFieldProps,
     ref: React.Ref<TextInput>
   ) => {
@@ -83,7 +89,9 @@ const InputField = forwardRef(
     return (
       <View className={`${rowWidth}`}>
         {labelVisible ? (
-          <Text className={`pb-1 pt-3.5 text-lg text-textBody font-senRegular`}>
+          <Text
+            className={`${labelClassname ? labelClassname : "pb-1 pt-3.5 text-lg text-textBody font-senRegular"} `}
+          >
             {label}
           </Text>
         ) : null}
@@ -95,7 +103,7 @@ const InputField = forwardRef(
             onChangeText={onChangeText}
             value={value}
             placeholder={placeholder}
-            placeholderClassName="font-senRegular"
+            placeholderClassName={`${placeholderClassname ? placeholderClassname : "font-senRegular"}`}
             placeholderTextColor={color.bodyText}
             autoCapitalize={autoCapitalize}
             disabled={disabled}

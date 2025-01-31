@@ -18,6 +18,7 @@ import {
 } from "../utils/photoManager";
 import { supabase } from "../utils/supabase";
 import AlertModal from "../components/AlertModal";
+import Toast from "react-native-toast-message";
 
 const Profile: React.FC = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -29,6 +30,13 @@ const Profile: React.FC = () => {
   const logOut = async () => {
     console.log("User logged out");
     signOut();
+    Toast.show({
+      autoHide: true,
+      position: "bottom",
+      visibilityTime: 2000,
+      type: "info",
+      text1: "Succesfully logged out",
+    });
     dispatch(clearUserData());
   };
 

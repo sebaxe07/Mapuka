@@ -20,6 +20,7 @@ import { supabase } from "../utils/supabase";
 import * as NoteBg from "../../assets/images/bookmarks/index";
 import AlertModal from "../components/AlertModal";
 import { TouchableWithoutFeedback, Keyboard } from "react-native";
+import Toast from "react-native-toast-message";
 
 const NoteDetails: React.FC = ({ route }: any) => {
   const Backgrounds = [
@@ -88,62 +89,6 @@ const NoteDetails: React.FC = ({ route }: any) => {
     }
   };
 
-  // Handle Save
-  const handleSave = async () => {
-    if (validateInputs()) {
-      try {
-        // Update database first
-        await updateNote();
-
-        // Update Redux state directly (global context)
-        const updatedNotes = notesData.map((n) =>
-          n.note_id === itemId ? { ...n, ...editableNote } : n
-        );
-        dispatch(setNotes(updatedNotes));
-
-        setIsEditing(false);
-      } catch (error) {
-        console.error("Error updating note:", error);
-      }
-    }
-  };
-
-  const deleteNote = async () => {
-    const { data, error } = await supabase
-      .from("notes")
-      .delete()
-      .eq("note_id", note.note_id);
-
-    if (error) {
-      console.error("Error deleting note: ", error.message);
-      return;
-    }
-  };
-
-  // Handle Navigation to Coordinates
-  const onPress = (longitude: number, latitude: number) => {
-    try {
-      navigation.navigate("Home", {
-        externalCoordinates: { longitude, latitude },
-      } as any);
-    } catch (error) {
-      console.error("Navigation error:", error);
-    }
-  };
-
-  const [currentBackground, setCurrentBackground] = useState<number>(
-    note.image
-  ); // Stores confirmed background
-  const [changedBackground, setChangedBackground] = useState<number>(
-    note.image
-  ); // Tracks live selection
-
-  const closeModal = () => {
-    Keyboard.dismiss();
-    setChangedBackground(currentBackground); // Reset selection on cancel
-    setIsModalVisible(false);
-  };
-
   const [titleError, setTitleError] = useState("");
   const [contentError, setContentError] = useState("");
   const [customAddressError, setCustomAddressError] = useState("");
@@ -183,6 +128,82 @@ const NoteDetails: React.FC = ({ route }: any) => {
 
     return valid;
   };
+
+  // Handle Save
+  const handleSave = async () => {
+    if (!validateInputs()) return;
+
+    try {
+      // Update database first
+      await updateNote();
+
+      // Update Redux state directly (global context)
+      const updatedNotes = notesData.map((n) =>
+        n.note_id === itemId ? { ...n, ...editableNote } : n
+      );
+      dispatch(setNotes(updatedNotes));
+
+      setIsEditing(false);
+
+      Toast.show({
+        type: "success",
+        position: "bottom",
+        text1: "Note updated",
+        text2: "Your changes have been saved successfully!",
+        visibilityTime: 2000,
+        autoHide: true,
+      });
+    } catch (error) {
+      console.error("Error updating note:", error);
+    }
+  };
+
+  const deleteNote = async () => {
+    const { data, error } = await supabase
+      .from("notes")
+      .delete()
+      .eq("note_id", note.note_id);
+    Toast.show({
+      autoHide: true,
+      position: "bottom",
+      visibilityTime: 2000,
+      type: "info",
+      text1: "Note deleted",
+      text2: "Note deleted successfully!",
+    });
+    if (error) {
+      console.error("Error deleting note: ", error.message);
+      return;
+    }
+  };
+
+  // Handle Navigation to Coordinates
+  const onPress = (longitude: number, latitude: number) => {
+    try {
+      navigation.navigate("Home", {
+        externalCoordinates: { longitude, latitude },
+      } as any);
+    } catch (error) {
+      console.error("Navigation error:", error);
+    }
+  };
+
+  const [currentBackground, setCurrentBackground] = useState<number>(
+    note.image
+  ); // Stores confirmed background
+  const [changedBackground, setChangedBackground] = useState<number>(
+    note.image
+  ); // Tracks live selection
+
+  const closeModal = () => {
+    Keyboard.dismiss();
+    setChangedBackground(currentBackground); // Reset selection on cancel
+    setIsModalVisible(false);
+  };
+
+  useEffect(() => {
+    setEditableNote({ ...editableNote, image: currentBackground } as any);
+  }, [currentBackground]);
 
   const renderImagePickerModal = () => (
     <Modal
@@ -238,7 +259,6 @@ const NoteDetails: React.FC = ({ route }: any) => {
                   ? closeModal()
                   : setIsAlertChangeBGVisible(true)
               }
-              disabled={changedBackground === null}
             >
               <Text className="text-textWhite text-center">
                 {changedBackground === currentBackground ? "Cancel" : "Save"}
@@ -255,16 +275,10 @@ const NoteDetails: React.FC = ({ route }: any) => {
         message="Change the current note background image?"
         onCancel={() => setIsAlertChangeBGVisible(false)}
         onConfirm={() => {
-          setCurrentBackground(changedBackground); // Confirm selection
-          setEditableNote(
-            (prevNote) =>
-              ({
-                ...prevNote,
-                image: changedBackground, // Ensure note is updated
-              }) as Note
-          );
+          setCurrentBackground(changedBackground); // Update confirmed selection
 
-          handleSave(); // Save to DB
+          handleSave();
+
           setIsAlertChangeBGVisible(false);
           closeModal();
         }}
@@ -407,9 +421,11 @@ const NoteDetails: React.FC = ({ route }: any) => {
                     : "bg-textInput"
                 }`}
                 onPress={() => setIsAlertSaveVisible(true)}
-                /* disabled={
-                  !editableNote?.title.trim() || !editableNote?.content.trim()
-                } */
+                disabled={
+                  !editableNote?.title.trim() ||
+                  !editableNote?.content.trim() ||
+                  !editableNote?.address.trim()
+                }
               >
                 <Text className="text-textWhite text-sm font-senSemiBold">
                   Save

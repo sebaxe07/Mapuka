@@ -7,6 +7,7 @@ import { useAppDispatch, useAppSelector } from "../contexts/hooks";
 import { setSpots, setNotes } from "../contexts/slices/userDataSlice";
 import { MAPBOX_ACCESS_TOKEN } from "@env";
 import AlertModal from "./AlertModal";
+import Toast from "react-native-toast-message";
 
 interface SaveBoxProps {
   type: "note" | "spot";
@@ -88,6 +89,11 @@ const SaveBox: React.FC<SaveBoxProps> = ({ type, onClose, coordinates }) => {
           },
         ])
         .select();
+      /* Toast.show({
+        type: "success",
+        text1: "Spot created",
+        text2: "Spot created successfully!",
+      }); */
 
       if (error) {
         console.error("Failed to add spot:", error.message);
@@ -122,6 +128,12 @@ const SaveBox: React.FC<SaveBoxProps> = ({ type, onClose, coordinates }) => {
         ])
         .select();
 
+      /* Toast.show({
+        type: "success",
+        text1: "Note created",
+        text2: "Your note created successfully!",
+      }); */
+
       if (error) {
         console.error("Failed to add note:", error.message);
         return;
@@ -132,6 +144,18 @@ const SaveBox: React.FC<SaveBoxProps> = ({ type, onClose, coordinates }) => {
 
       onClose(); // Close the modal after saving
     }
+
+    console.log(`${type} added successfully:`);
+
+    Toast.show({
+      autoHide: true,
+      position: "bottom",
+      visibilityTime: 2000,
+      type: "success",
+      text1: `${type} created`,
+      text2: `Your ${type} created successfully!`,
+    });
+
     setShowModal(false);
     onClose(); // Close the modal after saving
   };
@@ -148,9 +172,11 @@ const SaveBox: React.FC<SaveBoxProps> = ({ type, onClose, coordinates }) => {
       </View>
       <Divider />
       {/* Title Input */}
-      <Text className="text-textInput text-xl font-senSemiBold my-2">
-        Title
-      </Text>
+      {title !== "" ? (
+        <Text className="text-textInput text-xl font-senSemiBold my-2">
+          {title}
+        </Text>
+      ) : null}
       <TextInput
         placeholder={`Give a Title to your ${type}`}
         className="text-bgMain text-2xl font-senSemiBold py-2 mb-2 "
@@ -191,7 +217,7 @@ const SaveBox: React.FC<SaveBoxProps> = ({ type, onClose, coordinates }) => {
               : "bg-textInput"
           }`}
           onPress={handleSaveAttempt}
-          /* disabled={!title.trim() || (type === "note" && !description.trim())} */
+          disabled={!title.trim() || (type === "note" && !description.trim())}
         >
           <Text className="text-textWhite font-senSemiBold">
             {type === "note" ? "Save Note" : "Save Spot"}
