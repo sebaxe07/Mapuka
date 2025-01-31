@@ -67,7 +67,8 @@ const NoteDetails: React.FC = ({ route }: any) => {
       .update({
         title: editableNote?.title,
         content: editableNote?.content,
-        address: editableNote?.address
+        address: editableNote?.address,
+        image: editableNote?.image
       })
       .eq("note_id", note.note_id);
 
@@ -99,7 +100,9 @@ const NoteDetails: React.FC = ({ route }: any) => {
       // Update Redux state directly (global context)
       const updatedNotes = notesData.map((n) => 
         n.note_id === itemId ? { ...n, ...editableNote } : n
-      );
+    );
+      
+      console.log("Entered handleSave. Note image after update: ", editableNote?.image);
       dispatch(setNotes(updatedNotes));
       
       setIsEditing(false);
@@ -148,6 +151,12 @@ const NoteDetails: React.FC = ({ route }: any) => {
     }
   };
 
+  useEffect(() => {
+    if (editableNote !== null) {
+      handleSave();
+    }
+  }, [editableNote?.image]);
+
   // Render SVG Image Picker Modal
   const renderImagePickerModal = () => (
     <Modal
@@ -175,10 +184,15 @@ const NoteDetails: React.FC = ({ route }: any) => {
             renderItem={({ item: Background, index }) => (
               <TouchableOpacity
                 onPress={() => {
-                  setEditableNote((prev) => ({
-                    ...prev,
-                    image: index,
-                  }));
+                  setEditableNote(
+                    (prev) =>
+                      ({
+                        ...prev,
+                        image: index,
+                      }) as any
+                  );
+                  console.log("Selected image index: ", index);
+                  // handleSave();
                   setIsModalVisible(false);
                 }}
                 className="mr-4 w-24 h-24 rounded-lg items-center justify-center"
