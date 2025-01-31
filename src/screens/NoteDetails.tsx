@@ -151,6 +151,7 @@ const NoteDetails: React.FC = ({ route }: any) => {
     }
   };
 
+  // Save image when editableNote changes that specific attribute
   useEffect(() => {
     if (editableNote !== null) {
       handleSave();
@@ -191,8 +192,6 @@ const NoteDetails: React.FC = ({ route }: any) => {
                         image: index,
                       }) as any
                   );
-                  console.log("Selected image index: ", index);
-                  // handleSave();
                   setIsModalVisible(false);
                 }}
                 className="mr-4 w-24 h-24 rounded-lg items-center justify-center"
@@ -232,6 +231,7 @@ const NoteDetails: React.FC = ({ route }: any) => {
             {/* Edit / Save Button */}
             <TouchableOpacity
               onPress={() => {
+                // Only handle the save after user is done editing
                 if (isEditing) {
                   handleSave();
                 } else {
