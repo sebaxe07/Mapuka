@@ -71,19 +71,20 @@ const NoteDetails: React.FC = ({ route }: any) => {
 
   // Update note in database
   const updateNote = async () => {
+    if (!editableNote) return;
+
     const { data, error } = await supabase
       .from("notes")
       .update({
-        title: editableNote?.title,
-        address: editableNote?.address,
-        content: editableNote?.content,
-        image: editableNote?.image,
+        title: editableNote.title,
+        address: editableNote.address,
+        content: editableNote.content,
+        image: editableNote.image, // Ensure image is included
       })
       .eq("note_id", note.note_id);
 
     if (error) {
       console.error("Error saving edited note: ", error.message);
-      return;
     }
   };
 
@@ -255,10 +256,15 @@ const NoteDetails: React.FC = ({ route }: any) => {
         onCancel={() => setIsAlertChangeBGVisible(false)}
         onConfirm={() => {
           setCurrentBackground(changedBackground); // Confirm selection
-          setEditableNote({
-            ...editableNote,
-            image: changedBackground, // Update note
-          } as any);
+          setEditableNote(
+            (prevNote) =>
+              ({
+                ...prevNote,
+                image: changedBackground, // Ensure note is updated
+              }) as Note
+          );
+
+          handleSave(); // Save to DB
           setIsAlertChangeBGVisible(false);
           closeModal();
         }}
