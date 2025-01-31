@@ -83,18 +83,6 @@ const NoteDetails: React.FC = ({ route }: any) => {
     }
   };
 
-  const deleteNote = async () => {
-    const { data, error } = await supabase
-      .from("notes")
-      .delete()
-      .eq("note_id", note.note_id);
-
-    if (error) {
-      console.error("Error deleting note: ", error.message);
-      return;
-    }
-  };
-
   // Handle Save
   const handleSave = async () => {
     try {
@@ -113,23 +101,16 @@ const NoteDetails: React.FC = ({ route }: any) => {
     }
   };
 
-  // Handle Delete Note
-  const handleDelete = () => {
-    async () => {
-      try {
-        // Delete from database first
-        await deleteNote();
+  const deleteNote = async () => {
+    const { data, error } = await supabase
+      .from("notes")
+      .delete()
+      .eq("note_id", note.note_id);
 
-        // Update Redux state directly (global state)
-        const filteredNotes = notesData.filter((n) => n.note_id !== itemId);
-        dispatch(setNotes(filteredNotes));
-
-        // Navigate back only after state updates
-        navigation.goBack();
-      } catch (error) {
-        console.error("Error deleting note:", error);
-      }
-    };
+    if (error) {
+      console.error("Error deleting note: ", error.message);
+      return;
+    }
   };
 
   // Handle Navigation to Coordinates
@@ -378,7 +359,21 @@ const NoteDetails: React.FC = ({ route }: any) => {
         onBackdropPress={() => setIsAlertDeleteVisible(false)}
         message={`Are you sure you want to delete this note?\nThis action cannot be undone.`}
         onCancel={() => setIsAlertDeleteVisible(false)}
-        onConfirm={handleDelete}
+        onConfirm={async () => {
+          try {
+            // Delete from database first
+            await deleteNote();
+
+            // Update Redux state directly (global state)
+            const filteredNotes = notesData.filter((n) => n.note_id !== itemId);
+            dispatch(setNotes(filteredNotes));
+
+            // Navigate back only after state updates
+            navigation.goBack();
+          } catch (error) {
+            console.error("Error deleting note:", error);
+          }
+        }}
         confirmText="Delete"
         cancelText="Cancel"
         loading={loading}

@@ -2,11 +2,11 @@ import React, { useState } from "react";
 import { View, Text, TouchableOpacity, TextInput } from "react-native";
 import Close from "../../assets/icons/home/close_clean.svg";
 import Divider from "./utils/Divider";
-import AlertModal from "./AlertModal";
 import { supabase } from "../utils/supabase";
 import { useAppDispatch, useAppSelector } from "../contexts/hooks";
 import { setSpots, setNotes } from "../contexts/slices/userDataSlice";
 import { MAPBOX_ACCESS_TOKEN } from "@env";
+import AlertModal from "./AlertModal";
 
 interface SaveBoxProps {
   type: "note" | "spot";
@@ -17,19 +17,8 @@ interface SaveBoxProps {
 const SaveBox: React.FC<SaveBoxProps> = ({ type, onClose, coordinates }) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [showModal, setShowModal] = useState(false);
-
-  const handleSaveAttempt = () => {
-    setShowModal(true); // Show confirmation modal
-  };
-
-  const handleConfirmSave = () => {
-    console.log("Title:", title);
-    console.log("Description:", description);
-    setShowModal(false);
-    onClose(); // Close the modal after saving
-  };
-
+  const [titleError, setTitleError] = useState("");
+  const [descriptionError, setDescriptionError] = useState("");
   const userData = useAppSelector((state) => state.userData);
   const dispatch = useAppDispatch();
 
@@ -37,6 +26,42 @@ const SaveBox: React.FC<SaveBoxProps> = ({ type, onClose, coordinates }) => {
   const currentNotes = userData.notes;
   const profileid = userData.profile_id;
   console.log("COORDINATES AT SAVEBOX:", coordinates);
+
+  const [showModal, setShowModal] = useState(false);
+
+  const handleSaveAttempt = () => {
+    if (validateInputs()) {
+      setShowModal(true);
+    }
+  };
+
+  const validateInputs = () => {
+    let valid = true;
+
+    if (!title.trim()) {
+      setTitleError("Title is required.");
+      valid = false;
+    } else if (title.length > 100) {
+      setTitleError("Title must be under 100 characters.");
+      valid = false;
+    } else {
+      setTitleError("");
+    }
+
+    if (type === "note") {
+      if (!description.trim()) {
+        setDescriptionError("Description is required.");
+        valid = false;
+      } else if (description.length > 500) {
+        setDescriptionError("Description must be under 500 characters.");
+        valid = false;
+      } else {
+        setDescriptionError("");
+      }
+    }
+
+    return valid;
+  };
 
   const handleSave = async () => {
     // Get actual name address from Mapbox API
@@ -106,12 +131,14 @@ const SaveBox: React.FC<SaveBoxProps> = ({ type, onClose, coordinates }) => {
 
       onClose(); // Close the modal after saving
     }
+    setShowModal(false);
+    onClose(); // Close the modal after saving
   };
 
   return (
     <View className="absolute bottom-56 self-center w-11/12 bg-textWhite rounded-3xl shadow-lg py-5 px-10">
-      <View className="flex-row justify-between items-center mb-4 border-textBody">
-        <Text className="text-textBody text-2xl font-senSemiBold">
+      <View className="flex-row justify-between items-center mb-4 border-textBody ">
+        <Text className="text-textBody text-2xl font-senSemiBold   ">
           {type === "note" ? "Make a Note" : "Save a Spot"}
         </Text>
         <TouchableOpacity onPress={onClose}>
@@ -119,29 +146,49 @@ const SaveBox: React.FC<SaveBoxProps> = ({ type, onClose, coordinates }) => {
         </TouchableOpacity>
       </View>
       <Divider />
+      {/* Title Input */}
       <Text className="text-textInput text-xl font-senSemiBold my-2">
         Title
       </Text>
       <TextInput
         placeholder="Title"
+        className="text-bgMain text-2xl font-senSemiBold py-2 mb-2 "
         value={title}
-        className="text-bgMain text-2xl font-senSemiBold py-2 mb-2"
         onChangeText={setTitle}
+        maxLength={100}
       />
+      {titleError ? (
+        <Text className="text-buttonAccentRed">{titleError}</Text>
+      ) : null}
+
+      {/* Description Input (only for notes) */}
       {type === "note" && (
-        <TextInput
-          placeholder="Etiam vitae augue ultrices, efficitur lectus et, malesuada nulla."
-          value={description}
-          className="text-textBody text-xl font-senMedium py-2 mb-4"
-          onChangeText={setDescription}
-          multiline
-          numberOfLines={4}
-        />
+        <>
+          <TextInput
+            placeholder="Write a description here..."
+            className="text-textBody text-xl font-senMedium py-2 mb-4 "
+            value={description}
+            onChangeText={setDescription}
+            multiline
+            numberOfLines={4}
+            maxLength={500}
+          />
+          {descriptionError ? (
+            <Text className="text-buttonAccentRed">{descriptionError}</Text>
+          ) : null}
+        </>
       )}
-      <View className="">
+
+      {/* Save Button */}
+      <View>
         <TouchableOpacity
-          className="bg-textBody items-center justify-center rounded-full px-3 py-4 w-1/2"
-          onPress={handleSaveAttempt} // Trigger modal instead of direct save
+          className={`items-center justify-center rounded-full px-3 py-4 w-1/2 ${
+            title.trim() && (type !== "note" || description.trim())
+              ? "bg-textBody"
+              : "bg-textInput"
+          }`}
+          onPress={handleSaveAttempt}
+          disabled={!title.trim() || (type === "note" && !description.trim())}
         >
           <Text className="text-textWhite font-senSemiBold">
             {type === "note" ? "Save Note" : "Save Spot"}
@@ -155,7 +202,7 @@ const SaveBox: React.FC<SaveBoxProps> = ({ type, onClose, coordinates }) => {
         onBackdropPress={() => setShowModal(false)}
         message={`Are you sure you want to save this ${type}?`}
         onCancel={() => setShowModal(false)}
-        onConfirm={handleConfirmSave}
+        onConfirm={handleSave}
         confirmText="Save"
         cancelText="Cancel"
       />

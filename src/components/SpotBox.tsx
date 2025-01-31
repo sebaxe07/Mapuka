@@ -7,6 +7,7 @@ import { colors } from "../../colors";
 import { setSpots, Spot } from "../contexts/slices/userDataSlice";
 import { useAppDispatch, useAppSelector } from "../contexts/hooks";
 import { supabase } from "../utils/supabase";
+import AlertModal from "./AlertModal";
 
 const SpotBox: React.FC<{
   spot_id: string;
@@ -27,45 +28,23 @@ const SpotBox: React.FC<{
   const spotsData = useAppSelector((state) => state.userData.spots);
   const dispatch = useAppDispatch();
 
-  
+  const [loading, setLoading] = useState(false);
+
+  const [isAlertDeleteVisible, setIsAlertDeleteVisible] = useState(false);
+
   const deleteSpot = async (spotId: string) => {
-      const { data, error } = await supabase
-        .from("spots")
-        .delete()
-        .eq("spot_id", spotId);
-  
-  
-      if (error) {
-        console.error("Error deleting spot: ", error.message);
-        return;
-      }
-    };
+    const { data, error } = await supabase
+      .from("spots")
+      .delete()
+      .eq("spot_id", spotId);
 
-
-  const handleDelete = (spotId: string) => {
-    Alert.alert("Delete Spot", "Are you sure you want to delete this Spot?", [
-      {
-        text: "Cancel",
-        style: "cancel",
-      },
-      {
-        text: "Delete",
-        style: "destructive",
-        onPress: async () => {
-          try {
-            // Delete from database first
-            await deleteSpot(spotId);
-            
-            // Update Redux state directly (global state)
-            const filteredSpots = spotsData.filter((n) => n.spot_id !== spotId);
-            dispatch(setSpots(filteredSpots));
-          } catch (error) {
-            console.error("Error deleting spot:", error);
-          }
-        },
-      },
-    ]);
+    if (error) {
+      console.error("Error deleting spot: ", error.message);
+      return;
+    }
   };
+
+  const handleDelete = (spotId: string) => {};
 
   return (
     <View
@@ -88,7 +67,7 @@ const SpotBox: React.FC<{
             <Text className="text-textBody font-senRegular text-sm mb-1">
               {created_at}
             </Text>
-            <TouchableOpacity onPress={() => handleDelete(spot_id)}>
+            <TouchableOpacity onPress={() => setIsAlertDeleteVisible(true)}>
               <Trash />
             </TouchableOpacity>
           </View>
@@ -117,6 +96,30 @@ const SpotBox: React.FC<{
           </TouchableOpacity>
         </View>
       </View>
+      {/* Delete Confirmation Modal */}
+      <AlertModal
+        isVisible={isAlertDeleteVisible}
+        onBackdropPress={() => setIsAlertDeleteVisible(false)}
+        message={`Are you sure you want to delete this note?\nThis action cannot be undone.`}
+        onCancel={() => setIsAlertDeleteVisible(false)}
+        onConfirm={async () => {
+          try {
+            // Delete from database first
+            await deleteSpot(spot_id);
+
+            // Update Redux state directly (global state)
+            const filteredSpots = spotsData.filter(
+              (n) => n.spot_id !== spot_id
+            );
+            dispatch(setSpots(filteredSpots));
+          } catch (error) {
+            console.error("Error deleting spot:", error);
+          }
+        }}
+        confirmText="Delete"
+        cancelText="Cancel"
+        loading={loading}
+      />
     </View>
   );
 };
