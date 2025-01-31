@@ -75,8 +75,9 @@ const NoteDetails: React.FC = ({ route }: any) => {
       .from("notes")
       .update({
         title: editableNote?.title,
-        content: editableNote?.content,
         address: editableNote?.address,
+        content: editableNote?.content,
+        image: editableNote?.image,
       })
       .eq("note_id", note.note_id);
 
@@ -127,103 +128,104 @@ const NoteDetails: React.FC = ({ route }: any) => {
     }
   };
 
-  const [selectedBackground, setSelectedBackground] = useState<number | null>(
-    editableNote?.image ?? null
-  );
-  const [confirmedBackground, setConfirmedBackground] = useState(
-    note?.image ?? null
-  );
+  const [currentBackground, setCurrentBackground] = useState<number>(
+    note.image
+  ); // Stores confirmed background
+  const [changedBackground, setChangedBackground] = useState<number>(
+    note.image
+  ); // Tracks live selection
 
-  const renderImagePickerModal = () => {
-    const closeModal = () => {
-      Keyboard.dismiss();
-      setIsModalVisible(false);
-    };
-
-    return (
-      <Modal
-        visible={isModalVisible}
-        animationType="slide"
-        transparent
-        onRequestClose={closeModal}
-        onDismiss={closeModal}
-      >
-        <TouchableWithoutFeedback onPress={closeModal}>
-          <View className="flex-1 justify-end">
-            <View className="bg-boxContainer px-6 py-8 rounded-t-2xl">
-              <Text className="text-textWhite text-lg font-senSemiBold mb-4">
-                Change Note Background
-              </Text>
-
-              <FlatList
-                data={Backgrounds}
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                keyExtractor={(_, index) => index.toString()}
-                renderItem={({ item: Background, index }) => {
-                  const isSelected =
-                    (selectedBackground ?? confirmedBackground) === index;
-                  return (
-                    <TouchableOpacity
-                      onPress={() => setSelectedBackground(index)}
-                      className="mr-4 w-24 h-24 rounded-lg items-center justify-center"
-                      style={
-                        isSelected
-                          ? {
-                              borderWidth: 3,
-                              borderColor: colors.accentRed,
-                              borderRadius: 8,
-                              height: 65,
-                            }
-                          : {}
-                      }
-                    >
-                      <Background width={85} height={85} />
-                    </TouchableOpacity>
-                  );
-                }}
-              />
-
-              <TouchableOpacity
-                className={`rounded-3xl items-center justify-center w-1/2 mt-6 px-5 py-3 self-center ${
-                  selectedBackground === note.image
-                    ? "bg-boxContainer"
-                    : "bg-buttonAccentRed"
-                }`}
-                onPress={() =>
-                  selectedBackground === note.image
-                    ? closeModal()
-                    : setIsAlertChangeBGVisible(true)
-                }
-                disabled={selectedBackground === null}
-              >
-                <Text className="text-textWhite text-center">
-                  {selectedBackground === note.image ? "Cancel" : "Save"}
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </TouchableWithoutFeedback>
-
-        <AlertModal
-          isVisible={isAlertChangeBGVisible}
-          onBackdropPress={() => setIsAlertChangeBGVisible(false)}
-          message="Change the current note background image?"
-          onCancel={() => setIsAlertChangeBGVisible(false)}
-          onConfirm={() => {
-            setEditableNote((prev) => ({ ...prev, image: selectedBackground }));
-            setConfirmedBackground(selectedBackground);
-            setSelectedBackground(null);
-            setIsAlertChangeBGVisible(false);
-            closeModal();
-          }}
-          confirmText="Yes"
-          cancelText="No"
-          loading={loading}
-        />
-      </Modal>
-    );
+  const closeModal = () => {
+    Keyboard.dismiss();
+    setChangedBackground(currentBackground); // Reset selection on cancel
+    setIsModalVisible(false);
   };
+
+  const renderImagePickerModal = () => (
+    <Modal
+      visible={isModalVisible}
+      animationType="slide"
+      transparent
+      onRequestClose={closeModal}
+      onDismiss={closeModal}
+    >
+      <TouchableWithoutFeedback onPress={closeModal}>
+        <View className="flex-1 justify-end">
+          <View className="bg-boxContainer px-6 py-8 rounded-t-2xl">
+            <Text className="text-textWhite text-lg font-senSemiBold mb-4">
+              Change Note Background
+            </Text>
+
+            <FlatList
+              data={Backgrounds}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              keyExtractor={(_, index) => index.toString()}
+              renderItem={({ item: Background, index }) => {
+                const isSelected = changedBackground === index;
+                return (
+                  <TouchableOpacity
+                    onPress={() => setChangedBackground(index)} // Update temporary selection
+                    className="mr-4 w-24 h-24 rounded-lg items-center justify-center"
+                    style={
+                      isSelected
+                        ? {
+                            borderWidth: 3,
+                            borderColor: colors.accentRed,
+                            borderRadius: 8,
+                            height: 65,
+                          }
+                        : {}
+                    }
+                  >
+                    <Background width={85} height={85} />
+                  </TouchableOpacity>
+                );
+              }}
+            />
+
+            <TouchableOpacity
+              className={`rounded-3xl items-center justify-center w-1/2 mt-6 px-5 py-3 self-center ${
+                changedBackground === currentBackground
+                  ? "bg-bgMain"
+                  : "bg-buttonAccentRed"
+              }`}
+              onPress={() =>
+                changedBackground === currentBackground
+                  ? closeModal()
+                  : setIsAlertChangeBGVisible(true)
+              }
+              disabled={changedBackground === null}
+            >
+              <Text className="text-textWhite text-center">
+                {changedBackground === currentBackground ? "Cancel" : "Save"}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </TouchableWithoutFeedback>
+
+      {/* Save Confirmation Modal */}
+      <AlertModal
+        isVisible={isAlertChangeBGVisible}
+        onBackdropPress={() => setIsAlertChangeBGVisible(false)}
+        message="Change the current note background image?"
+        onCancel={() => setIsAlertChangeBGVisible(false)}
+        onConfirm={() => {
+          setCurrentBackground(changedBackground); // Confirm selection
+          setEditableNote({
+            ...editableNote,
+            image: changedBackground, // Update note
+          } as any);
+          setIsAlertChangeBGVisible(false);
+          closeModal();
+        }}
+        confirmText="Yes"
+        cancelText="No"
+        loading={loading}
+      />
+    </Modal>
+  );
 
   return (
     <View className="flex bg-bgMain h-full px-5">
