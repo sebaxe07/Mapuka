@@ -8,7 +8,6 @@ import NavbarBase from "../../assets/images/navbarbase.svg";
 import MaskedView from "@react-native-masked-view/masked-view";
 import { MotiView } from "moti";
 
-
 const FloatingNavbar: React.FC<{
   coordinates: [number, number];
 }> = ({ coordinates }) => {
@@ -19,7 +18,7 @@ const FloatingNavbar: React.FC<{
   const handleOptionSelect = (option: "note" | "spot") => {
     setActiveBox(option);
     setMenuExpanded(false); // Collapse the menu
-}
+  };
 
   const memoizedMiddle = useMemo(
     () => (
@@ -116,10 +115,10 @@ const FloatingNavbar: React.FC<{
       {memoizedExpandable}
       {/* Content Box */}
       {activeBox && (
-        <SaveBox 
-        type={activeBox} 
-        onClose={() => setActiveBox(null)}
-        coordinates={coordinates} 
+        <SaveBox
+          type={activeBox}
+          onClose={() => setActiveBox(null)}
+          coordinates={coordinates}
         />
       )}
     </View>

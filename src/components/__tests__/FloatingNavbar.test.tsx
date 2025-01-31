@@ -31,6 +31,10 @@ jest.mock("../../../assets/icons/home", () => ({
 
 jest.mock("../../../assets/images/navbarbase.svg", () => "NavbarBase");
 
+jest.mock("@react-native-async-storage/async-storage", () =>
+  require("@react-native-async-storage/async-storage/jest/async-storage-mock")
+);
+
 describe("FloatingNavbar Component", () => {
   beforeAll(() => {
     jest.useFakeTimers(); // Mock timers for animations
@@ -41,12 +45,12 @@ describe("FloatingNavbar Component", () => {
   });
 
   it("renders correctly", () => {
-    const { getByTestId } = render(<FloatingNavbar />);
+    const { getByTestId } = render(<FloatingNavbar coordinates={[0, 0]} />);
     expect(getByTestId("floating-navbar")).toBeTruthy();
   });
 
   it("toggles menuExpanded state when middle button is pressed", async () => {
-    const { getByTestId } = render(<FloatingNavbar />);
+    const { getByTestId } = render(<FloatingNavbar coordinates={[0, 0]} />);
     const middleButton = getByTestId("middle-button");
 
     // First press: animate the button
@@ -78,7 +82,7 @@ describe("FloatingNavbar Component", () => {
   });
 
   it("renders memoizedMiddle with correct rotation when menuExpanded is true", async () => {
-    const { getByTestId } = render(<FloatingNavbar />);
+    const { getByTestId } = render(<FloatingNavbar coordinates={[0, 0]} />);
     const middleButton = getByTestId("middle-button");
 
     // First press to toggle state
@@ -97,7 +101,7 @@ describe("FloatingNavbar Component", () => {
   });
 
   it("renders memoizedMiddle with correct rotation when menuExpanded is false", async () => {
-    const { getByTestId } = render(<FloatingNavbar />);
+    const { getByTestId } = render(<FloatingNavbar coordinates={[0, 0]} />);
     const middleButton = getByTestId("middle-button");
 
     // First press to expand menu

@@ -24,18 +24,18 @@ const SaveBox: React.FC<SaveBoxProps> = ({ type, onClose, coordinates }) => {
   const profileid = userData.profile_id;
   console.log("COORDINATES AT SAVEBOX:", coordinates);
 
-
   const handleSave = async () => {
     // Get actual name address from Mapbox API
     const response = await fetch(
       `https://api.mapbox.com/search/geocode/v6/reverse?longitude=${coordinates[0]}&latitude=${coordinates[1]}&access_token=${MAPBOX_ACCESS_TOKEN}`
     );
     const addressData = await response.json();
-    const address = addressData.features[0]?.properties?.name || "Unknown address";
+    const address =
+      addressData.features[0]?.properties?.name || "Unknown address";
 
-    if (type == "spot") { 
-      console.log('Adding spot:', { title, coordinates, address, profileid });
-  
+    if (type == "spot") {
+      console.log("Adding spot:", { title, coordinates, address, profileid });
+
       // Add spot to database
       const { data, error } = await supabase
         .from("spots")
@@ -44,25 +44,30 @@ const SaveBox: React.FC<SaveBoxProps> = ({ type, onClose, coordinates }) => {
             profile_id: profileid,
             coordinates: coordinates,
             title: title,
-            address: address
-          }
+            address: address,
+          },
         ])
         .select();
-    
+
       if (error) {
         console.error("Failed to add spot:", error.message);
         return;
       }
       console.log("Spot added successfully:", data);
-  
+
       // Add spot to local context
       dispatch(setSpots([...currentSpots, ...data]));
-  
-      onClose(); // Close the modal after saving
 
+      onClose(); // Close the modal after saving
     } else if (type == "note") {
-      console.log('Adding spot:', { title, description, coordinates, address, profileid});
-  
+      console.log("Adding spot:", {
+        title,
+        description,
+        coordinates,
+        address,
+        profileid,
+      });
+
       // Add note to database
       const { data, error } = await supabase
         .from("notes")
@@ -73,10 +78,10 @@ const SaveBox: React.FC<SaveBoxProps> = ({ type, onClose, coordinates }) => {
             address: address,
             title: title,
             content: description,
-          }
+          },
         ])
         .select();
-    
+
       if (error) {
         console.error("Failed to add note:", error.message);
         return;
@@ -84,11 +89,10 @@ const SaveBox: React.FC<SaveBoxProps> = ({ type, onClose, coordinates }) => {
       console.log("Note added successfully:", data);
 
       dispatch(setNotes([...currentNotes, ...data]));
-  
+
       onClose(); // Close the modal after saving
     }
   };
-
 
   return (
     <View className="absolute bottom-56 self-center w-11/12 bg-textWhite rounded-3xl shadow-lg py-5 px-10">
@@ -96,7 +100,7 @@ const SaveBox: React.FC<SaveBoxProps> = ({ type, onClose, coordinates }) => {
         <Text className="text-textBody text-2xl font-senSemiBold   ">
           {type === "note" ? "Make a Note" : "Save a Spot"}
         </Text>
-        <TouchableOpacity onPress={onClose}>
+        <TouchableOpacity testID="close-button" onPress={onClose}>
           <Close />
         </TouchableOpacity>
       </View>
@@ -112,7 +116,7 @@ const SaveBox: React.FC<SaveBoxProps> = ({ type, onClose, coordinates }) => {
         onChangeText={setTitle}
       />
       <TextInput
-        placeholder="Etiam vitae augue ultrices, efficitur lectus et, malesuada nulla."
+        placeholder="Description"
         placeholderClassName="text-textBody  text-xl  font-medium  py-2 mb-4"
         value={description}
         className="text-textBody  text-xl font-senMedium py-2 mb-4"
@@ -122,6 +126,7 @@ const SaveBox: React.FC<SaveBoxProps> = ({ type, onClose, coordinates }) => {
       />
       <View className="">
         <TouchableOpacity
+          testID="save-button"
           className="bg-textBody items-center justify-center rounded-full px-3 py-4 w-1/2"
           onPress={handleSave}
         >
