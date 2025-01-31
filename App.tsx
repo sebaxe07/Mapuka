@@ -16,6 +16,9 @@ import BookmarksScreen from "./src/screens/Bookmarks";
 import NoteDetailsScreen from "./src/screens/NoteDetails";
 import LeaderboardScreen from "./src/screens/Leaderboard";
 import ProfileScreen from "./src/screens/Profile";
+import SettingsScreen from "./src/screens/Settings";
+import UserDataScreen from "./src/screens/UserData";
+import ResetPasswordScreen from "./src/screens/ResetPassword";
 import MapFog from "./src/screens/MapFog";
 import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
@@ -68,6 +71,7 @@ const RootStack = createNativeStackNavigator({
             externalCoordinates: { latitude: null, longitude: null },
           }, */
           screen: HomeScreen,
+          animation: "slide_from_right",
         },
         Details: DetailsScreen,
         Map: MapScreen,
@@ -93,7 +97,6 @@ const RootStack = createNativeStackNavigator({
         },
         Bookmarks: {
           options: ({}) => ({
-            animation: "slide_from_left",
             headerShown: true,
             headerTitleAlign: "center",
             headerTitle: "",
@@ -153,7 +156,6 @@ const RootStack = createNativeStackNavigator({
         },
         Profile: {
           options: ({}) => ({
-            animation: "slide_from_left",
             headerShown: true,
             headerTitleAlign: "center",
             headerTitle: "Profile",
@@ -173,6 +175,63 @@ const RootStack = createNativeStackNavigator({
             headerLeft: () => <BackArrow />,
           }),
           screen: ProfileScreen,
+        },
+        UserData: {
+          options: ({}) => ({
+            headerShown: true,
+            headerTitleAlign: "center",
+            headerTitle: "",
+            headerLargeTitle: true,
+            headerTitleStyle: {
+              color: colors.lightText,
+            },
+            headerLargeTitleStyle: {
+              color: colors.lightText,
+            },
+            headerStyle: {
+              backgroundColor: colors.background,
+            },
+            headerLeft: () => <BackArrow />,
+          }),
+          screen: UserDataScreen,
+        },
+        ResetPassword: {
+          options: ({}) => ({
+            headerShown: true,
+            headerTitleAlign: "center",
+            headerTitle: "",
+            headerLargeTitle: true,
+            headerTitleStyle: {
+              color: colors.lightText,
+            },
+            headerLargeTitleStyle: {
+              color: colors.lightText,
+            },
+            headerStyle: {
+              backgroundColor: colors.background,
+            },
+            headerLeft: () => <BackArrow />,
+          }),
+          screen: ResetPasswordScreen,
+        },
+        Settings: {
+          options: ({}) => ({
+            headerShown: true,
+            headerTitleAlign: "center",
+            headerTitle: "",
+            headerLargeTitle: true,
+            headerTitleStyle: {
+              color: colors.lightText,
+            },
+            headerLargeTitleStyle: {
+              color: colors.lightText,
+            },
+            headerStyle: {
+              backgroundColor: colors.background,
+            },
+            headerLeft: () => <BackArrow />,
+          }),
+          screen: SettingsScreen,
         },
       },
     },

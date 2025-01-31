@@ -359,17 +359,26 @@ const Profile: React.FC = () => {
       <View className="space-y-4 mb-10 ">
         <TouchableOpacity className="flex-row items-center py-3 border-b border-textBody">
           <Icons.User color={colors.lightText} />
-          <Text className="text-textInput text-base ml-4 font-senRegular">
+          <Text
+            className="text-textInput text-base ml-4 font-senRegular"
+            onPress={() => navigation.navigate("UserData")}
+          >
             Your info
           </Text>
         </TouchableOpacity>
-        <TouchableOpacity className="flex-row items-center py-3 border-b border-textBody">
+        <TouchableOpacity
+          className="flex-row items-center py-3 border-b border-textBody"
+          onPress={() => navigation.navigate("ResetPassword")}
+        >
           <Icons.Lock color={colors.lightText} />
           <Text className="text-textInput text-base ml-4 font-senRegular">
             Password
           </Text>
         </TouchableOpacity>
-        <TouchableOpacity className="flex-row items-center py-3 border-b border-textBody">
+        <TouchableOpacity
+          className="flex-row items-center py-3 border-b border-textBody"
+          onPress={() => navigation.navigate("Settings")}
+        >
           <Icons.Settings color={colors.lightText} />
           <Text className="text-textInput text-base ml-4 font-senRegular">
             Settings
