@@ -151,7 +151,7 @@ const SaveBox: React.FC<SaveBoxProps> = ({ type, onClose, coordinates }) => {
         Title
       </Text>
       <TextInput
-        placeholder="Title"
+        placeholder={`Give a Title to your ${type}`}
         className="text-bgMain text-2xl font-senSemiBold py-2 mb-2 "
         value={title}
         onChangeText={setTitle}
@@ -162,11 +162,11 @@ const SaveBox: React.FC<SaveBoxProps> = ({ type, onClose, coordinates }) => {
       ) : null}
 
       {/* Description Input (only for notes) */}
-      {type === "note" && (
+      {type === "note" ? (
         <>
           <TextInput
             placeholder="Write a description here..."
-            className="text-textBody text-xl font-senMedium py-2 mb-4 "
+            className="text-textBody text-xl font-senMedium pt-2 pb-6 "
             value={description}
             onChangeText={setDescription}
             multiline
@@ -177,6 +177,8 @@ const SaveBox: React.FC<SaveBoxProps> = ({ type, onClose, coordinates }) => {
             <Text className="text-buttonAccentRed">{descriptionError}</Text>
           ) : null}
         </>
+      ) : (
+        <View className="pt-4 pb-4"></View>
       )}
 
       {/* Save Button */}

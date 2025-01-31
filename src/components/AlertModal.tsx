@@ -39,7 +39,7 @@ const AlertModal: React.FC<CustomModalProps> = ({
           {message}
         </Text>
         <Divider />
-        <View className="w-full flex-row  justify-around items-center px-4 gap-6">
+        <View className="w-full flex-row  justify-around items-center px-4 gap-6 mb-2 pt-4">
           <Button
             special={true}
             label={cancelText}
