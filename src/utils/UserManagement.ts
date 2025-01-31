@@ -108,20 +108,22 @@ export async function signInWithEmail({
       .from("spots")
       .select("*")
       .eq("profile_id", profiles.profile_id);
+
+    /* 
     if (spotsError) {
       console.error("Failed to fetch spots:", spotsError.message);
       return;
-    }
+    } */
 
     // Fetch user notes
     const { data: notesData, error: notesError } = await supabase
       .from("notes")
       .select("*")
       .eq("profile_id", profiles.profile_id);
-    if (notesError) {
+    /*     if (notesError) {
       console.error("Failed to fetch notes:", notesError.message);
       return;
-    }
+    } */
 
     // Dispatch the action to set user data in Redux state
     dispatch(
