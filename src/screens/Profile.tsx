@@ -211,6 +211,15 @@ const Profile: React.FC = () => {
       })
     );
 
+    Toast.show({
+      type: "success",
+      position: "bottom",
+      text1: "Avatar updated",
+      text2: "Your changes have been saved successfully!",
+      visibilityTime: 2000,
+      autoHide: true,
+    });
+
     setImage(null);
 
     // save the image URL to the database
