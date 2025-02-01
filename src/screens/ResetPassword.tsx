@@ -1,41 +1,64 @@
-import React, { useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  TextInput,
-  Modal,
-  Alert,
-  FlatList,
-} from "react-native";
-import Settings from "../../assets/icons/bookmarks/settings.svg";
-import Place from "../../assets/icons/bookmarks/place.svg";
-import Edit from "../../assets/icons/profile/edit_clean.svg";
-import Trash from "../../assets/icons/bookmarks/trash.svg";
-import { colors } from "../../colors";
-import { useNavigation } from "@react-navigation/native";
-import { Note, setNotes } from "../contexts/slices/userDataSlice";
-import { useAppDispatch, useAppSelector } from "../contexts/hooks";
+import React, { useState } from "react";
+import { View, Text, TouchableOpacity } from "react-native";
+import { useAppSelector } from "../contexts/hooks";
 import { supabase } from "../utils/supabase";
-import * as NoteBg from "../../assets/images/bookmarks/index";
-import AlertModal from "../components/AlertModal";
-import { TouchableWithoutFeedback, Keyboard } from "react-native";
 import Toast from "react-native-toast-message";
 
-const ResetPassword: React.FC = ({ route }: any) => {
-  const debugFlexbox = false;
+const ResetPassword: React.FC = () => {
+  const userData = useAppSelector((state) => state.userData);
+  const [loading, setLoading] = useState(false);
+
+  const handleResetPassword = async () => {
+    setLoading(true);
+
+    const { error } = await supabase.auth.resetPasswordForEmail(
+      userData?.email
+    );
+
+    setLoading(false);
+
+    if (error) {
+      console.error("Error sending reset email:", error.message);
+      Toast.show({
+        position: "bottom",
+        visibilityTime: 3000,
+        type: "error",
+        text1: "Reset Failed",
+        text2: "Failed to send reset link. Try again later.",
+      });
+      return;
+    }
+
+    Toast.show({
+      position: "bottom",
+      visibilityTime: 3000,
+      type: "success",
+      text1: "Reset Link Sent",
+      text2: `Check your email (${userData?.email}) for reset instructions.`,
+    });
+  };
 
   return (
-    <View className="bg-bgMain px-5  pb-10 h-full">
+    <View className="bg-bgMain px-5 pb-10 h-full">
       <View className="flex w-full my-16 justify-center items-start">
         {/* Header */}
         <Text className="text-textWhite text-2xl font-senMedium mb-1 ml-10">
           Reset Password
         </Text>
       </View>
-      <View
-        className={`flex-4 h-3/4 gap-3 ${debugFlexbox ? "bg-buttonDarkRed" : ""}`}
-      ></View>
+
+      <TouchableOpacity
+        className={` rounded-xl px-6 py-3 self-center `}
+        onPress={handleResetPassword}
+        disabled={loading}
+      >
+        <Text className="text-textInput font-senMedium text-xl">
+          Press here to send a reset password link to your e-mail
+        </Text>
+        <Text className="text-textWhite font-senMedium text-xl mb-4">
+          {userData?.email}
+        </Text>
+      </TouchableOpacity>
     </View>
   );
 };
