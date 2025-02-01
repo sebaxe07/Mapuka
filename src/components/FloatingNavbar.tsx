@@ -61,7 +61,7 @@ const FloatingNavbar: React.FC<{
   );
 
   return (
-    <View className="  justify-center items-center ">
+    <View testID="floating-navbar" className="  justify-center items-center ">
       {/* Main Navbar */}
       <MaskedView
         style={{ width: "auto" }}
@@ -106,6 +106,7 @@ const FloatingNavbar: React.FC<{
 
       {/* Middle Button */}
       <TouchableOpacity
+        testID="middle-button"
         className="w-16 h-16 items-center justify-center shadow-lg  absolute -top-8 left-1/2 transform -translate-x-1/2"
         onPress={() => setMenuExpanded(!menuExpanded)}
       >

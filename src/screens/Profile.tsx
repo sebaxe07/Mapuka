@@ -7,7 +7,7 @@ import { useAppDispatch, useAppSelector } from "../contexts/hooks";
 import { clearUserData } from "../contexts/slices/userDataSlice";
 import { useNavigation } from "@react-navigation/native";
 import { colors } from "../../colors";
-import BackArrow from "../components/BackArrow";
+import BackArrow from "../components/backArrow";
 import MaskedView from "@react-native-masked-view/masked-view";
 import Edit from "../../assets/icons/edit_icon.svg";
 import ProfileDefault from "../../assets/icons/profile/profile_default.svg";
@@ -17,14 +17,12 @@ import {
   base64ToArrayBuffer,
 } from "../utils/photoManager";
 import { supabase } from "../utils/supabase";
+import AlertModal from "../components/AlertModal";
+import Toast from "react-native-toast-message";
 
 const Profile: React.FC = () => {
-  const handleLogout = () => {
-    Alert.alert("Logout", "Are you sure you want to log out?", [
-      { text: "Cancel", style: "cancel" },
-      { text: "Logout", onPress: () => console.log("User logged out") },
-    ]);
-  };
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const dispatch = useAppDispatch();
@@ -32,6 +30,13 @@ const Profile: React.FC = () => {
   const logOut = async () => {
     console.log("User logged out");
     signOut();
+    Toast.show({
+      autoHide: true,
+      position: "bottom",
+      visibilityTime: 2000,
+      type: "info",
+      text1: "Succesfully logged out",
+    });
     dispatch(clearUserData());
   };
 
@@ -69,6 +74,19 @@ const Profile: React.FC = () => {
     if (userData.pic) {
       //console.log("User has a picture", userData.pic.pictureUrl);
       setAvatarUrl(userData.pic.pictureUrl);
+    }
+
+    // Calculate the percentage of achievements unlocked
+    if (userData.achievements) {
+      const unlockedAchievements = userData.achievements.filter(
+        (achievement) => achievement.unlocked
+      );
+      const achievementsPercentage =
+        (unlockedAchievements.length / userData.achievements.length) * 100;
+
+      const clampedAchievements =
+        Math.floor(achievementsPercentage * 100) / 100;
+      setAchievementsCount(clampedAchievements);
     }
   }, [userData]);
 
@@ -192,6 +210,15 @@ const Profile: React.FC = () => {
         image: {} as ImagePicker.ImagePickerAsset,
       })
     );
+
+    Toast.show({
+      type: "success",
+      position: "bottom",
+      text1: "Avatar updated",
+      text2: "Your changes have been saved successfully!",
+      visibilityTime: 2000,
+      autoHide: true,
+    });
 
     setImage(null);
 
@@ -332,17 +359,26 @@ const Profile: React.FC = () => {
       <View className="space-y-4 mb-10 ">
         <TouchableOpacity className="flex-row items-center py-3 border-b border-textBody">
           <Icons.User color={colors.lightText} />
-          <Text className="text-textInput text-base ml-4 font-senRegular">
+          <Text
+            className="text-textInput text-base ml-4 font-senRegular"
+            onPress={() => navigation.navigate("UserData")}
+          >
             Your info
           </Text>
         </TouchableOpacity>
-        <TouchableOpacity className="flex-row items-center py-3 border-b border-textBody">
+        <TouchableOpacity
+          className="flex-row items-center py-3 border-b border-textBody"
+          onPress={() => navigation.navigate("ResetPassword")}
+        >
           <Icons.Lock color={colors.lightText} />
           <Text className="text-textInput text-base ml-4 font-senRegular">
             Password
           </Text>
         </TouchableOpacity>
-        <TouchableOpacity className="flex-row items-center py-3 border-b border-textBody">
+        <TouchableOpacity
+          className="flex-row items-center py-3 border-b border-textBody"
+          onPress={() => navigation.navigate("Settings")}
+        >
           <Icons.Settings color={colors.lightText} />
           <Text className="text-textInput text-base ml-4 font-senRegular">
             Settings
@@ -354,7 +390,7 @@ const Profile: React.FC = () => {
       <View className="flex-row items-start py-3 rounded-lg justify-start ">
         <TouchableOpacity
           className="flex-row items-center py-3 rounded-lg justify-center "
-          onPress={logOut}
+          onPress={() => setIsModalVisible(true)}
         >
           <Icons.LogOut color={colors.lightText} />
           <Text className="text-textInput text-base ml-2 font-senRegular">
@@ -362,6 +398,17 @@ const Profile: React.FC = () => {
           </Text>
         </TouchableOpacity>
       </View>
+      {/* Logout Confirmation Modal */}
+      <AlertModal
+        isVisible={isModalVisible}
+        onBackdropPress={() => setIsModalVisible(false)}
+        message="Are you sure you want to log out?"
+        onCancel={() => setIsModalVisible(false)}
+        onConfirm={logOut}
+        confirmText="Yes, Log out"
+        cancelText="Cancel"
+        loading={loading}
+      />
     </View>
   );
 };

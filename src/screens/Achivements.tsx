@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { View, Text } from "react-native";
 import AchivementBox from "../components/AchivementBox";
+import * as Icons from "../../assets/icons/bookmarks/achivements/index";
+import { Achievement } from "../contexts/slices/userDataSlice";
+import { useAppSelector } from "../contexts/hooks";
+import { supabase } from "../utils/supabase";
 
 const Achievements: React.FC = () => {
   // Initial static metadata
@@ -22,7 +26,7 @@ const Achievements: React.FC = () => {
     },
     2: {
       title: "First Steps",
-      description: "Enter your first new zone.",
+      description: "Discover your first 1km.",
       layout: "vertical",
       unlocked: false,
     },
@@ -34,54 +38,69 @@ const Achievements: React.FC = () => {
     },
     4: {
       title: "Memo Keeper",
-      description: "Edit any note after saving it.",
+      description: "Edit any note.",
       layout: "vertical",
       unlocked: false,
     },
     5: {
       title: "Explorer's Habit",
-      description: "Visit at least one zone per day for 3 consecutive days.",
-      layout: "vertical",
+      description: "Discover a total of 5km.",
+      layout: "horizontal",
       unlocked: false,
     },
     6: {
       title: "Night Owl",
-      description: "Open the app for the first time after 10:00 PM.",
+      description: "Open the app after 10:00 PM.",
       layout: "vertical",
       unlocked: false,
     },
     7: {
       title: "Early Bird",
       description: "Open the app for the first time before 8:00 AM.",
-      layout: "horizontal",
+      layout: "vertical",
       unlocked: false,
     },
     8: {
       title: "Note Taker",
-      description: "Create your first personal note on the map.",
+      description: "Create your first note.",
       layout: "vertical",
       unlocked: false,
     },
     9: {
-      title: "Returning Adventurer",
+      title: "Eager Explorer",
       description: "Open the app 7 days in a row.",
       layout: "vertical",
       unlocked: false,
     },
   });
 
+  const userData = useAppSelector((state) => state.userData);
+
   // Simulated achievement data fetched from the database
-  const [achievementData, setAchievementData] = useState([
-    { id: 1, unlocked: false },
-    { id: 2, unlocked: false },
-    { id: 3, unlocked: false },
-    { id: 4, unlocked: false },
-    { id: 5, unlocked: false },
-    { id: 6, unlocked: false },
-    { id: 7, unlocked: false },
-    { id: 8, unlocked: false },
-    { id: 9, unlocked: false },
-  ]);
+  const [achievementData, setAchievementData] = useState<Achievement[]>(
+    userData.achievements
+  );
+
+  useEffect(() => {
+    // Check if there are new achievements to update
+    RequestAchievement();
+  }, []);
+
+  const RequestAchievement = async () => {
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("achievements")
+      .eq("profile_id", userData.profile_id);
+
+    if (error) {
+      console.error("Error fetching achievements:", error.message);
+      return;
+    }
+
+    // Update the achievement data
+    const parsedAchievements = JSON.parse(data[0].achievements);
+    setAchievementData(parsedAchievements);
+  };
 
   useEffect(() => {
     const updatedMetadata = { ...achievementMetadata };
@@ -115,6 +134,7 @@ const Achievements: React.FC = () => {
           >
             <View className="justify-center items-center flex-[60%]">
               <AchivementBox
+                icon={Icons.WelcomeAboard}
                 title={achievementMetadata[1].title}
                 description={achievementMetadata[1].description}
                 unlocked={achievementMetadata[1].unlocked}
@@ -123,6 +143,7 @@ const Achievements: React.FC = () => {
             </View>
             <View className="justify-center items-center flex-[40%]">
               <AchivementBox
+                icon={Icons.FirstSteps}
                 title={achievementMetadata[2].title}
                 description={achievementMetadata[2].description}
                 unlocked={achievementMetadata[2].unlocked}
@@ -137,6 +158,7 @@ const Achievements: React.FC = () => {
           >
             <View className="justify-center items-center" style={{ flex: 1 }}>
               <AchivementBox
+                icon={Icons.StickyNotes}
                 title={achievementMetadata[3].title}
                 description={achievementMetadata[3].description}
                 unlocked={achievementMetadata[3].unlocked}
@@ -145,6 +167,7 @@ const Achievements: React.FC = () => {
             </View>
             <View className="justify-center items-center" style={{ flex: 1 }}>
               <AchivementBox
+                icon={Icons.MemoKeeper}
                 title={achievementMetadata[4].title}
                 description={achievementMetadata[4].description}
                 unlocked={achievementMetadata[4].unlocked}
@@ -153,10 +176,11 @@ const Achievements: React.FC = () => {
             </View>
             <View className="justify-center items-center" style={{ flex: 1 }}>
               <AchivementBox
-                title={achievementMetadata[5].title}
-                description={achievementMetadata[5].description}
-                unlocked={achievementMetadata[5].unlocked}
-                layout={achievementMetadata[5].layout}
+                icon={Icons.NightOwl}
+                title={achievementMetadata[6].title}
+                description={achievementMetadata[6].description}
+                unlocked={achievementMetadata[6].unlocked}
+                layout={achievementMetadata[6].layout}
               />
             </View>
           </View>
@@ -171,10 +195,11 @@ const Achievements: React.FC = () => {
             style={{ flex: 0.5, height: "100%" }}
           >
             <AchivementBox
-              title={achievementMetadata[6].title}
-              description={achievementMetadata[6].description}
-              unlocked={achievementMetadata[6].unlocked}
-              layout={achievementMetadata[6].layout}
+              icon={Icons.EarlyBird}
+              title={achievementMetadata[7].title}
+              description={achievementMetadata[7].description}
+              unlocked={achievementMetadata[7].unlocked}
+              layout={achievementMetadata[7].layout}
             />
           </View>
 
@@ -185,16 +210,18 @@ const Achievements: React.FC = () => {
           >
             <View className="justify-center items-center" style={{ flex: 1 }}>
               <AchivementBox
-                title={achievementMetadata[7].title}
-                description={achievementMetadata[7].description}
-                unlocked={achievementMetadata[7].unlocked}
-                layout={achievementMetadata[7].layout}
+                icon={Icons.Explorer}
+                title={achievementMetadata[5].title}
+                description={achievementMetadata[5].description}
+                unlocked={achievementMetadata[5].unlocked}
+                layout={achievementMetadata[5].layout}
               />
             </View>
 
             <View className="flex-row justify-center gap-3" style={{ flex: 1 }}>
               <View className="justify-center items-center" style={{ flex: 1 }}>
                 <AchivementBox
+                  icon={Icons.NoteTaker}
                   title={achievementMetadata[8].title}
                   description={achievementMetadata[8].description}
                   unlocked={achievementMetadata[8].unlocked}
@@ -203,6 +230,7 @@ const Achievements: React.FC = () => {
               </View>
               <View className="justify-center items-center" style={{ flex: 1 }}>
                 <AchivementBox
+                  icon={Icons.ReturningAdventurer}
                   title={achievementMetadata[9].title}
                   description={achievementMetadata[9].description}
                   unlocked={achievementMetadata[9].unlocked}
