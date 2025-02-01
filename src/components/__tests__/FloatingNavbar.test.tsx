@@ -5,6 +5,9 @@ import { render, fireEvent, waitFor } from "@testing-library/react-native";
 import FloatingNavbar from "../FloatingNavbar";
 import { useNavigation } from "@react-navigation/native";
 import { MotiView } from "moti";
+import { Provider } from "react-redux";
+import { combineReducers, configureStore } from "@reduxjs/toolkit";
+import userDataReducer from "../../contexts/slices/userDataSlice";
 
 const mockNavigate = jest.fn();
 
@@ -32,10 +35,50 @@ jest.mock("../../../assets/icons/home", () => ({
 }));
 
 jest.mock("../../../assets/images/navbarbase.svg", () => "NavbarBase");
-
+jest.mock("../../../assets/icons/home/close_clean.svg", () => "Close");
+jest.mock("../utils/Divider", () => "Divider");
 jest.mock("@react-native-async-storage/async-storage", () =>
   require("@react-native-async-storage/async-storage/jest/async-storage-mock")
 );
+jest.mock("@env");
+
+const renderWithProviders = (
+  ui:
+    | string
+    | number
+    | boolean
+    | React.JSX.Element
+    | Iterable<React.ReactNode>
+    | null
+    | undefined,
+  {
+    preloadedState = initialState,
+    store = configureStore({
+      reducer: { userData: userDataReducer },
+      preloadedState,
+    }),
+  } = {}
+) => {
+  return render(<Provider store={store}>{ui}</Provider>);
+};
+
+const initialState = {
+  userData: {
+    session: null,
+    auth: null,
+    profile_id: "85c76b",
+    email: "",
+    name: "",
+    lastname: "",
+    discovered_area: 0,
+    discovered_polygon: null,
+    achievements: [],
+    created_at: "",
+    pic: null,
+    notes: [],
+    spots: [],
+  },
+};
 
 describe("FloatingNavbar Component", () => {
   beforeAll(() => {
@@ -130,7 +173,20 @@ describe("FloatingNavbar Component", () => {
   });
 
   it("handles the option selected correctly for note", async () => {
-    const { getByTestId } = render(<FloatingNavbar coordinates={[0, 0]} />);
+    const rootReducer = combineReducers({
+      userData: userDataReducer,
+    });
+
+    const store = configureStore({
+      reducer: rootReducer,
+      preloadedState: initialState,
+    });
+
+    const { getByTestId } = renderWithProviders(
+      <FloatingNavbar coordinates={[0, 0]} />,
+      { store }
+    );
+
     const middleButton = getByTestId("middle-button");
 
     // First press to expand menu
@@ -156,7 +212,20 @@ describe("FloatingNavbar Component", () => {
   });
 
   it("handles the option selected correctly for spot", async () => {
-    const { getByTestId } = render(<FloatingNavbar coordinates={[0, 0]} />);
+    const rootReducer = combineReducers({
+      userData: userDataReducer,
+    });
+
+    const store = configureStore({
+      reducer: rootReducer,
+      preloadedState: initialState,
+    });
+
+    const { getByTestId } = renderWithProviders(
+      <FloatingNavbar coordinates={[0, 0]} />,
+      { store }
+    );
+
     const middleButton = getByTestId("middle-button");
 
     // First press to expand menu
