@@ -132,8 +132,9 @@ const NoteDetails: React.FC = ({ route }: any) => {
   // Handle Save
   const handleSave = async () => {
 
-    // FIXME: if there are any invalid inputs, this will return without updating the image and without warning to the user
+    // BUG: if there are any invalid inputs, this will return without updating the image and without warning to the user
     // If all inputs are valid then it will update the image.
+    // NOTE: A user can't create an image without description (it's validated by the frontend, so this shouldn't be a problem)
     if (!validateInputs()) return;
 
     try {
