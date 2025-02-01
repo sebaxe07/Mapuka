@@ -35,7 +35,7 @@ const SaveBox: React.FC<SaveBoxProps> = ({ type, onClose, coordinates }) => {
 
     if (type == "spot") { 
       console.log('Adding spot:', { title, coordinates, address, profileid });
-  
+
       // Add spot to database
       const { data, error } = await supabase
         .from("spots")
@@ -44,7 +44,7 @@ const SaveBox: React.FC<SaveBoxProps> = ({ type, onClose, coordinates }) => {
             profile_id: profileid,
             coordinates: coordinates,
             title: title,
-            address: address
+            address: address,
           }
         ])
         .select();
@@ -73,6 +73,7 @@ const SaveBox: React.FC<SaveBoxProps> = ({ type, onClose, coordinates }) => {
             address: address,
             title: title,
             content: description,
+            image: 1
           }
         ])
         .select();
