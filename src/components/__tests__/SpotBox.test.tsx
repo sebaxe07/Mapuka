@@ -176,8 +176,10 @@ describe("SpotBox Component", () => {
     });
 
     const deleteSpy = jest.spyOn(supabase, "from").mockReturnValue({
-      delete: jest.fn().mockResolvedValue({
-        error: null,
+      delete: jest.fn().mockReturnValue({
+        eq: jest.fn().mockResolvedValue({
+          error: null,
+        }),
       }),
     } as any);
 
@@ -211,5 +213,62 @@ describe("SpotBox Component", () => {
     });
 
     deleteSpy.mockRestore();
+  });
+
+  it("Logs an error when deleting a spot fails", async () => {
+    const rootReducer = combineReducers({
+      userData: userDataReducer,
+    });
+
+    const store = configureStore({
+      reducer: rootReducer,
+      preloadedState: initialState,
+    });
+
+    const deleteSpy = jest.spyOn(supabase, "from").mockReturnValue({
+      delete: jest.fn().mockReturnValue({
+        eq: jest.fn().mockResolvedValue({
+          data: null,
+          error: "Error deleting spot",
+        }),
+      }),
+    } as any);
+
+    const consoleSpy = jest.spyOn(console, "error").mockImplementation();
+
+    const { getByTestId, getByText } = renderWithProviders(
+      <SpotBox
+        spot_id="1"
+        title="Spot 1"
+        date="2023-01-01"
+        address="Address 1"
+        onPress={jest.fn()}
+      />,
+      { store }
+    );
+
+    await act(async () => {
+      fireEvent.press(getByTestId("delete-button"));
+    });
+
+    await waitFor(() => {
+      expect(
+        getByText("Are you sure you want to delete this note?")
+      ).toBeTruthy();
+    });
+
+    await act(async () => {
+      fireEvent.press(getByText("Delete"));
+    });
+
+    await waitFor(() => {
+      expect(consoleSpy).toHaveBeenCalledWith(
+        "Error deleting spot: ",
+        undefined
+      );
+    });
+
+    deleteSpy.mockRestore();
+    consoleSpy.mockRestore();
   });
 });
