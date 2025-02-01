@@ -23,8 +23,21 @@
       "!**/babel.config.js",
       "!**/expo-env.d.ts",
       "!**/.expo/**",
-      "!src/utils/supabase.ts"
-    ]
+      "!src/utils/supabase.ts",
+      "!app.config.js",
+      "!declarations.d.ts",
+      "!env.d.ts",
+      "!index.ts",
+      "!metro.config.js",
+      "!nativewind-env.d.ts",
+      "!react-native.config.js",
+      "!tailwind.config.js",
+      "!themes.js",
+      "!App.tsx"
+    ],
+    "moduleNameMapper": {
+      "\\.(css|less|scss|sass)$": "jest-transform-stub"
+    }
   },
   "dependencies": {
     "@expo-google-fonts/sen": "^0.2.3",
@@ -106,6 +119,7 @@
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-prettier": "^5.0.1",
     "eslint-plugin-tailwindcss": "^3.13.0",
+    "jest-transform-stub": "^2.0.0",
     "prettier": "^3.1.0",
     "react-native-svg-transformer": "^1.5.0",
     "typescript": "^5.3.3"
