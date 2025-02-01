@@ -131,6 +131,9 @@ const NoteDetails: React.FC = ({ route }: any) => {
 
   // Handle Save
   const handleSave = async () => {
+
+    // FIXME: if there are any invalid inputs, this will return without updating the image and without warning to the user
+    // If all inputs are valid then it will update the image.
     if (!validateInputs()) return;
 
     try {
@@ -190,30 +193,34 @@ const NoteDetails: React.FC = ({ route }: any) => {
     }
   };
 
-  // Save image when editableNote changes that specific attribute
-  useEffect(() => {
-    if (editableNote !== null) {
-      handleSave();
-    }
-  }, [editableNote?.image]);
-
+  
   const [currentBackground, setCurrentBackground] = useState<number>(
     note.image
   ); // Stores confirmed background
   const [changedBackground, setChangedBackground] = useState<number>(
     note.image
   ); // Tracks live selection
-
+  
   const closeModal = () => {
     Keyboard.dismiss();
     setChangedBackground(currentBackground); // Reset selection on cancel
     setIsModalVisible(false);
   };
-
+  
+  // Edit image on note when user changes the current image
   useEffect(() => {
+    console.log("USEEFFECT1: Changing image in editable note to: ", currentBackground);
     setEditableNote({ ...editableNote, image: currentBackground } as any);
   }, [currentBackground]);
 
+  // Save image when editableNote changes that specific attribute
+  useEffect(() => {
+    if (editableNote !== null) {
+      console.log("USEEFFECT2: Changing image in DB and global context to: ", editableNote?.image);
+      handleSave();
+    }
+  }, [editableNote?.image]);
+  
   const renderImagePickerModal = () => (
     <Modal
       visible={isModalVisible}
@@ -285,8 +292,6 @@ const NoteDetails: React.FC = ({ route }: any) => {
         onCancel={() => setIsAlertChangeBGVisible(false)}
         onConfirm={() => {
           setCurrentBackground(changedBackground); // Update confirmed selection
-
-          handleSave();
 
           setIsAlertChangeBGVisible(false);
           closeModal();
