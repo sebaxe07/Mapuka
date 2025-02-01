@@ -48,8 +48,16 @@ const NoteDetails: React.FC = ({ route }: any) => {
   const [editableNote, setEditableNote] = useState<Note | undefined>(note);
   const [isModalVisible, setIsModalVisible] = useState(false); // For the image picker modal
 
+  // This is to prevent useEffects from running on the first render
+  const [hasMounted, setHasMounted] = useState(false);
+
   const navigation = useNavigation();
   const dispatch = useAppDispatch();
+
+  // Will be true after the first render
+  useEffect(() => {
+    setHasMounted(true);
+  }, []);
 
   if (!note) {
     return (
@@ -210,13 +218,15 @@ const NoteDetails: React.FC = ({ route }: any) => {
   
   // Edit image on note when user changes the current image
   useEffect(() => {
-    console.log("USEEFFECT1: Changing image in editable note to: ", currentBackground);
-    setEditableNote({ ...editableNote, image: currentBackground } as any);
+    if (hasMounted) {
+      console.log("USEEFFECT1: Changing image in editable note to: ", currentBackground);
+      setEditableNote({ ...editableNote, image: currentBackground } as any);
+    }
   }, [currentBackground]);
 
   // Save image when editableNote changes that specific attribute
   useEffect(() => {
-    if (editableNote !== null) {
+    if (hasMounted && editableNote !== null) {
       console.log("USEEFFECT2: Changing image in DB and global context to: ", editableNote?.image);
       handleSave();
     }
