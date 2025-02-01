@@ -9,8 +9,6 @@ import {
 import { supabase } from "./src/utils/supabase";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import HomeScreen from "./src/screens/Home";
-import DetailsScreen from "./src/screens/Details";
-import MapScreen from "./src/screens/Map";
 import AchivementsScreen from "./src/screens/Achivements";
 import BookmarksScreen from "./src/screens/Bookmarks";
 import NoteDetailsScreen from "./src/screens/NoteDetails";
@@ -73,8 +71,6 @@ const RootStack = createNativeStackNavigator({
           screen: HomeScreen,
           animation: "slide_from_right",
         },
-        Details: DetailsScreen,
-        Map: MapScreen,
         Achivements: {
           options: ({}) => ({
             animation: "slide_from_left",
