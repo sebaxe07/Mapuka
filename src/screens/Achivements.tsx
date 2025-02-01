@@ -114,8 +114,6 @@ const Achievements: React.FC = () => {
     setAchievementMetadata(updatedMetadata);
   }, [achievementData]);
 
-  const debugFlexbox = false;
-
   return (
     <View className="bg-bgMain px-5  pb-10 h-full">
       <View className="flex w-full my-16 justify-center items-center">
@@ -124,13 +122,11 @@ const Achievements: React.FC = () => {
           Achievements
         </Text>
       </View>
-      <View
-        className={`flex-4 h-3/4 gap-3 ${debugFlexbox ? "bg-buttonDarkRed" : ""}`}
-      >
+      <View className={`flex-4 h-3/4 gap-3 `}>
         <View className="flex-1 gap-3">
           {/* 1st Row */}
           <View
-            className={`flex-row flex-1 rounded-3xl gap-3 justify-between ${debugFlexbox ? "bg-buttonAqua" : ""}`}
+            className={`flex-row flex-1 rounded-3xl gap-3 justify-between `}
           >
             <View className="justify-center items-center flex-[60%]">
               <AchivementBox
@@ -154,7 +150,7 @@ const Achievements: React.FC = () => {
 
           {/* 2nd Row */}
           <View
-            className={`flex-row flex-1 rounded-3xl justify-between gap-3 ${debugFlexbox ? "bg-buttonBlue" : ""}`}
+            className={`flex-row flex-1 rounded-3xl justify-between gap-3 `}
           >
             <View className="justify-center items-center" style={{ flex: 1 }}>
               <AchivementBox
@@ -187,7 +183,7 @@ const Achievements: React.FC = () => {
         </View>
         {/* 3rd Row */}
         <View
-          className={`flex-row flex-1 h-[35%] w-full rounded-3xl justify-around gap-3 ${debugFlexbox ? "bg-buttonPurple" : ""}`}
+          className={`flex-row flex-1 h-[35%] w-full rounded-3xl justify-around gap-3 `}
         >
           {/* Left Column */}
           <View

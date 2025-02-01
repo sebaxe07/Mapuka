@@ -27,19 +27,24 @@ const ProfilePic: React.FC<ProfilePicProps> = ({
             <View className="size-full items-center justify-center rounded-full  aspect-square bg-green-400" />
           }
         >
-          {avatarUrl ? (
+          {avatarUrl && avatarUrl != "" ? (
             <Image
               source={{ uri: avatarUrl }}
               accessibilityLabel="Avatar"
               style={[{ height: size, width: size }]}
             />
           ) : (
-            <ProfileDefault width={size} height={size} />
+            <ProfileDefault
+              accessibilityLabel="profile-default"
+              width={size}
+              height={size}
+            />
           )}
         </MaskedView>
       </View>
       {crown && (
         <Crown
+          testID="crown"
           style={{ position: "absolute", top: -28, right: -14 }}
           width={60}
           height={60}

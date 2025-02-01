@@ -18,7 +18,6 @@ export const searchLocation = async ({
   userLocation,
   setRouteCoords,
 }: SearchLocationProps): Promise<void> => {
-  console.log("Button pressed");
   if (!text) return;
 
   try {
@@ -51,7 +50,7 @@ export const searchLocation = async ({
       Alert.alert("No results found", "Please try a different search term.");
     }
   } catch (error) {
-    console.error("Error searching location: ", error);
+    //console.error("Error searching location: ", error);
     Alert.alert("Error", "Failed to fetch location. Please try again.");
   }
 };
@@ -62,7 +61,7 @@ interface TraceRouteToMarkerProps {
   setRouteCoords: (route: [number, number][]) => void;
 }
 
-const traceRouteToMarker = async ({
+export const traceRouteToMarker = async ({
   userLocation,
   destination,
   setRouteCoords,
@@ -86,7 +85,7 @@ const traceRouteToMarker = async ({
       Alert.alert("No route found", "Could not trace a route.");
     }
   } catch (error) {
-    console.error("Error tracing route: ", error);
+    //console.error("Error tracing route: ", error);
     Alert.alert("Error", "Failed to trace route. Please try again.");
   }
 };

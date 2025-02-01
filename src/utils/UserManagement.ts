@@ -32,7 +32,7 @@ export async function signInWithEmail({
   if (error) {
     return error;
   }
-  console.log(JSON.stringify(data, null, 2));
+  //console.log(JSON.stringify(data, null, 2));
 
   // Fetch user profile data from the 'profiles' table
   try {
@@ -45,7 +45,7 @@ export async function signInWithEmail({
     if (error) {
       return error;
     }
-    console.log("profiles", profiles);
+    //console.log("profiles", profiles);
 
     // transform the discovered_polygon jsonb to a GeoJSON object
     let discoveredPolygon: Feature<
@@ -66,7 +66,7 @@ export async function signInWithEmail({
       console.error("Error fetching list of photos:", listerror.message);
       throw listerror;
     } else if (listdata && listdata.length > 0) {
-      console.log("List of photos:", listdata);
+      //console.log("List of photos:", listdata);
 
       const imageUrl = await supabase.storage
         .from("avatars")
@@ -90,7 +90,7 @@ export async function signInWithEmail({
           path: profiles.profile_id,
           image: {} as ImagePicker.ImagePickerAsset,
         };
-        console.log("\x1b[32m", "pic URL:", pic.pictureUrl);
+        //console.log("\x1b[32m", "pic URL:", pic.pictureUrl);
       }
     }
 
@@ -108,20 +108,22 @@ export async function signInWithEmail({
       .from("spots")
       .select("*")
       .eq("profile_id", profiles.profile_id);
+
+    /* 
     if (spotsError) {
       console.error("Failed to fetch spots:", spotsError.message);
       return;
-    }
+    } */
 
     // Fetch user notes
     const { data: notesData, error: notesError } = await supabase
       .from("notes")
       .select("*")
       .eq("profile_id", profiles.profile_id);
-    if (notesError) {
+    /*     if (notesError) {
       console.error("Failed to fetch notes:", notesError.message);
       return;
-    }
+    } */
 
     // Dispatch the action to set user data in Redux state
     dispatch(
@@ -150,37 +152,6 @@ export async function signInWithEmail({
   }
 }
 
-const defaultAchievements = async (userid: String) => {
-  const emptyAchievements = [
-    { id: 1, unlocked: false },
-    { id: 2, unlocked: false },
-    { id: 3, unlocked: false },
-    { id: 4, unlocked: false },
-    { id: 5, unlocked: false },
-    { id: 6, unlocked: false },
-    { id: 7, unlocked: false },
-    { id: 8, unlocked: false },
-    { id: 9, unlocked: false },
-  ];
-
-  // Map to jsonb
-  const achievements = JSON.stringify(emptyAchievements);
-
-  // upload the achievements to the database
-  const { data: profiles, error } = await supabase
-    .from("profiles")
-    .update({ achievements })
-    .eq("profile_id", userid);
-
-  if (error) {
-    console.error("Error updating achievements:", error.message);
-    return error;
-  }
-
-  console.log("Achievements updated");
-  return emptyAchievements;
-};
-
 export const signOut = async () => {
   console.log("Signing out");
   const { error } = await supabase.auth.signOut();
@@ -190,11 +161,6 @@ export const signOut = async () => {
     return;
   }
   console.log("Logged out");
-
-  const dispatch = useAppDispatch();
-  dispatch(clearUserData());
-
-  console.log("User data cleared");
 };
 
 interface SignUpUserProps {
@@ -231,7 +197,7 @@ export async function signUpUser({
 
   if (data) {
     console.log("User created");
-    console.log(data);
+    //console.log(data);
 
     return;
   }

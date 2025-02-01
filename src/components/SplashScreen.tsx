@@ -8,7 +8,10 @@ interface SplashScreenProps {}
 
 const SplashScreen: React.FC<SplashScreenProps> = ({}) => {
   return (
-    <View className="bg-[#11112D] size-full flex items-center justify-center">
+    <View
+      testID="splash-screen"
+      className="bg-[#11112D] size-full flex items-center justify-center"
+    >
       <MotiView
         animate={{
           scale: 2,
@@ -16,9 +19,9 @@ const SplashScreen: React.FC<SplashScreenProps> = ({}) => {
         }}
         className="absolute z-0 top-0 left-0 right-0 bottom-0"
       >
-        <BGDecorator />
+        <BGDecorator testID="bg-decorator" />
       </MotiView>
-      <Logo />
+      <Logo testID="logo" />
     </View>
   );
 };

@@ -73,6 +73,11 @@ const SaveBox: React.FC<SaveBoxProps> = ({ type, onClose, coordinates }) => {
     const addressData = await response.json();
     const address =
       addressData.features[0]?.properties?.name || "Unknown address";
+    const address =
+      addressData.features[0]?.properties?.name || "Unknown address";
+
+    if (type == "spot") {
+      console.log("Adding spot:", { title, coordinates, address, profileid });
 
     if (type == "spot") {
       console.log("Adding spot:", { title, coordinates, address, profileid });
@@ -101,11 +106,21 @@ const SaveBox: React.FC<SaveBoxProps> = ({ type, onClose, coordinates }) => {
       }
       console.log("Spot added successfully:", data);
 
+
       // Add spot to local context
       dispatch(setSpots([...currentSpots, ...data]));
 
+
       onClose(); // Close the modal after saving
     } else if (type == "note") {
+      console.log("Adding spot:", {
+        title,
+        description,
+        coordinates,
+        address,
+        profileid,
+      });
+
       console.log("Adding spot:", {
         title,
         description,
@@ -143,6 +158,7 @@ const SaveBox: React.FC<SaveBoxProps> = ({ type, onClose, coordinates }) => {
 
       dispatch(setNotes([...currentNotes, ...data]));
 
+
       onClose(); // Close the modal after saving
     }
 
@@ -167,7 +183,7 @@ const SaveBox: React.FC<SaveBoxProps> = ({ type, onClose, coordinates }) => {
         <Text className="text-textBody text-2xl font-senSemiBold   ">
           {type === "note" ? "Make a Note" : "Save a Spot"}
         </Text>
-        <TouchableOpacity onPress={onClose}>
+        <TouchableOpacity testID="close-button" onPress={onClose}>
           <Close />
         </TouchableOpacity>
       </View>
