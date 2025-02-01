@@ -3,6 +3,7 @@
 import React from "react";
 import { render, fireEvent, act } from "@testing-library/react-native";
 import AlertModal from "../AlertModal";
+import { SvgProps } from "react-native-svg";
 
 jest.mock("react-native-modal", () => {
   return ({ children }: { children: React.ReactNode }) => children;

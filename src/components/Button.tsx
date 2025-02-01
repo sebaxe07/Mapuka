@@ -16,6 +16,7 @@ interface ButtonProps {
   width?: string;
   height?: string;
   disabled?: boolean;
+  testID?: string;
 }
 
 // Button is a component that creates a button
@@ -35,11 +36,13 @@ const Button = React.memo(
     width,
     height,
     disabled = false,
+    testID,
   }: ButtonProps) => {
     const color = colors;
 
     return (
       <TouchableOpacity
+        testID={testID}
         onPress={onPress}
         disabled={disabled}
         activeOpacity={0.8}

@@ -48,6 +48,7 @@ const AlertModal: React.FC<CustomModalProps> = ({
           />
           {onConfirm && (
             <Button
+              testID="confirm-button"
               label={confirmText}
               width="flex-1"
               onPress={onConfirm}
@@ -55,7 +56,13 @@ const AlertModal: React.FC<CustomModalProps> = ({
             />
           )}
         </View>
-        {loading && <ActivityIndicator size="small" color={colors.accentRed} />}
+        {loading && (
+          <ActivityIndicator
+            testID="ActivityIndicator"
+            size="small"
+            color={colors.accentRed}
+          />
+        )}
       </View>
     </Modal>
   );

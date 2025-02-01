@@ -20,6 +20,18 @@ jest.mock("../../utils/supabase", () => ({
 
 jest.mock("../../../assets/icons/bookmarks/holder.svg", () => "HolderV");
 jest.mock("../../../assets/icons/bookmarks/holderH.svg", () => "HolderH");
+// Mock import * as Icons from "../../../assets/icons/bookmarks/achivements/index";
+jest.mock("../../../assets/icons/bookmarks/achivements/index", () => ({
+  WelcomeAboard: "WelcomeAboard",
+  StickyNotes: "StickyNotes",
+  ReturningAdventurer: "ReturningAdventurer",
+  NoteTaker: "NoteTaker",
+  NightOwl: "NightOwl",
+  MemoKeeper: "MemoKeeper",
+  FirstSteps: "FirstSteps",
+  Explorer: "Explorer",
+  EarlyBird: "EarlyBird",
+}));
 
 describe("Achievements Screen", () => {
   it("renders achievements screen with Redux state", async () => {

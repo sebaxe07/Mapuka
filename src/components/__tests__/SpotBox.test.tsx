@@ -8,8 +8,19 @@ import { supabase } from "../../utils/supabase";
 import { Provider } from "react-redux";
 import userDataReducer from "../../contexts/slices/userDataSlice";
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
+import Toast from "react-native-toast-message";
+import { PostgrestFilterBuilder } from "@supabase/postgrest-js";
+import {
+  ParseQuery,
+  Ast,
+} from "@supabase/postgrest-js/dist/cjs/select-query-parser/parser";
+import {
+  TypeScriptTypes,
+  IsNonEmptyArray,
+  AggregateWithColumnFunctions,
+} from "@supabase/postgrest-js/dist/cjs/select-query-parser/types";
+import { GetFieldNodeResultName } from "@supabase/postgrest-js/dist/cjs/select-query-parser/utils";
 // Mock dependencies
-jest.mock("../../contexts/hooks");
 jest.mock("../../../assets/icons/bookmarks/place.svg", () => "Place");
 jest.mock("../../../assets/icons/bookmarks/trash.svg", () => "Trash");
 jest.mock(
@@ -20,6 +31,12 @@ jest.mock(
 jest.mock("@react-native-async-storage/async-storage", () =>
   require("@react-native-async-storage/async-storage/jest/async-storage-mock")
 );
+
+jest.mock("react-native-toast-message", () => ({
+  show: jest.fn((options) => {
+    console.log("Toast shown with options:", options);
+  }),
+}));
 
 const initialState = {
   userData: {
@@ -35,7 +52,15 @@ const initialState = {
     created_at: "",
     pic: null,
     notes: [],
-    spots: [],
+    spots: [
+      {
+        spot_id: "1",
+        title: "Spot 1",
+        created_at: "2023-01-01",
+        address: "Address 1",
+        coordinates: [0, 0],
+      },
+    ],
   },
 };
 
@@ -65,14 +90,24 @@ describe("SpotBox Component", () => {
   });
 
   it("renders correctly with default props", () => {
-    const { getByText } = render(
+    const rootReducer = combineReducers({
+      userData: userDataReducer,
+    });
+
+    const store = configureStore({
+      reducer: rootReducer,
+      preloadedState: initialState,
+    });
+
+    const { getByText } = renderWithProviders(
       <SpotBox
         spot_id="1"
         title="Spot 1"
         date="2023-01-01"
         address="Address 1"
         onPress={jest.fn()}
-      />
+      />,
+      { store }
     );
     expect(getByText("Spot 1")).toBeTruthy();
     expect(getByText("2023-01-01")).toBeTruthy();
@@ -80,44 +115,101 @@ describe("SpotBox Component", () => {
   });
 
   it("calls onPress when 'View Spot' button is pressed", () => {
+    const rootReducer = combineReducers({
+      userData: userDataReducer,
+    });
+
+    const store = configureStore({
+      reducer: rootReducer,
+      preloadedState: initialState,
+    });
     const onPressMock = jest.fn();
-    const { getByText } = render(
+    const { getByText } = renderWithProviders(
       <SpotBox
         spot_id="1"
         title="Spot 1"
         date="2023-01-01"
         address="Address 1"
         onPress={onPressMock}
-      />
+      />,
+      { store }
     );
     fireEvent.press(getByText("View Spot"));
     expect(onPressMock).toHaveBeenCalled();
   });
 
-  it("calls handleDelete when delete button is pressed", () => {
-    jest.spyOn(Alert, "alert").mockImplementation((title, message, buttons) => {
-      if (buttons && buttons[1] && buttons[1].onPress) {
-        buttons[1].onPress();
-      }
+  it("shows delete confirmation modal when delete button is pressed", () => {
+    const rootReducer = combineReducers({
+      userData: userDataReducer,
     });
 
-    const { getByTestId } = render(
+    const store = configureStore({
+      reducer: rootReducer,
+      preloadedState: initialState,
+    });
+
+    const { getByTestId, getByText } = renderWithProviders(
       <SpotBox
         spot_id="1"
         title="Spot 1"
         date="2023-01-01"
         address="Address 1"
         onPress={jest.fn()}
-      />
+      />,
+      { store }
     );
 
     fireEvent.press(getByTestId("delete-button"));
-    waitFor(() => {
-      expect(Alert.alert).toHaveBeenCalledWith(
-        "Delete Spot",
-        "Are you sure you want to delete this Spot?",
-        expect.any(Array)
-      );
+    expect(
+      getByText("Are you sure you want to delete this note?")
+    ).toBeTruthy();
+  });
+
+  it("deletes a spot correctly when confirmed", async () => {
+    const rootReducer = combineReducers({
+      userData: userDataReducer,
     });
+
+    const store = configureStore({
+      reducer: rootReducer,
+      preloadedState: initialState,
+    });
+
+    const deleteSpy = jest.spyOn(supabase, "from").mockReturnValue({
+      delete: jest.fn().mockResolvedValue({
+        error: null,
+      }),
+    } as any);
+
+    const { getByTestId, getByText } = renderWithProviders(
+      <SpotBox
+        spot_id="1"
+        title="Spot 1"
+        date="2023-01-01"
+        address="Address 1"
+        onPress={jest.fn()}
+      />,
+      { store }
+    );
+
+    await act(async () => {
+      fireEvent.press(getByTestId("delete-button"));
+    });
+
+    await waitFor(() => {
+      expect(
+        getByText("Are you sure you want to delete this note?")
+      ).toBeTruthy();
+    });
+
+    await act(async () => {
+      fireEvent.press(getByText("Delete"));
+    });
+
+    await waitFor(() => {
+      expect(deleteSpy).toHaveBeenCalledWith("spots");
+    });
+
+    deleteSpy.mockRestore();
   });
 });

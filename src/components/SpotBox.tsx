@@ -34,10 +34,16 @@ const SpotBox: React.FC<{
   const [isAlertDeleteVisible, setIsAlertDeleteVisible] = useState(false);
 
   const deleteSpot = async (spotId: string) => {
+    console.log("\x1b[31m", "Deleting spot:", spotId);
     const { data, error } = await supabase
       .from("spots")
       .delete()
       .eq("spot_id", spotId);
+
+    if (error) {
+      console.error("Error deleting spot: ", error.message);
+      return;
+    }
 
     Toast.show({
       autoHide: true,
@@ -47,40 +53,6 @@ const SpotBox: React.FC<{
       text1: "Note deleted",
       text2: "Note deleted successfully!",
     });
-
-    if (error) {
-      console.error("Error deleting spot: ", error.message);
-      return;
-    }
-  };
-
-  const handleDelete = (spotId: string) => {
-    Alert.alert("Delete Spot", "Are you sure you want to delete this Spot?", [
-      {
-        text: "Cancel",
-        style: "cancel",
-      },
-      {
-        text: "Delete",
-        style: "destructive",
-        onPress: async () => {
-          try {
-            // Delete from database first
-            await deleteSpot(spotId);
-
-            if (!spotsData) {
-              return;
-            }
-
-            // Update Redux state directly (global state)
-            const filteredSpots = spotsData.filter((n) => n.spot_id !== spotId);
-            dispatch(setSpots(filteredSpots));
-          } catch (error) {
-            console.error("Error deleting spot:", error);
-          }
-        },
-      },
-    ]);
   };
 
   return (

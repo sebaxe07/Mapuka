@@ -81,13 +81,8 @@ const AchievementBox: React.FC<ContentBoxProps> = ({
         </Text>
         <Text
           className={`font-senRegular text-xs text-center ${unlocked ? "text-textBody" : "text-bgMain"}`}
-          style={
-            {
-              /* color: textColor */
-            }
-          }
         >
-          {description},
+          {description}
         </Text>
       </View>
     </View>
