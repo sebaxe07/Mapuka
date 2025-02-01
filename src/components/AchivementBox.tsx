@@ -51,7 +51,7 @@ const AchievementBox: React.FC<ContentBoxProps> = ({
   return (
     <View
       testID="achivement-box"
-      className={`rounded-3xl items-center w-full h-full ${boxStyles} `}
+      className={`rounded-3xl items-center justify-center w-full h-full ${boxStyles} bg-boxMenu`}
       style={{
         /* backgroundColor: unlocked ? randomColor : colors.menus, */
         //Out of service pretty colors
