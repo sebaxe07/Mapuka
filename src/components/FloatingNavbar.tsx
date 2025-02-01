@@ -120,13 +120,13 @@ const FloatingNavbar: React.FC<{
       {/* Expandable Options */}
       {memoizedExpandable}
       {/* Content Box */}
-      {/* {activeBox && (
+      {activeBox && (
         <SaveBox
           type={activeBox}
           onClose={() => setActiveBox(null)}
           coordinates={coordinates}
         />
-      )} */}
+      )}
     </View>
   );
 };

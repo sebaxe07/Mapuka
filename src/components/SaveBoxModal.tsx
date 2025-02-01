@@ -73,11 +73,6 @@ const SaveBox: React.FC<SaveBoxProps> = ({ type, onClose, coordinates }) => {
     const addressData = await response.json();
     const address =
       addressData.features[0]?.properties?.name || "Unknown address";
-    const address =
-      addressData.features[0]?.properties?.name || "Unknown address";
-
-    if (type == "spot") {
-      console.log("Adding spot:", { title, coordinates, address, profileid });
 
     if (type == "spot") {
       console.log("Adding spot:", { title, coordinates, address, profileid });
@@ -113,21 +108,6 @@ const SaveBox: React.FC<SaveBoxProps> = ({ type, onClose, coordinates }) => {
 
       onClose(); // Close the modal after saving
     } else if (type == "note") {
-      console.log("Adding spot:", {
-        title,
-        description,
-        coordinates,
-        address,
-        profileid,
-      });
-
-      console.log("Adding spot:", {
-        title,
-        description,
-        coordinates,
-        address,
-        profileid,
-      });
 
       // Add note to database
       const { data, error } = await supabase
