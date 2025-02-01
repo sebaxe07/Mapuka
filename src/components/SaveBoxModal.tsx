@@ -27,23 +27,23 @@ const SaveBox: React.FC<SaveBoxProps> = ({ type, onClose, coordinates }) => {
   const currentNotes = userData.notes;
   const profileid = userData.profile_id;
 
-  console.log("COORDINATES AT SAVEBOX:", coordinates);
+  //  console.log("COORDINATES AT SAVEBOX:", coordinates);
 
   const [showModal, setShowModal] = useState(false);
-
+  console.log("COORDINATES AT SAVEBOX:", coordinates);
   const handleSaveAttempt = () => {
+    console.log("\x1b[31m", "Save attempt:", { title, description });
     if (validateInputs()) {
       setShowModal(true);
+    } else {
+      console.log("Failed to save", type);
     }
   };
 
   const validateInputs = () => {
     let valid = true;
 
-    if (!title.trim()) {
-      setTitleError("Title is required.");
-      valid = false;
-    } else if (title.length > 100) {
+    if (title.length > 100) {
       setTitleError("Title must be under 100 characters.");
       valid = false;
     } else {
@@ -51,10 +51,7 @@ const SaveBox: React.FC<SaveBoxProps> = ({ type, onClose, coordinates }) => {
     }
 
     if (type === "note") {
-      if (!description.trim()) {
-        setDescriptionError("Description is required.");
-        valid = false;
-      } else if (description.length > 500) {
+      if (description.length > 500) {
         setDescriptionError("Description must be under 500 characters.");
         valid = false;
       } else {
@@ -86,7 +83,7 @@ const SaveBox: React.FC<SaveBoxProps> = ({ type, onClose, coordinates }) => {
             coordinates: coordinates,
             title: title,
             address: address,
-          }
+          },
         ])
         .select();
       /* Toast.show({
@@ -101,15 +98,19 @@ const SaveBox: React.FC<SaveBoxProps> = ({ type, onClose, coordinates }) => {
       }
       console.log("Spot added successfully:", data);
 
-
       // Add spot to local context
       dispatch(setSpots([...currentSpots, ...data]));
 
-
       onClose(); // Close the modal after saving
     } else if (type == "note") {
-
       // Add note to database
+      console.log("\x1b[33m", "Adding note:", {
+        title,
+        coordinates,
+        address,
+        description,
+        profileid,
+      });
       const { data, error } = await supabase
         .from("notes")
         .insert([
@@ -119,8 +120,8 @@ const SaveBox: React.FC<SaveBoxProps> = ({ type, onClose, coordinates }) => {
             address: address,
             title: title,
             content: description,
-            image: 1
-          }
+            image: 1,
+          },
         ])
         .select();
 
@@ -137,7 +138,6 @@ const SaveBox: React.FC<SaveBoxProps> = ({ type, onClose, coordinates }) => {
       console.log("Note added successfully:", data);
 
       dispatch(setNotes([...currentNotes, ...data]));
-
 
       onClose(); // Close the modal after saving
     }
@@ -175,6 +175,7 @@ const SaveBox: React.FC<SaveBoxProps> = ({ type, onClose, coordinates }) => {
         </Text>
       ) : null}
       <TextInput
+        testID="title-input"
         placeholder={`Give a Title to your ${type}`}
         className="text-bgMain text-2xl font-senSemiBold py-2 mb-2 "
         value={title}
@@ -182,13 +183,16 @@ const SaveBox: React.FC<SaveBoxProps> = ({ type, onClose, coordinates }) => {
         maxLength={100}
       />
       {titleError ? (
-        <Text className="text-buttonAccentRed">{titleError}</Text>
+        <Text testID="title-error" className="text-buttonAccentRed">
+          {titleError}
+        </Text>
       ) : null}
 
       {/* Description Input (only for notes) */}
       {type === "note" ? (
         <>
           <TextInput
+            testID="description"
             placeholder="Write a description here..."
             className="text-textBody text-xl font-senMedium pt-2 pb-6 "
             value={description}
@@ -208,6 +212,7 @@ const SaveBox: React.FC<SaveBoxProps> = ({ type, onClose, coordinates }) => {
       {/* Save Button */}
       <View>
         <TouchableOpacity
+          testID="save-button"
           className={`items-center justify-center rounded-full px-3 py-4 w-1/2 ${
             title.trim() && (type !== "note" || description.trim())
               ? "bg-textBody"

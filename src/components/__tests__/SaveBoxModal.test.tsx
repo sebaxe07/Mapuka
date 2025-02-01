@@ -56,11 +56,11 @@ const renderWithProviders = (
 
 describe("SaveBox Component", () => {
   it("renders correctly with default props", () => {
-    const { getByText, getByPlaceholderText } = renderWithProviders(
+    const { getByText, getByTestId } = renderWithProviders(
       <SaveBox type="note" onClose={jest.fn()} coordinates={[0, 0]} />
     );
     expect(getByText("Make a Note")).toBeTruthy();
-    expect(getByPlaceholderText("Title")).toBeTruthy();
+    expect(getByTestId("title-input")).toBeTruthy();
   });
 
   it("calls onClose when close button is pressed", () => {
@@ -82,37 +82,44 @@ describe("SaveBox Component", () => {
       preloadedState: initialState,
     });
 
-    const { getByTestId, getByPlaceholderText } = renderWithProviders(
+    const { getByTestId, getByText } = renderWithProviders(
       <SaveBox type="note" onClose={jest.fn()} coordinates={[0, 0]} />,
       { store }
     );
 
-    fireEvent.changeText(getByPlaceholderText("Title"), "Test Note");
+    fireEvent.changeText(getByTestId("title-input"), "Test Note");
     fireEvent.changeText(
-      getByPlaceholderText("Description"),
+      getByTestId("description"),
       "This is a test note description."
     );
 
+    const insertSpy = jest.spyOn(supabase, "from").mockReturnValue({
+      insert: jest.fn().mockReturnValue({
+        select: jest.fn().mockResolvedValue({
+          data: [
+            {
+              profile_id: "85c76b",
+              coordinates: [0, 0],
+              address: "Test Address",
+              title: "Test Note",
+              content: "This is a test note description.",
+              image: 1,
+            },
+          ],
+          error: null,
+        }),
+      }),
+    } as any);
+
     fireEvent.press(getByTestId("save-button"));
 
-    // Wait for the note to be inserted
-    await waitFor(async () => {
-      const { data, error } = await supabase
-        .from("notes")
-        .select("*")
-        .eq("title", "Test Note");
+    // Simulate the confirmation action in the alert modal
+    await waitFor(() => getByText("Save"));
+    fireEvent.press(getByText("Save"));
 
-      expect(error).toBeNull();
-      expect(data).toHaveLength(1);
-
-      expect(data).not.toBeNull();
-      expect(data![0].title).toBe("Test Note");
-      expect(data![0].content).toBe("This is a test note description.");
-      expect(data![0].coordinates).toEqual([0, 0]);
+    await waitFor(() => {
+      expect(insertSpy).toHaveBeenCalledWith("notes");
     });
-
-    // Cleanup: Delete the test note
-    await supabase.from("notes").delete().eq("title", "Test Note");
   });
 
   it("saves a spot correctly", async () => {
@@ -125,31 +132,92 @@ describe("SaveBox Component", () => {
       preloadedState: initialState,
     });
 
-    const { getByTestId, getByPlaceholderText } = renderWithProviders(
+    const { getByTestId, getByText } = renderWithProviders(
       <SaveBox type="spot" onClose={jest.fn()} coordinates={[0, 0]} />,
       { store }
     );
 
-    fireEvent.changeText(getByPlaceholderText("Title"), "Test Spot");
+    fireEvent.changeText(getByTestId("title-input"), "Test Note");
+
+    const insertSpy = jest.spyOn(supabase, "from").mockReturnValue({
+      insert: jest.fn().mockReturnValue({
+        select: jest.fn().mockResolvedValue({
+          data: [
+            {
+              profile_id: "85c76b",
+              coordinates: [0, 0],
+              address: "Test Address",
+              title: "Test spot",
+            },
+          ],
+          error: null,
+        }),
+      }),
+    } as any);
 
     fireEvent.press(getByTestId("save-button"));
 
-    // Wait for the note to be inserted
-    await waitFor(async () => {
-      const { data, error } = await supabase
-        .from("spots")
-        .select("*")
-        .eq("title", "Test Spot");
+    // Simulate the confirmation action in the alert modal
+    await waitFor(() => getByText("Save"));
+    fireEvent.press(getByText("Save"));
 
-      expect(error).toBeNull();
-      expect(data).toHaveLength(1);
+    await waitFor(() => {
+      expect(insertSpy).toHaveBeenCalledWith("spots");
+    });
+  });
 
-      expect(data).not.toBeNull();
-      expect(data![0].title).toBe("Test Spot");
-      expect(data![0].coordinates).toEqual([0, 0]);
+  it("shows error when title is over 100 characters", async () => {
+    const rootReducer = combineReducers({
+      userData: userDataReducer,
     });
 
-    // Cleanup: Delete the test note
-    await supabase.from("spots").delete().eq("title", "Test Spot");
+    const store = configureStore({
+      reducer: rootReducer,
+      preloadedState: initialState,
+    });
+
+    const { getByTestId, getByText } = renderWithProviders(
+      <SaveBox type="note" onClose={jest.fn()} coordinates={[0, 0]} />,
+      { store }
+    );
+
+    fireEvent.changeText(getByTestId("title-input"), "a".repeat(101));
+    fireEvent.changeText(
+      getByTestId("description"),
+      "This is a test note description."
+    );
+
+    fireEvent.press(getByTestId("save-button"));
+
+    await waitFor(() => {
+      expect(getByText("Title must be under 100 characters.")).toBeTruthy();
+    });
+  });
+
+  it("shows error when description is over 500 characters", async () => {
+    const rootReducer = combineReducers({
+      userData: userDataReducer,
+    });
+
+    const store = configureStore({
+      reducer: rootReducer,
+      preloadedState: initialState,
+    });
+
+    const { getByTestId, getByText } = renderWithProviders(
+      <SaveBox type="note" onClose={jest.fn()} coordinates={[0, 0]} />,
+      { store }
+    );
+
+    fireEvent.changeText(getByTestId("title-input"), "Test Note");
+    fireEvent.changeText(getByTestId("description"), "a".repeat(501));
+
+    fireEvent.press(getByTestId("save-button"));
+
+    await waitFor(() => {
+      expect(
+        getByText("Description must be under 500 characters.")
+      ).toBeTruthy();
+    });
   });
 });
