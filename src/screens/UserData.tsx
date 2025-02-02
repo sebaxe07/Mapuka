@@ -50,6 +50,9 @@ const UserData: React.FC = () => {
       !newLastName.trim()
     ) {
       Toast.show({
+        position: "bottom",
+        visibilityTime: 2000,
+        autoHide: true,
         type: "error",
         text1: "Invalid Input",
         text2: "Please fix errors before saving.",
@@ -68,6 +71,9 @@ const UserData: React.FC = () => {
     if (error) {
       console.error("Error updating name:", error.message);
       Toast.show({
+        position: "bottom",
+        visibilityTime: 2000,
+        autoHide: true,
         type: "error",
         text1: "Update Failed",
         text2: "An error occurred. Please try again.",
@@ -82,7 +88,11 @@ const UserData: React.FC = () => {
         lastname: newLastName.trim(),
       })
     );
+
     Toast.show({
+      position: "bottom",
+      visibilityTime: 2000,
+      autoHide: true,
       type: "success",
       text1: "Profile Updated",
       text2: "Your name has been updated successfully!",

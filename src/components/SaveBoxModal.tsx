@@ -86,12 +86,6 @@ const SaveBox: React.FC<SaveBoxProps> = ({ type, onClose, coordinates }) => {
           },
         ])
         .select();
-      /* Toast.show({
-        type: "success",
-        text1: "Spot created",
-        text2: "Spot created successfully!",
-      }); */
-
       if (error) {
         console.error("Failed to add spot:", error.message);
         return;
@@ -124,12 +118,6 @@ const SaveBox: React.FC<SaveBoxProps> = ({ type, onClose, coordinates }) => {
           },
         ])
         .select();
-
-      /* Toast.show({
-        type: "success",
-        text1: "Note created",
-        text2: "Your note created successfully!",
-      }); */
 
       if (error) {
         console.error("Failed to add note:", error.message);

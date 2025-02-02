@@ -97,46 +97,55 @@ const NoteDetails: React.FC = ({ route }: any) => {
     }
   };
 
-  const [titleError, setTitleError] = useState("");
-  const [contentError, setContentError] = useState("");
-  const [customAddressError, setCustomAddressError] = useState("");
+  const [titleError, setTitleError] = useState<string | null>(null);
+  const [contentError, setContentError] = useState<string | null>(null);
+  const [addressError, setAddressError] = useState<string | null>(null);
 
-  const validateInputs = () => {
-    let valid = true;
-
-    if (!editableNote?.title.trim()) {
-      valid = false;
-    } else if (editableNote?.title.length > 100) {
-      valid = false;
+  const validateTitle = (text: string) => {
+    if (!text.trim()) {
+      setTitleError("Title is required.");
+    } else if (text.length > 100) {
+      setTitleError("Title must be under 100 characters.");
     } else {
-      setTitleError("");
+      setTitleError(null);
     }
-
-    if (!editableNote?.address.trim()) {
-      valid = false;
-    } else if (editableNote?.address.length > 50) {
-      setCustomAddressError("Adress must be under 50 characters.");
-      valid = false;
-    } else {
-      setCustomAddressError("");
-    }
-
-    if (!editableNote?.content.trim()) {
-      valid = false;
-    } else if (editableNote?.content.length > 500) {
-      setContentError("Description must be under 500 characters.");
-      valid = false;
-    } else {
-      setContentError("");
-    }
-
-    return valid;
+    setEditableNote({ ...editableNote, title: text } as any);
   };
+
+  const validateAddress = (text: string) => {
+    if (!text.trim()) {
+      setAddressError("Address cannot be empty.");
+    } else if (text.length > 50) {
+      setAddressError("Address must be under 50 characters.");
+    } else {
+      setAddressError(null);
+    }
+    setEditableNote({ ...editableNote, address: text } as any);
+  };
+
+  const validateContent = (text: string) => {
+    if (!text.trim()) {
+      setContentError("Note description is required.");
+    } else if (text.length > 500) {
+      setContentError("Description must be under 500 characters.");
+    } else {
+      setContentError(null);
+    }
+    setEditableNote({ ...editableNote, content: text } as any);
+  };
+
+  // Function to check if the save button should be disabled
+  const isSaveDisabled = !!(
+    titleError ||
+    contentError ||
+    addressError ||
+    !editableNote?.title.trim() ||
+    !editableNote?.content.trim() ||
+    !editableNote?.address.trim()
+  );
 
   // Handle Save
   const handleSave = async () => {
-    if (!validateInputs()) return;
-
     try {
       // Update database first
       await updateNote();
@@ -157,12 +166,12 @@ const NoteDetails: React.FC = ({ route }: any) => {
       console.error("Error updating note:", error);
     }
     Toast.show({
-      type: "success",
       position: "bottom",
-      text1: "Note updated",
-      text2: "Your changes have been saved successfully!",
       visibilityTime: 2000,
       autoHide: true,
+      type: "success",
+      text1: "Note updated",
+      text2: "Your changes have been saved successfully!",
     });
   };
 
@@ -374,9 +383,7 @@ const NoteDetails: React.FC = ({ route }: any) => {
               <>
                 <TextInput
                   value={editableNote?.title || ""}
-                  onChangeText={(text) =>
-                    setEditableNote({ ...editableNote, title: text } as any)
-                  }
+                  onChangeText={(text) => validateTitle(text)}
                   className="text-boxContainer text-4xl font-senMedium mb-2 border-b border-boxContainer"
                 />
                 {titleError ? (
@@ -403,14 +410,12 @@ const NoteDetails: React.FC = ({ route }: any) => {
                 <View className="flex-1">
                   <TextInput
                     value={editableNote?.address || ""}
-                    onChangeText={(text) =>
-                      setEditableNote({ ...editableNote, address: text } as any)
-                    }
+                    onChangeText={(text) => validateAddress(text)}
                     className="text-textBody text-base font-senRegular border-b border-textBody"
                   />
-                  {customAddressError ? (
+                  {addressError ? (
                     <Text className="text-buttonAccentRed font-senSemiBold text-sm">
-                      {customAddressError}
+                      {addressError}
                     </Text>
                   ) : null}
                 </View>
@@ -426,11 +431,9 @@ const NoteDetails: React.FC = ({ route }: any) => {
               <>
                 <TextInput
                   value={editableNote?.content || ""}
-                  onChangeText={(text) =>
-                    setEditableNote({ ...editableNote, content: text } as any)
-                  }
+                  onChangeText={(text) => validateContent(text)}
                   multiline
-                  className="text-textBody text-base font-senMedium border-b border-textBody mb-2"
+                  className="text-textBody text-wrap text-base font-senMedium border-b border-textBody mb-2"
                 />
                 {contentError ? (
                   <Text className="text-buttonAccentRed font-senSemiBold text-sm">
@@ -450,16 +453,10 @@ const NoteDetails: React.FC = ({ route }: any) => {
             {isEditing ? (
               <TouchableOpacity
                 className={`bg-buttonAccentRed rounded-3xl items-center justify-center w-1/2 px-5 py-3 ${
-                  editableNote?.title.trim() && editableNote?.content.trim()
-                    ? "bg-buttonAccentRed"
-                    : "bg-textInput"
+                  isSaveDisabled ? "bg-textInput" : "bg-buttonAccentRed"
                 }`}
                 onPress={() => setIsAlertSaveVisible(true)}
-                disabled={
-                  !editableNote?.title.trim() ||
-                  !editableNote?.content.trim() ||
-                  !editableNote?.address.trim()
-                }
+                disabled={isSaveDisabled}
               >
                 <Text className="text-textWhite text-sm font-senSemiBold">
                   Save
