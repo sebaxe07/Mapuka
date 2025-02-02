@@ -150,6 +150,7 @@ const UserData: React.FC = () => {
 
       <View className="flex-row items-center justify-center gap-6 mt-4">
         <Button
+          testID="discard"
           label="Discard"
           special
           onPress={() => setIsAlerCancelVisible(true)}
