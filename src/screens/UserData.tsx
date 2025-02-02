@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity } from "react-native";
+import { View, Text, TextInput } from "react-native";
 import { useAppSelector, useAppDispatch } from "../contexts/hooks";
 import { supabase } from "../utils/supabase";
 import { setUserData } from "../contexts/slices/userDataSlice";
@@ -16,32 +16,71 @@ const UserData: React.FC = () => {
   const [newFirstName, setNewFirstName] = useState(userData?.name || "");
   const [newLastName, setNewLastName] = useState(userData?.lastname || "");
 
+  const [firstNameError, setFirstNameError] = useState<string | null>(null);
+  const [lastNameError, setLastNameError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [isAlertSaveVisible, setIsAlertSaveVisible] = useState(false);
   const [isAlertCancelVisible, setIsAlerCancelVisible] = useState(false);
 
+  const validateFirstName = (text: string) => {
+    if (!text.trim()) {
+    } else if (text.length < 2) {
+      setFirstNameError("First name must be at least 2 characters.");
+    } else {
+      setFirstNameError(null);
+    }
+    setNewFirstName(text);
+  };
+
+  const validateLastName = (text: string) => {
+    if (!text.trim()) {
+    } else if (text.length < 2) {
+      setLastNameError("Last name must be at least 2 characters.");
+    } else {
+      setLastNameError(null);
+    }
+    setNewLastName(text);
+  };
+
   const handleSave = async () => {
-    if (!newFirstName.trim() || !newLastName.trim()) {
+    if (
+      firstNameError ||
+      lastNameError ||
+      !newFirstName.trim() ||
+      !newLastName.trim()
+    ) {
       Toast.show({
         type: "error",
         text1: "Invalid Input",
-        text2: "First and last name cannot be empty.",
+        text2: "Please fix errors before saving.",
       });
       return;
     }
 
+    setLoading(true);
     const { error } = await supabase
       .from("profiles")
-      .update({ name: newFirstName, lastname: newLastName })
+      .update({ name: newFirstName.trim(), lastname: newLastName.trim() })
       .eq("profile_id", userData?.profile_id);
+
+    setLoading(false);
 
     if (error) {
       console.error("Error updating name:", error.message);
+      Toast.show({
+        type: "error",
+        text1: "Update Failed",
+        text2: "An error occurred. Please try again.",
+      });
       return;
     }
 
     dispatch(
-      setUserData({ ...userData, name: newFirstName, lastname: newLastName })
+      setUserData({
+        ...userData,
+        name: newFirstName.trim(),
+        lastname: newLastName.trim(),
+      })
     );
     Toast.show({
       type: "success",
@@ -63,30 +102,48 @@ const UserData: React.FC = () => {
         <View className="flex-row w-full">
           <TextInput
             value={newFirstName}
-            onChangeText={setNewFirstName}
-            className="flex-1 text-boxContainer rounded-2xl bg-textInput text-2xl font-senRegular border-b border-boxContainer mb-4 px-4 py-2"
+            onChangeText={validateFirstName}
+            className="flex-1 text-boxContainer rounded-2xl bg-textInput text-2xl font-senRegular border-b border-boxContainer px-4 py-2"
           />
         </View>
+        {firstNameError && (
+          <Text className="text-buttonAccentRed font-senSemiBold text-sm mt-1">
+            {firstNameError}
+          </Text>
+        )}
 
         {/* Last Name */}
         <Text className="text-textInput text-xl font-senMedium">Last Name</Text>
         <View className="flex-row w-full">
           <TextInput
             value={newLastName}
-            onChangeText={setNewLastName}
-            className="flex-1 text-boxContainer rounded-2xl bg-textInput text-2xl font-senRegular border-b border-boxContainer mb-4 px-4 py-2"
+            onChangeText={validateLastName}
+            className="flex-1 text-boxContainer rounded-2xl bg-textInput text-2xl font-senRegular border-b border-boxContainer px-4 py-2"
           />
         </View>
+        {lastNameError && (
+          <Text className="text-buttonAccentRed font-senSemiBold text-sm mt-1">
+            {lastNameError}
+          </Text>
+        )}
       </View>
+
       <View className="flex-row items-center justify-center gap-6 mt-4">
         <Button
           label="Discard"
           special
-          onPress={() => {
-            setIsAlerCancelVisible(true);
-          }}
+          onPress={() => setIsAlerCancelVisible(true)}
         />
-        <Button label="Save" onPress={() => setIsAlertSaveVisible(true)} />
+        <Button
+          label="Save"
+          onPress={() => setIsAlertSaveVisible(true)}
+          disabled={
+            !!firstNameError ||
+            !!lastNameError ||
+            !newFirstName.trim() ||
+            !newLastName.trim()
+          }
+        />
       </View>
 
       {/* Save Confirmation Modal */}

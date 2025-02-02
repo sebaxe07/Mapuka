@@ -88,7 +88,7 @@ const NoteDetails: React.FC = ({ route }: any) => {
         title: editableNote?.title,
         content: editableNote?.content,
         address: editableNote?.address,
-        image: editableNote?.image
+        image: editableNote?.image,
       })
       .eq("note_id", note.note_id);
 
@@ -105,17 +105,14 @@ const NoteDetails: React.FC = ({ route }: any) => {
     let valid = true;
 
     if (!editableNote?.title.trim()) {
-      setTitleError("Title is required.");
       valid = false;
     } else if (editableNote?.title.length > 100) {
-      setTitleError("Title must be under 100 characters.");
       valid = false;
     } else {
       setTitleError("");
     }
 
     if (!editableNote?.address.trim()) {
-      setCustomAddressError("Adress is required.");
       valid = false;
     } else if (editableNote?.address.length > 50) {
       setCustomAddressError("Adress must be under 50 characters.");
@@ -125,7 +122,6 @@ const NoteDetails: React.FC = ({ route }: any) => {
     }
 
     if (!editableNote?.content.trim()) {
-      setContentError("Description is required.");
       valid = false;
     } else if (editableNote?.content.length > 500) {
       setContentError("Description must be under 500 characters.");
@@ -139,10 +135,6 @@ const NoteDetails: React.FC = ({ route }: any) => {
 
   // Handle Save
   const handleSave = async () => {
-
-    // BUG: if there are any invalid inputs, this will return without updating the image and without warning to the user
-    // If all inputs are valid then it will update the image.
-    // NOTE: A user can't create an image without description (it's validated by the frontend, so this shouldn't be a problem)
     if (!validateInputs()) return;
 
     try {
@@ -152,24 +144,26 @@ const NoteDetails: React.FC = ({ route }: any) => {
       // Update Redux state directly (global context)
       const updatedNotes = notesData.map((n) =>
         n.note_id === itemId ? { ...n, ...editableNote } : n
-    );
-      
-      console.log("Entered handleSave. Note image after update: ", editableNote?.image);
+      );
+
+      console.log(
+        "Entered handleSave. Note image after update: ",
+        editableNote?.image
+      );
       dispatch(setNotes(updatedNotes));
 
       setIsEditing(false);
-
-      Toast.show({
-        type: "success",
-        position: "bottom",
-        text1: "Note updated",
-        text2: "Your changes have been saved successfully!",
-        visibilityTime: 2000,
-        autoHide: true,
-      });
     } catch (error) {
       console.error("Error updating note:", error);
     }
+    Toast.show({
+      type: "success",
+      position: "bottom",
+      text1: "Note updated",
+      text2: "Your changes have been saved successfully!",
+      visibilityTime: 2000,
+      autoHide: true,
+    });
   };
 
   const deleteNote = async () => {
@@ -177,6 +171,10 @@ const NoteDetails: React.FC = ({ route }: any) => {
       .from("notes")
       .delete()
       .eq("note_id", note.note_id);
+    if (error) {
+      console.error("Error deleting note: ", error.message);
+      return;
+    }
     Toast.show({
       autoHide: true,
       position: "bottom",
@@ -185,10 +183,6 @@ const NoteDetails: React.FC = ({ route }: any) => {
       text1: "Note deleted",
       text2: "Note deleted successfully!",
     });
-    if (error) {
-      console.error("Error deleting note: ", error.message);
-      return;
-    }
   };
 
   // Handle Navigation to Coordinates
@@ -202,24 +196,26 @@ const NoteDetails: React.FC = ({ route }: any) => {
     }
   };
 
-  
   const [currentBackground, setCurrentBackground] = useState<number>(
     note.image
   ); // Stores confirmed background
   const [changedBackground, setChangedBackground] = useState<number>(
     note.image
   ); // Tracks live selection
-  
+
   const closeModal = () => {
     Keyboard.dismiss();
     setChangedBackground(currentBackground); // Reset selection on cancel
     setIsModalVisible(false);
   };
-  
+
   // Edit image on note when user changes the current image
   useEffect(() => {
     if (hasMounted) {
-      console.log("USEEFFECT1: Changing image in editable note to: ", currentBackground);
+      console.log(
+        "USEEFFECT1: Changing image in editable note to: ",
+        currentBackground
+      );
       setEditableNote({ ...editableNote, image: currentBackground } as any);
     }
   }, [currentBackground]);
@@ -227,11 +223,14 @@ const NoteDetails: React.FC = ({ route }: any) => {
   // Save image when editableNote changes that specific attribute
   useEffect(() => {
     if (hasMounted && editableNote !== null) {
-      console.log("USEEFFECT2: Changing image in DB and global context to: ", editableNote?.image);
+      console.log(
+        "USEEFFECT2: Changing image in DB and global context to: ",
+        editableNote?.image
+      );
       handleSave();
     }
   }, [editableNote?.image]);
-  
+
   const renderImagePickerModal = () => (
     <Modal
       visible={isModalVisible}
@@ -372,17 +371,20 @@ const NoteDetails: React.FC = ({ route }: any) => {
 
             {/* Title */}
             {isEditing ? (
-              <TextInput
-                placeholderClassName="text-buttonAccentRed text-4xl font-senMedium mb-4 border-b border-textBody"
-                placeholder={
-                  editableNote?.title.trim() ? "" : `${titleError}` // Error message
-                }
-                value={editableNote?.title || ""}
-                onChangeText={(text) =>
-                  setEditableNote({ ...editableNote, title: text } as any)
-                }
-                className="text-boxContainer text-4xl font-senMedium mb-4 border-b border-boxContainer"
-              />
+              <>
+                <TextInput
+                  value={editableNote?.title || ""}
+                  onChangeText={(text) =>
+                    setEditableNote({ ...editableNote, title: text } as any)
+                  }
+                  className="text-boxContainer text-4xl font-senMedium mb-2 border-b border-boxContainer"
+                />
+                {titleError ? (
+                  <Text className="text-buttonAccentRed font-senSemiBold text-sm">
+                    {titleError}
+                  </Text>
+                ) : null}
+              </>
             ) : (
               <Text className="text-boxContainer text-4xl font-senMedium mb-4">
                 {note.title}
@@ -390,7 +392,7 @@ const NoteDetails: React.FC = ({ route }: any) => {
             )}
 
             {/* Address */}
-            <View className="flex-row items-center mb-4">
+            <View className="flex-row items-center mb-2">
               <Place
                 width={16}
                 height={16}
@@ -398,17 +400,20 @@ const NoteDetails: React.FC = ({ route }: any) => {
                 style={{ marginRight: 8 }}
               />
               {isEditing ? (
-                <TextInput
-                  placeholderClassName="text-buttonAccentRed text-base font-senRegular  border-b border-textBody"
-                  placeholder={
-                    editableNote?.address.trim() ? "" : `${customAddressError}` // Error message
-                  }
-                  value={editableNote?.address || ""}
-                  onChangeText={(text) =>
-                    setEditableNote({ ...editableNote, address: text } as any)
-                  }
-                  className="text-textBody text-base font-senRegular border-b border-textBody"
-                />
+                <View className="flex-1">
+                  <TextInput
+                    value={editableNote?.address || ""}
+                    onChangeText={(text) =>
+                      setEditableNote({ ...editableNote, address: text } as any)
+                    }
+                    className="text-textBody text-base font-senRegular border-b border-textBody"
+                  />
+                  {customAddressError ? (
+                    <Text className="text-buttonAccentRed font-senSemiBold text-sm">
+                      {customAddressError}
+                    </Text>
+                  ) : null}
+                </View>
               ) : (
                 <Text className="text-textBody font-senRegular text-base">
                   {note.address}
@@ -418,18 +423,21 @@ const NoteDetails: React.FC = ({ route }: any) => {
 
             {/* Content */}
             {isEditing ? (
-              <TextInput
-                placeholderClassName="text-buttonAccentRed text-base font-senMedium border-b border-textBody"
-                placeholder={
-                  editableNote?.content.trim() ? "" : `${contentError}` // Error message
-                }
-                value={editableNote?.content || ""}
-                onChangeText={(text) =>
-                  setEditableNote({ ...editableNote, content: text } as any)
-                }
-                multiline
-                className="text-textBody text-base font-senMedium border-b border-textBody"
-              />
+              <>
+                <TextInput
+                  value={editableNote?.content || ""}
+                  onChangeText={(text) =>
+                    setEditableNote({ ...editableNote, content: text } as any)
+                  }
+                  multiline
+                  className="text-textBody text-base font-senMedium border-b border-textBody mb-2"
+                />
+                {contentError ? (
+                  <Text className="text-buttonAccentRed font-senSemiBold text-sm">
+                    {contentError}
+                  </Text>
+                ) : null}
+              </>
             ) : (
               <Text className="text-textBody font-senMedium text-base">
                 {note.content}
