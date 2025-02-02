@@ -94,6 +94,86 @@ describe("UserData", () => {
     });
   });
 
+  it("shows error when first or last name is less than 2 characters", async () => {
+    const rootReducer = combineReducers({
+      userData: userDataReducer,
+    });
+
+    const store = configureStore({
+      reducer: rootReducer,
+      preloadedState: initialState,
+    });
+
+    const updateSpy = jest.spyOn(supabase, "from").mockReturnValue({
+      update: jest.fn().mockReturnValue({
+        eq: jest.fn().mockResolvedValue({
+          data: null,
+          error: null,
+        }),
+      }),
+    } as any);
+
+    const { getByTestId } = renderWithProviders(<UserData />, {
+      store,
+    });
+
+    await act(async () => {
+      fireEvent.changeText(getByTestId("firstname"), "a");
+    });
+    await act(async () => {
+      fireEvent.changeText(getByTestId("lastname"), "a");
+    });
+
+    updateSpy.mockRestore();
+
+    await waitFor(() => {
+      expect(getByTestId("firstname-error")).toBeTruthy();
+      expect(getByTestId("lastname-error")).toBeTruthy();
+    });
+  });
+
+  it("it shows toast when discarding", async () => {
+    const rootReducer = combineReducers({
+      userData: userDataReducer,
+    });
+
+    const store = configureStore({
+      reducer: rootReducer,
+      preloadedState: initialState,
+    });
+
+    const updateSpy = jest.spyOn(supabase, "from").mockReturnValue({
+      update: jest.fn().mockReturnValue({
+        eq: jest.fn().mockResolvedValue({
+          data: null,
+          error: null,
+        }),
+      }),
+    } as any);
+
+    const { getByText, getByDisplayValue } = renderWithProviders(<UserData />, {
+      store,
+    });
+    await act(async () => {
+      fireEvent.changeText(getByDisplayValue("OldFirstName"), "NewFirstName");
+      fireEvent.changeText(getByDisplayValue("OldLastName"), "NewLastName");
+    });
+
+    await act(async () => {
+      fireEvent.press(getByText("Discard"));
+    });
+
+    await act(async () => {
+      fireEvent.press(getByText("Yes"));
+    });
+
+    await waitFor(() => {
+      expect(getByText("Yes")).toBeTruthy();
+    });
+
+    updateSpy.mockRestore();
+  });
+
   it("updates user data successfully", async () => {
     const rootReducer = combineReducers({
       userData: userDataReducer,
@@ -144,6 +224,81 @@ describe("UserData", () => {
     const state = store.getState();
     expect(state.userData.name).toBe("NewFirstName");
     expect(state.userData.lastname).toBe("NewLastName");
+
+    updateSpy.mockRestore();
+  });
+
+  it("cancels updates user data successfully", async () => {
+    const rootReducer = combineReducers({
+      userData: userDataReducer,
+    });
+
+    const store = configureStore({
+      reducer: rootReducer,
+      preloadedState: initialState,
+    });
+
+    const updateSpy = jest.spyOn(supabase, "from").mockReturnValue({
+      update: jest.fn().mockReturnValue({
+        eq: jest.fn().mockResolvedValue({
+          data: null,
+          error: null,
+        }),
+      }),
+    } as any);
+
+    const { getByText, getByDisplayValue } = renderWithProviders(<UserData />, {
+      store,
+    });
+    await act(async () => {
+      fireEvent.changeText(getByDisplayValue("OldFirstName"), "NewFirstName");
+      fireEvent.changeText(getByDisplayValue("OldLastName"), "NewLastName");
+    });
+
+    await act(async () => {
+      fireEvent.press(getByText("Save"));
+    });
+
+    await act(async () => {
+      fireEvent.press(getByText("Cancel"));
+    });
+
+    updateSpy.mockRestore();
+  });
+  it("cancels discard user data successfully", async () => {
+    const rootReducer = combineReducers({
+      userData: userDataReducer,
+    });
+
+    const store = configureStore({
+      reducer: rootReducer,
+      preloadedState: initialState,
+    });
+
+    const updateSpy = jest.spyOn(supabase, "from").mockReturnValue({
+      update: jest.fn().mockReturnValue({
+        eq: jest.fn().mockResolvedValue({
+          data: null,
+          error: null,
+        }),
+      }),
+    } as any);
+
+    const { getByText, getByDisplayValue } = renderWithProviders(<UserData />, {
+      store,
+    });
+    await act(async () => {
+      fireEvent.changeText(getByDisplayValue("OldFirstName"), "NewFirstName");
+      fireEvent.changeText(getByDisplayValue("OldLastName"), "NewLastName");
+    });
+
+    await act(async () => {
+      fireEvent.press(getByText("Discard"));
+    });
+
+    await act(async () => {
+      fireEvent.press(getByText("Cancel"));
+    });
 
     updateSpy.mockRestore();
   });
