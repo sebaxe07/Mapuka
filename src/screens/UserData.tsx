@@ -12,9 +12,11 @@ const UserData: React.FC = () => {
 
   const [firstName, setFirstName] = useState(userData?.name || "");
   const [lastName, setLastName] = useState(userData?.lastname || "");
+  const [newFirstName, setNewFirstName] = useState(userData?.name || "");
+  const [newLastName, setNewLastName] = useState(userData?.lastname || "");
 
   const handleSave = async () => {
-    if (!firstName.trim() || !lastName.trim()) {
+    if (!newFirstName.trim() || !newLastName.trim()) {
       Toast.show({
         type: "error",
         text1: "Invalid Input",
@@ -25,7 +27,7 @@ const UserData: React.FC = () => {
 
     const { error } = await supabase
       .from("profiles")
-      .update({ name: firstName, lastname: lastName })
+      .update({ name: newFirstName, lastname: newLastName })
       .eq("profile_id", userData?.profile_id);
 
     if (error) {
@@ -33,7 +35,9 @@ const UserData: React.FC = () => {
       return;
     }
 
-    dispatch(setUserData({ ...userData, name: firstName, lastname: lastName }));
+    dispatch(
+      setUserData({ ...userData, name: newFirstName, lastname: newLastName })
+    );
     Toast.show({
       type: "success",
       text1: "Profile Updated",
@@ -53,8 +57,8 @@ const UserData: React.FC = () => {
         </Text>
         <View className="flex-row w-full">
           <TextInput
-            value={firstName}
-            onChangeText={setFirstName}
+            value={newFirstName}
+            onChangeText={setNewFirstName}
             className="flex-1 text-boxContainer rounded-2xl bg-textInput text-2xl font-senRegular border-b border-boxContainer mb-4 px-4 py-2"
           />
         </View>
@@ -63,14 +67,21 @@ const UserData: React.FC = () => {
         <Text className="text-textInput text-xl font-senMedium">Last Name</Text>
         <View className="flex-row w-full">
           <TextInput
-            value={lastName}
-            onChangeText={setLastName}
+            value={newLastName}
+            onChangeText={setNewLastName}
             className="flex-1 text-boxContainer rounded-2xl bg-textInput text-2xl font-senRegular border-b border-boxContainer mb-4 px-4 py-2"
           />
         </View>
       </View>
       <View className="flex-row items-center justify-center gap-6 mt-4">
-        <Button label="Discard" special onPress={() => {}} />
+        <Button
+          label="Discard"
+          special
+          onPress={() => {
+            setNewFirstName(firstName);
+            setNewLastName(lastName);
+          }}
+        />
         <Button label="Save" onPress={handleSave} />
       </View>
     </View>
