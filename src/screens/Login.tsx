@@ -22,11 +22,7 @@ import { AnimatePresence, MotiView } from "moti";
 import InputField from "../components/InputField";
 import Button from "../components/Button";
 import BackArrow from "../components/backArrow";
-import { HeaderBackButton } from "@react-navigation/elements";
 import { Easing } from "react-native-reanimated";
-import { MotiPressable } from "moti/interactions";
-import { colors } from "../../colors";
-import AlertModal from "../components/AlertModal";
 
 interface LoginProps {}
 
@@ -80,6 +76,15 @@ const Login: React.FC<LoginProps> = ({}) => {
       forceUpdate(); // Custom method for triggering re-render
     }, 800); // Delay based on animation duration
   }, [signUp]);
+  useEffect(() => {
+    // This will force a re-render once the state changes after animation
+    setError("");
+    setErrorColor("text-red-500");
+    setTimeout(() => {
+      // Ensure any necessary state changes or layout updates
+      forceUpdate(); // Custom method for triggering re-render
+    }, 800); // Delay based on animation duration
+  }, [forgot]);
 
   const forceUpdate = React.useReducer(() => ({}), {})[1];
 
@@ -95,7 +100,7 @@ const Login: React.FC<LoginProps> = ({}) => {
       setError(
         result.message.charAt(0).toUpperCase() + result.message.slice(1)
       );
-      console.log("Error", result);
+      //      console.log("Error", result);
       setLoading(false);
 
       return;
@@ -141,7 +146,6 @@ const Login: React.FC<LoginProps> = ({}) => {
       setLoading(false);
       return;
     }
-
     if (password !== passwordConfirm) {
       setError("Passwords do not match");
       setLoading(false);
@@ -184,7 +188,6 @@ const Login: React.FC<LoginProps> = ({}) => {
 
       return;
     }
-
     // If result is undefined, the user has successfully logged in and navigate to the home
     if (result === undefined) {
       // Clear event listener for back button before navigating
@@ -241,7 +244,10 @@ const Login: React.FC<LoginProps> = ({}) => {
                   : "Welcome back!"}
             </Text>
             {error && (
-              <Text className={`${errorColor} text-base font-senRegular`}>
+              <Text
+                testID="error-message"
+                className={`${errorColor} text-base font-senRegular`}
+              >
                 {error}
               </Text>
             )}
@@ -315,6 +321,7 @@ const Login: React.FC<LoginProps> = ({}) => {
 
           <MotiView animate={{ opacity: signUp || forgot ? 0 : 1 }}>
             <TouchableOpacity
+              testID="forgot-button"
               onPress={() => setForgot(!forgot)}
               className=" self-end right-0 w-1/3 items-center justify-center flex"
             >
@@ -335,6 +342,7 @@ const Login: React.FC<LoginProps> = ({}) => {
               className="w-[48%]"
             >
               <Button
+                testID="signup-button"
                 label="Sign up"
                 special
                 onPress={() => setSignUp(true)}
@@ -352,6 +360,7 @@ const Login: React.FC<LoginProps> = ({}) => {
               className="w-[48%]"
             >
               <Button
+                testID="login-button"
                 label="Log in"
                 onPress={HandleLogin}
                 width="w-full"
@@ -374,6 +383,7 @@ const Login: React.FC<LoginProps> = ({}) => {
               }}
             >
               <Button
+                testID="reset-sign"
                 label={forgot ? "Send email" : "Sign up"}
                 onPress={forgot ? HandleReset : HandleSignUp}
                 width="w-[48%]"
