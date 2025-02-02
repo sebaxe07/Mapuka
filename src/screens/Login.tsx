@@ -46,16 +46,19 @@ const Login: React.FC<LoginProps> = ({}) => {
   const [lastname, setLastname] = useState("");
 
   const [signUp, setSignUp] = useState(false);
+  const [forgot, setForgot] = useState(false);
 
   const AnimateSignUp = () => {
     console.log("Animating");
-    setSignUp(!signUp);
+    setSignUp(false);
+    setForgot(false);
   };
 
   const backAction = () => {
     // Check if the user is on the login screen
     console.log("Back actionA");
     setSignUp(false);
+    setForgot(false);
     // If the user is on the login screen, exit the app
     return true;
   };
@@ -105,6 +108,28 @@ const Login: React.FC<LoginProps> = ({}) => {
     }
 
     setLoading(false);
+  };
+
+  const HandleReset = async () => {
+    setLoading(true);
+    setErrorColor("text-red-500");
+    setError("");
+    if (email.length < 1) {
+      setError("Email cannot be empty");
+      return;
+    }
+
+    const { error } = await supabase.auth.resetPasswordForEmail(email);
+
+    if (error) {
+      setError(error.message);
+      return;
+    }
+
+    setError("Email sent, please check your inbox");
+    setErrorColor("text-green-500");
+    setLoading(false);
+    setForgot(false);
   };
 
   const HandleSignUp = async () => {
@@ -185,14 +210,17 @@ const Login: React.FC<LoginProps> = ({}) => {
 
   return (
     <View className="flex-1 flex-col items-center justify-end bg-bgMain">
-      {signUp && (
+      {(signUp || forgot) && (
         <TouchableOpacity className="absolute top-14 left-7  z-10">
           <BackArrow size={35} onpress={AnimateSignUp} />
         </TouchableOpacity>
       )}
 
       <MotiView
-        animate={{ scale: signUp ? 2 : 1, translateY: signUp ? 200 : 0 }}
+        animate={{
+          scale: forgot ? 1.5 : signUp ? 2 : 1,
+          translateY: signUp ? 200 : 0,
+        }}
         transition={{ type: "timing", duration: 800 } as any}
         className="absolute top-0 left-0 right-0 bottom-0  "
       >
@@ -201,12 +229,16 @@ const Login: React.FC<LoginProps> = ({}) => {
       <KeyboardAvoidingView behavior="padding" keyboardVerticalOffset={-150}>
         <View className=" mb-24 mx-14 ">
           <MotiView
-            animate={{ translateY: signUp ? 0 : 170 }}
+            animate={{ translateY: forgot ? 220 : signUp ? 0 : 170 }}
             transition={{ type: "timing", duration: 300 } as any}
           >
             <LogoMapuka />
             <Text className="text-white text-2xl font-senMedium mt-[1.96rem]">
-              {signUp ? "Sign up " : "Welcome back!"}
+              {forgot
+                ? "Please enter your email to reset your password"
+                : signUp
+                  ? "Sign up "
+                  : "Welcome back!"}
             </Text>
             {error && (
               <Text className={`${errorColor} text-base font-senRegular`}>
@@ -222,14 +254,26 @@ const Login: React.FC<LoginProps> = ({}) => {
                 logo={true}
                 rowWidth="w-96"
               />
-              <InputField
-                onChangeText={setPassword}
-                value={password}
-                leftIcon={{ type: "font-awesome", name: "lock" }}
-                placeholder="Password"
-                logo={true}
-                rowWidth="w-96"
-              />
+              <MotiView
+                animate={{
+                  opacity: !forgot ? 1 : 0,
+                  scaleY: !forgot ? 1 : 0,
+                }}
+                transition={{
+                  opacity: { type: "timing", duration: 100 },
+                  scaleY: { type: "timing", duration: 300 },
+                }}
+                className="gap-[1.22rem] "
+              >
+                <InputField
+                  onChangeText={setPassword}
+                  value={password}
+                  leftIcon={{ type: "font-awesome", name: "lock" }}
+                  placeholder="Password"
+                  logo={true}
+                  rowWidth="w-96"
+                />
+              </MotiView>
               <MotiView
                 animate={{
                   opacity: signUp ? 1 : 0,
@@ -269,9 +313,9 @@ const Login: React.FC<LoginProps> = ({}) => {
             </MotiView>
           </MotiView>
 
-          <MotiView animate={{ opacity: signUp ? 0 : 1 }}>
+          <MotiView animate={{ opacity: signUp || forgot ? 0 : 1 }}>
             <TouchableOpacity
-              onPress={() => {}}
+              onPress={() => setForgot(!forgot)}
               className=" self-end right-0 w-1/3 items-center justify-center flex"
             >
               <Text className="text-textInput text-sm font-senMedium text-center">
@@ -283,7 +327,7 @@ const Login: React.FC<LoginProps> = ({}) => {
           <MotiView className="flex flex-row items-center justify-between mt-[3rem] ">
             <MotiView
               animate={{
-                opacity: signUp ? 0 : 1,
+                opacity: signUp || forgot ? 0 : 1,
               }}
               transition={
                 { type: "timing", duration: 300, easing: Easing.linear } as any
@@ -300,7 +344,7 @@ const Login: React.FC<LoginProps> = ({}) => {
             </MotiView>
             <MotiView
               animate={{
-                opacity: signUp ? 0 : 1,
+                opacity: signUp || forgot ? 0 : 1,
               }}
               transition={
                 { type: "timing", duration: 300, easing: Easing.linear } as any
@@ -316,8 +360,8 @@ const Login: React.FC<LoginProps> = ({}) => {
             </MotiView>
             <MotiView
               animate={{
-                opacity: signUp ? 1 : 0,
-                translateY: signUp ? 0 : 100,
+                opacity: signUp || forgot ? 1 : 0,
+                translateY: signUp || forgot ? 0 : 100,
               }}
               transition={{
                 opacity: { type: "timing", duration: 100 },
@@ -330,8 +374,8 @@ const Login: React.FC<LoginProps> = ({}) => {
               }}
             >
               <Button
-                label="Create account"
-                onPress={HandleSignUp}
+                label={forgot ? "Send email" : "Sign up"}
+                onPress={forgot ? HandleReset : HandleSignUp}
                 width="w-[48%]"
                 disabled={loading}
               />
