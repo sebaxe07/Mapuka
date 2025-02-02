@@ -1,22 +1,23 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { View, TouchableOpacity, Alert } from "react-native";
-import MapboxGL from "@rnmapbox/maps";
 import * as Icons from "../../assets/icons/home";
 import FloatingNavbar from "../components/FloatingNavbar";
-import * as Location from "expo-location";
-import { MAPBOX_ACCESS_TOKEN } from "@env";
 import SearchBar from "../components/SearchBar";
 import Compass from "../components/Compass";
-import MaskedView from "@react-native-masked-view/masked-view";
-import NavbarBase from "../../assets/images/navbarbase.svg";
 import { colors } from "../../colors";
 import { Easing } from "react-native-reanimated";
 import { MotiView } from "moti";
 import Map from "./MapFog";
 
-MapboxGL.setAccessToken(MAPBOX_ACCESS_TOKEN);
+interface HomeProps {
+  route?: {
+    params: {
+      externalCoordinates: { latitude: number; longitude: number };
+    };
+  };
+}
 
-const Home: React.FC = ({ route }: any) => {
+const Home: React.FC<HomeProps> = ({ route }: any) => {
   const [text, setText] = useState(""); // Text entered in the search bar
   const [searchText, setSearchText] = useState(""); // Trigger for search
   const [triggerAction, setTriggerAction] = useState(""); // Action triggers (e.g., GPS)
@@ -96,6 +97,7 @@ const Home: React.FC = ({ route }: any) => {
           }
         >
           <TouchableOpacity
+            testID="change-default"
             className="bg-[#1a1b3f] rounded-full items-center justify-center size-14"
             onPress={handleMapCustom}
           >
@@ -113,6 +115,7 @@ const Home: React.FC = ({ route }: any) => {
           }
         >
           <TouchableOpacity
+            testID="change-dark"
             className="bg-[#292929]  rounded-full items-center justify-center size-14"
             onPress={handleMapDark}
           >
@@ -131,6 +134,7 @@ const Home: React.FC = ({ route }: any) => {
           }
         >
           <TouchableOpacity
+            testID="change-light"
             className="bg-white  rounded-full items-center justify-center size-14"
             onPress={handleMapLight}
           >
@@ -178,6 +182,7 @@ const Home: React.FC = ({ route }: any) => {
             {/* Top Right Buttons */}
             <View className="items-end gap-3">
               <TouchableOpacity
+                testID="change-theme"
                 className="bg-buttonPurple  rounded-full items-center justify-center size-14 z-10"
                 onPress={() => setChangeTheme(!changeTheme)}
               >
@@ -197,6 +202,7 @@ const Home: React.FC = ({ route }: any) => {
 
             <View className=" gap-4 items-end">
               <TouchableOpacity
+                testID="gps"
                 className="bg-buttonAqua rounded-full items-center justify-center size-14"
                 onPress={() => setTriggerAction("gps")}
               >

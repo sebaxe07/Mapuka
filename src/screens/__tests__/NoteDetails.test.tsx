@@ -113,6 +113,15 @@ describe("NoteDetails", () => {
     expect(getByText("Test Address")).toBeTruthy();
   });
 
+  it("renders error when note not found", () => {
+    const { getByText } = renderWithProviders(
+      <NoteDetails route={{ params: { itemId: "2" } }} />,
+      { store }
+    );
+
+    expect(getByText("Note not found.")).toBeTruthy();
+  });
+
   it("validates inputs length correctly", async () => {
     const { debug, getByText, getByTestId } = renderWithProviders(
       <NoteDetails route={{ params: { itemId: "1" } }} />,
@@ -338,5 +347,91 @@ describe("NoteDetails", () => {
 
     deleteSpy.mockRestore();
     consoleSpy.mockRestore();
+  });
+
+  it("renders change bg modal correctly", async () => {
+    const { getByText, getByTestId } = renderWithProviders(
+      <NoteDetails route={{ params: { itemId: "1" } }} />,
+      { store }
+    );
+
+    await act(async () => {
+      fireEvent.press(getByTestId("change-bg"));
+    });
+
+    await waitFor(() => {
+      expect(getByText("Change Note Background")).toBeTruthy();
+      expect(getByTestId("Style0")).toBeTruthy();
+      expect(getByTestId("Style1")).toBeTruthy();
+      expect(getByTestId("Style2")).toBeTruthy();
+      expect(getByTestId("Style3")).toBeTruthy();
+      expect(getByTestId("Style4")).toBeTruthy();
+      expect(getByTestId("Style5")).toBeTruthy();
+    });
+
+    await act(async () => {
+      fireEvent.press(getByTestId("Style0"));
+    });
+  });
+
+  it("updates note background successfully", async () => {
+    const { getByText, getByTestId } = renderWithProviders(
+      <NoteDetails route={{ params: { itemId: "1" } }} />,
+      { store }
+    );
+
+    await act(async () => {
+      fireEvent.press(getByTestId("change-bg"));
+    });
+
+    await act(async () => {
+      fireEvent.press(getByTestId("Style3"));
+    });
+
+    await act(async () => {
+      fireEvent.press(getByTestId("cancel-save"));
+    });
+
+    await waitFor(() => {
+      fireEvent.press(getByText("Yes"));
+    });
+  });
+
+  it("closes change bg modal successfully", async () => {
+    const { getByText, getByTestId } = renderWithProviders(
+      <NoteDetails route={{ params: { itemId: "1" } }} />,
+      { store }
+    );
+
+    await act(async () => {
+      fireEvent.press(getByTestId("change-bg"));
+    });
+
+    await act(async () => {
+      fireEvent.press(getByTestId("cancel-save"));
+    });
+  });
+
+  it("cancels the change bg modal successfully", async () => {
+    const { getByText, getByTestId } = renderWithProviders(
+      <NoteDetails route={{ params: { itemId: "1" } }} />,
+      { store }
+    );
+
+    await act(async () => {
+      fireEvent.press(getByTestId("change-bg"));
+    });
+
+    await act(async () => {
+      fireEvent.press(getByTestId("Style3"));
+    });
+
+    await act(async () => {
+      fireEvent.press(getByTestId("cancel-save"));
+    });
+
+    await act(async () => {
+      fireEvent.press(getByText("No"));
+    });
   });
 });

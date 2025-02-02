@@ -279,6 +279,7 @@ const NoteDetails: React.FC<NoteDetailsProps> = ({ route }) => {
                 const isSelected = changedBackground === index;
                 return (
                   <TouchableOpacity
+                    testID={`Style${index}`}
                     onPress={() => setChangedBackground(index)} // Update temporary selection
                     className="mr-4 w-24 h-24 rounded-lg items-center justify-center"
                     style={
@@ -299,6 +300,7 @@ const NoteDetails: React.FC<NoteDetailsProps> = ({ route }) => {
             />
 
             <TouchableOpacity
+              testID="cancel-save"
               className={`rounded-3xl items-center justify-center w-1/2 mt-6 px-5 py-3 self-center ${
                 changedBackground === currentBackground
                   ? "bg-bgMain"
@@ -351,7 +353,10 @@ const NoteDetails: React.FC<NoteDetailsProps> = ({ route }) => {
         <View className="flex-row w-full justify-between px-6 items-center">
           <View className="flex-row gap-5">
             {/* Image Picker */}
-            <TouchableOpacity onPress={() => setIsModalVisible(true)}>
+            <TouchableOpacity
+              testID="change-bg"
+              onPress={() => setIsModalVisible(true)}
+            >
               <Settings />
             </TouchableOpacity>
             {/* Edit / Save Button */}
