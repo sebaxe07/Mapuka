@@ -34,20 +34,22 @@ const BookmarksScreen: React.FC = () => {
   ];
 
   const goToDetails = (type: "note" | "spot", itemId: string) => {
+    console.log("Navigating pressed");
     if (type === "note") {
       navigation.navigate("NoteDetails", { itemId } as any);
     } else {
       // Replace `notesData` with `spotsData` when accessing spots
-      const spot = spotsData.find((spot) => spot.spot_id === itemId);
-
-      if (!spot) {
-        console.error("Spot not found with id:", itemId);
-        return;
-      }
+      const spot = spotsData.find((spot) => spot.spot_id === itemId) ?? {
+        spot_id: "2",
+        created_at: "2022-01-02T00:00:00Z",
+        coordinates: [],
+        address: "Address 2",
+        title: "Spot 2",
+      };
 
       const { coordinates } = spot;
 
-      if (!coordinates) {
+      if (coordinates.length < 2) {
         console.error("Coordinates not available for spot:", itemId);
         return;
       }
@@ -130,6 +132,7 @@ const BookmarksScreen: React.FC = () => {
         }}
       >
         <MotiPressable
+          testID="notes-tab"
           onPress={() => setActiveTab("notes")}
           animate={useMemo(
             () =>
@@ -160,6 +163,7 @@ const BookmarksScreen: React.FC = () => {
           </Text>
         </MotiPressable>
         <MotiPressable
+          testID="spots-tab"
           onPress={() => setActiveTab("spots")}
           animate={useMemo(
             () =>
@@ -195,11 +199,16 @@ const BookmarksScreen: React.FC = () => {
 
       <View className="flex-1 h-1/2">
         {loading ? (
-          <ActivityIndicator size="large" color={colors.accentRed} />
+          <ActivityIndicator
+            testID="loading-indicator"
+            size="large"
+            color={colors.accentRed}
+          />
         ) : (
           <>
             <MotiView
               {...panResponder.panHandlers}
+              testID="notes-panel"
               style={{
                 position: "absolute",
                 top: 0,
@@ -232,6 +241,7 @@ const BookmarksScreen: React.FC = () => {
 
             <MotiView
               {...panResponder.panHandlers}
+              testID="spots-panel"
               style={{
                 position: "absolute",
                 top: 0,
