@@ -6,7 +6,7 @@ import Toast from "react-native-toast-message";
 import { Provider } from "react-redux";
 import userDataReducer from "../../contexts/slices/userDataSlice";
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
-import { useNavigation } from "@react-navigation/native";
+import { NavigationContainer, useNavigation } from "@react-navigation/native";
 
 /* Mock All Icons
 import Settings from "../../assets/icons/bookmarks/settings.svg";
@@ -34,14 +34,16 @@ jest.mock("../../utils/supabase");
 jest.mock("react-native-toast-message", () => ({
   show: jest.fn(),
 }));
-jest.mock("@react-navigation/native", () => ({
-  useNavigation: jest.fn(),
-}));
+
 jest.mock("@env");
 jest.mock("@react-native-async-storage/async-storage", () =>
   require("@react-native-async-storage/async-storage/jest/async-storage-mock")
 );
-
+jest.mock("@react-navigation/native", () => ({
+  useNavigation: () => ({
+    goBack: jest.fn(),
+  }),
+}));
 const initialState = {
   userData: {
     session: null,
@@ -111,7 +113,7 @@ describe("NoteDetails", () => {
     expect(getByText("Test Address")).toBeTruthy();
   });
 
-  /*   it("validates inputs correctly", async () => {
+  it("validates inputs length correctly", async () => {
     const { debug, getByText, getByTestId } = renderWithProviders(
       <NoteDetails route={{ params: { itemId: "1" } }} />,
       { store }
@@ -123,64 +125,39 @@ describe("NoteDetails", () => {
 
     await waitFor(() => {
       fireEvent.changeText(getByTestId("title-edit"), "a".repeat(101));
-    });
-    await act(async () => {
-      fireEvent.press(getByTestId("save"));
-    });
-    await act(async () => {
-      fireEvent.press(getByTestId("confirm-button"));
-    });
-    debug();
-    await waitFor(() => {
-      expect(Toast.show).toHaveBeenCalledWith({
-        type: "error",
-        text1: "Invalid Input",
-        text2: "Title is required.",
-      });
-    });
-
-    await waitFor(() => {
-      fireEvent.changeText(getByTestId("title-edit"), "title");
-    });
-    await waitFor(() => {
       fireEvent.changeText(getByTestId("address-edit"), "a".repeat(51));
-    });
-    await act(async () => {
-      fireEvent.press(getByTestId("save"));
-    });
-    await act(async () => {
-      fireEvent.press(getByTestId("confirm-button"));
-    });
-    await waitFor(() => {
-      expect(Toast.show).toHaveBeenCalledWith({
-        type: "error",
-        text1: "Invalid Input",
-        text2: "Address is required.",
-      });
-    });
-
-    await waitFor(() => {
-      fireEvent.changeText(getByTestId("address-edit"), "address");
-    });
-    await waitFor(() => {
       fireEvent.changeText(getByTestId("content-edit"), "a".repeat(501));
     });
-    await act(async () => {
-      fireEvent.press(getByTestId("save"));
+    await waitFor(() => {
+      expect(getByTestId("title-error")).toBeTruthy();
+      expect(getByTestId("address-error")).toBeTruthy();
+      expect(getByTestId("content-error")).toBeTruthy();
     });
+  });
+
+  it("validates inputs empty correctly", async () => {
+    const { debug, getByText, getByTestId } = renderWithProviders(
+      <NoteDetails route={{ params: { itemId: "1" } }} />,
+      { store }
+    );
+
     await act(async () => {
-      fireEvent.press(getByTestId("confirm-button"));
+      fireEvent.press(getByText("Edit"));
+    });
+
+    await waitFor(() => {
+      fireEvent.changeText(getByTestId("title-edit"), "");
+      fireEvent.changeText(getByTestId("address-edit"), "");
+      fireEvent.changeText(getByTestId("content-edit"), "");
     });
     await waitFor(() => {
-      expect(Toast.show).toHaveBeenCalledWith({
-        type: "error",
-        text1: "Invalid Input",
-        text2: "Description is required.",
-      });
+      expect(getByTestId("title-error")).toBeTruthy();
+      expect(getByTestId("address-error")).toBeTruthy();
+      expect(getByTestId("content-error")).toBeTruthy();
     });
-  }); */
+  });
 
-  /*   it("updates note successfully", async () => {
+  it("updates note successfully", async () => {
     const updateSpy = jest.spyOn(supabase, "from").mockReturnValue({
       update: jest.fn().mockReturnValue({
         eq: jest.fn().mockResolvedValue({
@@ -190,7 +167,7 @@ describe("NoteDetails", () => {
       }),
     } as any);
 
-    const { getByText, getByPlaceholderText } = renderWithProviders(
+    const { getByText, getByTestId } = renderWithProviders(
       <NoteDetails route={{ params: { itemId: "1" } }} />,
       { store }
     );
@@ -199,15 +176,16 @@ describe("NoteDetails", () => {
       fireEvent.press(getByText("Edit"));
     });
 
-    fireEvent.changeText(getByPlaceholderText("Title"), "Updated Title");
-    fireEvent.changeText(
-      getByPlaceholderText("Description"),
-      "Updated Description"
-    );
-    fireEvent.changeText(getByPlaceholderText("Address"), "Updated Address");
+    fireEvent.changeText(getByTestId("title-edit"), "Updated Title");
+    fireEvent.changeText(getByTestId("content-edit"), "Updated Description");
+    fireEvent.changeText(getByTestId("address-edit"), "Updated Address");
 
     await act(async () => {
       fireEvent.press(getByText("Save"));
+    });
+
+    await waitFor(() => {
+      fireEvent.press(getByText("Yes"));
     });
 
     await waitFor(() => {
@@ -226,9 +204,12 @@ describe("NoteDetails", () => {
     const updatedNote = state.userData.notes.find(
       (note) => note.note_id === "1"
     );
-    expect(updatedNote.title).toBe("Updated Title");
-    expect(updatedNote.content).toBe("Updated Description");
-    expect(updatedNote.address).toBe("Updated Address");
+    expect(updatedNote).toBeDefined();
+    if (updatedNote) {
+      expect(updatedNote.title).toBe("Updated Title");
+      expect(updatedNote.content).toBe("Updated Description");
+      expect(updatedNote.address).toBe("Updated Address");
+    }
 
     updateSpy.mockRestore();
   });
@@ -245,7 +226,7 @@ describe("NoteDetails", () => {
 
     const consoleSpy = jest.spyOn(console, "error").mockImplementation();
 
-    const { getByText, getByPlaceholderText } = renderWithProviders(
+    const { getByText, getByTestId } = renderWithProviders(
       <NoteDetails route={{ params: { itemId: "1" } }} />,
       { store }
     );
@@ -254,15 +235,16 @@ describe("NoteDetails", () => {
       fireEvent.press(getByText("Edit"));
     });
 
-    fireEvent.changeText(getByPlaceholderText("Title"), "Updated Title");
-    fireEvent.changeText(
-      getByPlaceholderText("Description"),
-      "Updated Description"
-    );
-    fireEvent.changeText(getByPlaceholderText("Address"), "Updated Address");
+    fireEvent.changeText(getByTestId("title-edit"), "Updated Title");
+    fireEvent.changeText(getByTestId("content-edit"), "Updated Description");
+    fireEvent.changeText(getByTestId("address-edit"), "Updated Address");
 
     await act(async () => {
       fireEvent.press(getByText("Save"));
+    });
+
+    await waitFor(() => {
+      fireEvent.press(getByText("Yes"));
     });
 
     await waitFor(() => {
@@ -277,7 +259,7 @@ describe("NoteDetails", () => {
     consoleSpy.mockRestore();
   });
 
-  it("deletes note successfully", async () => {
+  /*   it("deletes note successfully", async () => {
     const deleteSpy = jest.spyOn(supabase, "from").mockReturnValue({
       delete: jest.fn().mockReturnValue({
         eq: jest.fn().mockResolvedValue({
@@ -287,12 +269,16 @@ describe("NoteDetails", () => {
       }),
     } as any);
 
-    const { getByText } = renderWithProviders(
+    const { getByText, getByTestId } = renderWithProviders(
       <NoteDetails route={{ params: { itemId: "1" } }} />,
       { store }
     );
 
     await act(async () => {
+      fireEvent.press(getByTestId("delete"));
+    });
+
+    await waitFor(() => {
       fireEvent.press(getByText("Delete"));
     });
 
@@ -315,7 +301,7 @@ describe("NoteDetails", () => {
     expect(deletedNote).toBeUndefined();
 
     deleteSpy.mockRestore();
-  });
+  }); */
 
   it("shows error when deleting note fails", async () => {
     const deleteSpy = jest.spyOn(supabase, "from").mockReturnValue({
@@ -329,12 +315,16 @@ describe("NoteDetails", () => {
 
     const consoleSpy = jest.spyOn(console, "error").mockImplementation();
 
-    const { getByText } = renderWithProviders(
+    const { debug, getByText, getByTestId } = renderWithProviders(
       <NoteDetails route={{ params: { itemId: "1" } }} />,
       { store }
     );
-
+    debug();
     await act(async () => {
+      fireEvent.press(getByTestId("delete"));
+    });
+
+    await waitFor(() => {
       fireEvent.press(getByText("Delete"));
     });
 
@@ -348,5 +338,5 @@ describe("NoteDetails", () => {
 
     deleteSpy.mockRestore();
     consoleSpy.mockRestore();
-  }); */
+  });
 });

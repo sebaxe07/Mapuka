@@ -200,6 +200,13 @@ const NoteDetails: React.FC<NoteDetailsProps> = ({ route }) => {
       text1: "Note deleted",
       text2: "Note deleted successfully!",
     });
+
+    // Update Redux state directly (global state)
+    const filteredNotes = notesData.filter((n) => n.note_id !== itemId);
+    dispatch(setNotes(filteredNotes));
+
+    // Navigate back only after state updates
+    navigation.goBack();
   };
 
   // Handle Navigation to Coordinates
@@ -369,6 +376,7 @@ const NoteDetails: React.FC<NoteDetailsProps> = ({ route }) => {
           {/* Delete Note */}
           <View className="justify-center items-center ">
             <TouchableOpacity
+              testID="delete"
               onPress={() => {
                 setIsAlertDeleteVisible(true);
               }}
@@ -396,7 +404,10 @@ const NoteDetails: React.FC<NoteDetailsProps> = ({ route }) => {
                   className="text-boxContainer text-4xl font-senMedium mb-2 border-b border-boxContainer"
                 />
                 {titleError ? (
-                  <Text className="text-buttonAccentRed font-senSemiBold text-sm">
+                  <Text
+                    testID="title-error"
+                    className="text-buttonAccentRed font-senSemiBold text-sm"
+                  >
                     {titleError}
                   </Text>
                 ) : null}
@@ -424,7 +435,10 @@ const NoteDetails: React.FC<NoteDetailsProps> = ({ route }) => {
                     className="text-textBody text-base font-senRegular border-b border-textBody"
                   />
                   {addressError ? (
-                    <Text className="text-buttonAccentRed font-senSemiBold text-sm">
+                    <Text
+                      testID="address-error"
+                      className="text-buttonAccentRed font-senSemiBold text-sm"
+                    >
                       {addressError}
                     </Text>
                   ) : null}
@@ -447,7 +461,10 @@ const NoteDetails: React.FC<NoteDetailsProps> = ({ route }) => {
                   className="text-textBody text-wrap text-base font-senMedium border-b border-textBody mb-2"
                 />
                 {contentError ? (
-                  <Text className="text-buttonAccentRed font-senSemiBold text-sm">
+                  <Text
+                    testID="content-error"
+                    className="text-buttonAccentRed font-senSemiBold text-sm"
+                  >
                     {contentError}
                   </Text>
                 ) : null}
@@ -534,13 +551,6 @@ const NoteDetails: React.FC<NoteDetailsProps> = ({ route }) => {
           try {
             // Delete from database first
             await deleteNote();
-
-            // Update Redux state directly (global state)
-            const filteredNotes = notesData.filter((n) => n.note_id !== itemId);
-            dispatch(setNotes(filteredNotes));
-
-            // Navigate back only after state updates
-            navigation.goBack();
           } catch (error) {
             console.error("Error deleting note:", error);
           }

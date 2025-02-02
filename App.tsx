@@ -48,7 +48,7 @@ function useIsSignedOut() {
   return isSignedIn === false || isSignedIn === null;
 }
 
-const RootStack = createNativeStackNavigator({
+export const RootStack = createNativeStackNavigator({
   screenOptions: {
     headerShown: false,
     statusBarTranslucent: true,
