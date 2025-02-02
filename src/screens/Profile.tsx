@@ -92,6 +92,7 @@ const Profile: React.FC = () => {
 
   async function uploadAvatar() {
     try {
+      console.log("Uploading avatar");
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images, // Restrict to only images
         allowsMultipleSelection: false, // Can only select one image
@@ -99,7 +100,6 @@ const Profile: React.FC = () => {
         quality: 1,
         exif: false, // We don't want nor need that data.
       });
-
       if (result.canceled || !result.assets || result.assets.length === 0) {
         console.log("User cancelled image picker.");
         return;
@@ -156,20 +156,20 @@ const Profile: React.FC = () => {
 
     if (error) {
       console.error("Error fetching existing images:", error);
-      throw error;
+      //throw error;
     } else {
       if (listdata && listdata.length > 0) {
         console.log("Existing images:", listdata);
         // Delete all the images in the folder
         for (const file of listdata) {
           const deletePath = `${userData.profile_id}/${file.name}`;
-          console.log("\x1b[31m", "Deleting existing image:", deletePath);
+          console.log("Deleting existing image:", deletePath);
           const { error: deleteError } = await supabase.storage
             .from("avatars")
             .remove([deletePath]);
           if (deleteError) {
             console.error("Error deleting existing image:", deleteError);
-            throw deleteError;
+            //throw deleteError;
           }
         }
       }
@@ -183,7 +183,7 @@ const Profile: React.FC = () => {
       });
     if (uploadError) {
       console.error("Error uploading image:", uploadError);
-      throw uploadError;
+      //throw uploadError;
     }
 
     console.log("Uploaded image data: ", data);
@@ -192,8 +192,9 @@ const Profile: React.FC = () => {
       .from("avatars")
       .getPublicUrl(FinalPath);
 
+    console.log("Image URL: ", imageUrl);
     if (!imageUrl) {
-      console.error("Error fetching signed URL for photo:", FinalPath);
+      console.error("No reply for: ", FinalPath);
       return;
     }
     if (!imageUrl.data) {
@@ -211,6 +212,14 @@ const Profile: React.FC = () => {
       })
     );
 
+    setImage(null);
+
+    // save the image URL to the database
+    const { error: dbError } = await supabase
+      .from("profiles")
+      .update({ pic_url: imageUrl.data.publicUrl })
+      .eq("profile_id", userData.profile_id);
+
     Toast.show({
       type: "success",
       position: "bottom",
@@ -220,17 +229,9 @@ const Profile: React.FC = () => {
       autoHide: true,
     });
 
-    setImage(null);
-
-    // save the image URL to the database
-    const { error: dbError } = await supabase
-      .from("profiles")
-      .update({ pic_url: imageUrl.data.publicUrl })
-      .eq("profile_id", userData.profile_id);
-
     if (dbError) {
       console.error("Error updating image URL in the database:", dbError);
-      throw dbError;
+      //throw dbError;
     }
 
     console.log("Uploaded image URL: ", imageUrl);
@@ -263,6 +264,7 @@ const Profile: React.FC = () => {
           <View className="flex-1 items-center justify-center">
             <View className="flex-[0.60]  size-full items-center justify-center">
               <TouchableOpacity
+                testID="upload-avatar"
                 onPress={uploadAvatar}
                 style={{
                   aspectRatio: 1,
@@ -389,6 +391,7 @@ const Profile: React.FC = () => {
       {/* Logout Button */}
       <View className="flex-row items-start py-3 rounded-lg justify-start ">
         <TouchableOpacity
+          testID="logout"
           className="flex-row items-center py-3 rounded-lg justify-center "
           onPress={() => setIsModalVisible(true)}
         >
