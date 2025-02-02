@@ -77,10 +77,10 @@ describe("Home Screen", () => {
   });
 
   it("handles search trigger", () => {
-    const { debug, getByTestId } = render(<Home />);
-    debug();
+    const { getByTestId } = render(<Home />);
+
     fireEvent.changeText(getByTestId("search-input-mocked"), "Test Place");
-    debug();
+
     fireEvent.press(getByTestId("search-bar-mocked"));
   });
 

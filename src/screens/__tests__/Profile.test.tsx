@@ -417,8 +417,20 @@ describe("Profile Screen", () => {
 
     debug();
 
+    const createdDate = new Date(initialState.userData.created_at);
+    const currentDate = new Date();
+    const timeDiff = Math.abs(currentDate.getTime() - createdDate.getTime());
+    const daysSinceCreation = Math.ceil(timeDiff / (1000 * 3600 * 24));
+    // Check that is not nan
+    let testDays = daysSinceCreation;
+    if (!isNaN(daysSinceCreation)) {
+      testDays = daysSinceCreation;
+    } else {
+      testDays = 0;
+    }
+
     await waitFor(() => {
-      expect(getByText("9 days")).toBeTruthy();
+      expect(getByText(`${testDays} days`)).toBeTruthy();
     });
   });
 });

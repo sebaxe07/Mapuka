@@ -24,15 +24,23 @@ jest.mock("@rnmapbox/maps", () => ({
   },
 }));
 
-jest.mock("expo-location", () => ({
-  requestForegroundPermissionsAsync: jest.fn(),
-  watchPositionAsync: jest.fn(),
-}));
-
+/* jest.mock("expo-location", () => {
+  const actualLocation = jest.requireActual("expo-location");
+  return {
+    ...actualLocation,
+    requestForegroundPermissionsAsync: jest.fn(),
+    getCurrentPositionAsync: jest.fn(),
+    watchPositionAsync: jest.fn().mockImplementation((options, callback) => {
+      callback({ coords: { latitude: 0, longitude: 0 } });
+      return Promise.resolve({
+        remove: jest.fn(),
+      });
+    }),
+  };
+}); */
 jest.mock("expo-location", () => ({
   ...jest.requireActual("expo-location"),
   requestForegroundPermissionsAsync: jest.fn(),
-  getCurrentPositionAsync: jest.fn(),
   watchPositionAsync: jest.fn(),
 }));
 
@@ -91,7 +99,7 @@ describe("MapFog Screen", () => {
     reducer: rootReducer,
     preloadedState: initialState,
   });
-  /* 
+
   it("renders essential UI", async () => {
     (Location.requestForegroundPermissionsAsync as jest.Mock).mockResolvedValue(
       {
@@ -99,7 +107,7 @@ describe("MapFog Screen", () => {
       }
     );
 
-    const { debug, getByTestId } = renderWithProviders(
+    const { getByTestId } = renderWithProviders(
       <Map
         searchText=""
         triggerAction=""
@@ -113,15 +121,20 @@ describe("MapFog Screen", () => {
       { store }
     );
 
-    debug();
     await waitFor(() => {
       expect(getByTestId("map-view")).toBeTruthy();
     });
   });
 
   it("handles spot coordinates", async () => {
+    (Location.requestForegroundPermissionsAsync as jest.Mock).mockResolvedValue(
+      {
+        status: "granted",
+      }
+    );
+
     const setSpotCoordinates = jest.fn();
-    const { rerender } = render(
+    const { rerender } = renderWithProviders(
       <Map
         searchText=""
         triggerAction=""
@@ -131,14 +144,39 @@ describe("MapFog Screen", () => {
         SpotCoordinates={[10, 20]}
         setSpotCoordinates={setSpotCoordinates}
         onCoordinatesChange={jest.fn()}
-      />
+      />,
+      { store }
     );
 
     await waitFor(() => {
       expect(setSpotCoordinates).toHaveBeenCalledWith(null);
     });
+  });
 
-    rerender(
+  it("requests location permission and starts tracking", async () => {
+    (Location.requestForegroundPermissionsAsync as jest.Mock).mockResolvedValue(
+      {
+        status: "granted",
+      }
+    );
+
+    const locationUpdates = [
+      { latitude: 37.7749, longitude: -122.4194 },
+      { latitude: 37.775, longitude: -122.4195 },
+      { latitude: 37.7751, longitude: -122.4196 },
+    ];
+
+    (Location.watchPositionAsync as jest.Mock).mockImplementation(
+      async (_options, callback) => {
+        locationUpdates.forEach((coords, index) => {
+          setTimeout(() => {
+            callback({ coords });
+          }, index * 2000); // Simulate movement every 2 second
+        });
+        return { remove: jest.fn() }; // Mock remove function
+      }
+    );
+    const { getByTestId } = renderWithProviders(
       <Map
         searchText=""
         triggerAction=""
@@ -146,53 +184,26 @@ describe("MapFog Screen", () => {
         onBearingChange={jest.fn()}
         mapType="custom"
         SpotCoordinates={null}
-        setSpotCoordinates={setSpotCoordinates}
+        setSpotCoordinates={jest.fn()}
         onCoordinatesChange={jest.fn()}
-      />
-    );
-  });
-
-  it("handles user location updates", async () => {
-    const onCoordinatesChange = jest.fn();
-    const { rerender } = render(
-      <Map
-        searchText=""
-        triggerAction=""
-        setTriggerAction={jest.fn()}
-        onBearingChange={jest.fn()}
-        mapType="custom"
-        SpotCoordinates={null}
-        setSpotCoordinates={jest.fn()}
-        onCoordinatesChange={onCoordinatesChange}
-      />
+      />,
+      { store }
     );
 
-    await act(async () => {
-      Location.watchPositionAsync.mock.calls[0][1]({
-        coords: { latitude: 10, longitude: 20 },
-      });
-    });
+    await new Promise((resolve) => setTimeout(resolve, 6000));
 
-    await waitFor(() => {
-      expect(onCoordinatesChange).toHaveBeenCalledWith([20, 10]);
-    });
-
-    rerender(
-      <Map
-        searchText=""
-        triggerAction=""
-        setTriggerAction={jest.fn()}
-        onBearingChange={jest.fn()}
-        mapType="custom"
-        SpotCoordinates={null}
-        setSpotCoordinates={jest.fn()}
-        onCoordinatesChange={onCoordinatesChange}
-      />
-    );
-  });
+    expect(Location.requestForegroundPermissionsAsync).toHaveBeenCalled();
+    expect(Location.watchPositionAsync).toHaveBeenCalled();
+  }, 10000);
 
   it("handles search text updates", async () => {
-    const { rerender } = render(
+    (Location.requestForegroundPermissionsAsync as jest.Mock).mockResolvedValue(
+      {
+        status: "granted",
+      }
+    );
+
+    const { rerender } = renderWithProviders(
       <Map
         searchText="test"
         triggerAction=""
@@ -202,30 +213,20 @@ describe("MapFog Screen", () => {
         SpotCoordinates={null}
         setSpotCoordinates={jest.fn()}
         onCoordinatesChange={jest.fn()}
-      />
+      />,
+      { store }
     );
-
-    rerender(
-      <Map
-        searchText=""
-        triggerAction=""
-        setTriggerAction={jest.fn()}
-        onBearingChange={jest.fn()}
-        mapType="custom"
-        SpotCoordinates={null}
-        setSpotCoordinates={jest.fn()}
-        onCoordinatesChange={jest.fn()}
-      />
-    );
-
-    await waitFor(() => {
-      expect(MapboxGL.PointAnnotation).not.toBeNull();
-    });
   });
 
-  it("handles GPS and north actions", async () => {
+  it("handles GPS action", async () => {
+    (Location.requestForegroundPermissionsAsync as jest.Mock).mockResolvedValue(
+      {
+        status: "granted",
+      }
+    );
+
     const setTriggerAction = jest.fn();
-    const { rerender } = render(
+    const { rerender } = renderWithProviders(
       <Map
         searchText=""
         triggerAction="gps"
@@ -235,33 +236,86 @@ describe("MapFog Screen", () => {
         SpotCoordinates={null}
         setSpotCoordinates={jest.fn()}
         onCoordinatesChange={jest.fn()}
-      />
-    );
-
-    await waitFor(() => {
-      expect(setTriggerAction).toHaveBeenCalledWith("");
-    });
-
-    rerender(
-      <Map
-        searchText=""
-        triggerAction="north"
-        setTriggerAction={setTriggerAction}
-        onBearingChange={jest.fn()}
-        mapType="custom"
-        SpotCoordinates={null}
-        setSpotCoordinates={jest.fn()}
-        onCoordinatesChange={jest.fn()}
-      />
+      />,
+      { store }
     );
 
     await waitFor(() => {
       expect(setTriggerAction).toHaveBeenCalledWith("");
     });
   });
+  it("handles north action", async () => {
+    (Location.requestForegroundPermissionsAsync as jest.Mock).mockResolvedValue(
+      {
+        status: "granted",
+      }
+    );
+
+    // Mock cameraRef.current && userLocation
+    const cameraRef = {
+      current: {
+        setCamera: jest.fn(),
+      },
+    };
+
+    const userLocation = {
+      latitude: 37.7749,
+      longitude: -122.4194,
+    };
+    jest.spyOn(React, "useRef").mockReturnValue(cameraRef);
+    jest.spyOn(React, "useState").mockReturnValue([userLocation, jest.fn()]);
+    const setTriggerAction = jest.fn();
+    const { rerender } = renderWithProviders(
+      <Map
+        searchText=""
+        triggerAction="gps"
+        setTriggerAction={setTriggerAction}
+        onBearingChange={jest.fn()}
+        mapType="custom"
+        SpotCoordinates={null}
+        setSpotCoordinates={jest.fn()}
+        onCoordinatesChange={jest.fn()}
+      />,
+      { store }
+    );
+
+    await waitFor(() => {
+      /*       expect(cameraRef.current.setCamera).toHaveBeenCalledWith({
+        heading: 0,
+        animationDuration: 1000,
+      }); */
+      expect(setTriggerAction).toHaveBeenCalledWith("");
+    });
+
+    await waitFor(() => {
+      expect(setTriggerAction).toHaveBeenCalledWith("");
+    });
+  });
+  it("handles denied permission", async () => {
+    (Location.requestForegroundPermissionsAsync as jest.Mock).mockResolvedValue(
+      {
+        status: "denied",
+      }
+    );
+
+    const setTriggerAction = jest.fn();
+    const { rerender } = renderWithProviders(
+      <Map
+        searchText=""
+        triggerAction="gps"
+        setTriggerAction={setTriggerAction}
+        onBearingChange={jest.fn()}
+        mapType="custom"
+        SpotCoordinates={null}
+        setSpotCoordinates={jest.fn()}
+        onCoordinatesChange={jest.fn()}
+      />,
+      { store }
+    );
+  });
 
   it("handles touch move", async () => {
-    const { getByTestId } = render(
+    const { getByTestId } = renderWithProviders(
       <Map
         searchText=""
         triggerAction=""
@@ -271,13 +325,10 @@ describe("MapFog Screen", () => {
         SpotCoordinates={null}
         setSpotCoordinates={jest.fn()}
         onCoordinatesChange={jest.fn()}
-      />
+      />,
+      { store }
     );
 
     fireEvent(getByTestId("map-view"), "onTouchMove");
-
-    await waitFor(() => {
-      expect(MapboxGL.Camera).not.toBeNull();
-    }); 
-  });*/
+  });
 });

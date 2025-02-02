@@ -151,7 +151,7 @@ const Map: React.FC<MapProps> = ({
           "Permission Denied",
           "Location permission is required to show your location on the map."
         );
-        return;
+        throw new Error("Location permission denied");
       }
       // console.log("\x1b[32m", "Starting to watch position...");
 
@@ -162,12 +162,12 @@ const Map: React.FC<MapProps> = ({
           distanceInterval: 1,
         },
         (location) => {
-          // console.log("\x1b[33m", "Location received: ", location);
+          console.log("\x1b[33m", "Location received: ", location);
           const { latitude, longitude } = location.coords;
           const coordinates: [number, number] = [longitude, latitude];
           setUserLocation(coordinates);
           onCoordinatesChange(coordinates);
-          // console.log("User location: ", coordinates);
+          console.log("User location: ", coordinates);
           // Before focusing the camera on the user's location, check if the location change is significant
 
           if (
@@ -175,10 +175,10 @@ const Map: React.FC<MapProps> = ({
             turf.distance(turf.point(userLocation), turf.point(coordinates)) <
               0.01
           ) {
-            // console.log("Location change is not significant");
+            console.log("Location change is not significant");
             return;
           }
-          // console.log("\x1b[31m", "Location change is significant");
+          console.log("\x1b[31m", "Location change is significant");
 
           discoverArea(coordinates, 0.1);
 
@@ -352,7 +352,9 @@ const Map: React.FC<MapProps> = ({
     if (triggerAction === "gps") {
       console.log("\x1b[32m", "Triggering GPS action...");
       // Focus the map on the user's location
+      console.log("\x1b[33m", "Focusing camera on user location...");
       if (cameraRef.current && userLocation) {
+        console.log("\x1b[34m", "Focused");
         setFocused(true);
         cameraRef.current.setCamera({
           centerCoordinate: userLocation,
@@ -362,13 +364,16 @@ const Map: React.FC<MapProps> = ({
       }
     } else if (triggerAction === "north") {
       // Rotate the map to face north
+      console.log("\x1b[32m", "Triggering North action...");
       if (cameraRef.current) {
+        console.log("\x1b[33m", "Triggered");
         cameraRef.current.setCamera({
           heading: 0,
           animationDuration: 1000,
         });
       }
     }
+    console.log("\x1b[31m", "Trigger action: ", triggerAction);
     setTriggerAction("");
   }, [triggerAction]);
   const handleTouchMove = useMemo(
@@ -385,9 +390,11 @@ const Map: React.FC<MapProps> = ({
   }, [focused]);
 
   return (
-    <View className="size-full flex-1  justify-center items-center">
+    <View
+      testID="map-view"
+      className="size-full flex-1  justify-center items-center"
+    >
       <MapboxGL.MapView
-        testID="map-view"
         style={styles.map}
         styleURL={mapStyle}
         compassEnabled={false}
