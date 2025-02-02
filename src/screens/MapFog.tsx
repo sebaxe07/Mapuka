@@ -276,7 +276,7 @@ const Map: React.FC<MapProps> = ({
     );
   }, [discoveredPolygons, userData.profile_id, dispatch]);
 
-  const clearDiscoveredAreas = async () => {
+  /* const clearDiscoveredAreas = async () => {
     setDiscoveredPolygons(initialDiscovery);
     try {
       const { data, error } = await supabase
@@ -296,7 +296,7 @@ const Map: React.FC<MapProps> = ({
     } catch (error) {
       // console.error("Error clearing discovered areas: ", error);
     }
-  };
+  }; */
 
   const [text, setText] = useState("");
   const [routeCoords, setRouteCoords] = useState<number[][] | null>(null);
@@ -387,6 +387,7 @@ const Map: React.FC<MapProps> = ({
   return (
     <View className="size-full flex-1  justify-center items-center">
       <MapboxGL.MapView
+        testID="map-view"
         style={styles.map}
         styleURL={mapStyle}
         compassEnabled={false}
