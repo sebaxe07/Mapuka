@@ -24,6 +24,7 @@ const UserData: React.FC = () => {
 
   const validateFirstName = (text: string) => {
     if (!text.trim()) {
+      setFirstNameError("First name is required.");
     } else if (text.length < 2) {
       setFirstNameError("First name must be at least 2 characters.");
     } else {
@@ -34,6 +35,7 @@ const UserData: React.FC = () => {
 
   const validateLastName = (text: string) => {
     if (!text.trim()) {
+      setLastNameError("Last name is required.");
     } else if (text.length < 2) {
       setLastNameError("Last name must be at least 2 characters.");
     } else {
@@ -111,13 +113,17 @@ const UserData: React.FC = () => {
         </Text>
         <View className="flex-row w-full">
           <TextInput
+            testID="firstname"
             value={newFirstName}
             onChangeText={validateFirstName}
             className="flex-1 text-boxContainer rounded-2xl bg-textInput text-2xl font-senRegular border-b border-boxContainer px-4 py-2"
           />
         </View>
         {firstNameError && (
-          <Text className="text-buttonAccentRed font-senSemiBold text-sm mt-1">
+          <Text
+            testID="firstname-error"
+            className="text-buttonAccentRed font-senSemiBold text-sm mt-1"
+          >
             {firstNameError}
           </Text>
         )}
@@ -126,13 +132,17 @@ const UserData: React.FC = () => {
         <Text className="text-textInput text-xl font-senMedium">Last Name</Text>
         <View className="flex-row w-full">
           <TextInput
+            testID="lastname"
             value={newLastName}
             onChangeText={validateLastName}
             className="flex-1 text-boxContainer rounded-2xl bg-textInput text-2xl font-senRegular border-b border-boxContainer px-4 py-2"
           />
         </View>
         {lastNameError && (
-          <Text className="text-buttonAccentRed font-senSemiBold text-sm mt-1">
+          <Text
+            testID="lastname-error"
+            className="text-buttonAccentRed font-senSemiBold text-sm mt-1"
+          >
             {lastNameError}
           </Text>
         )}
@@ -145,6 +155,7 @@ const UserData: React.FC = () => {
           onPress={() => setIsAlerCancelVisible(true)}
         />
         <Button
+          testID="save"
           label="Save"
           onPress={() => setIsAlertSaveVisible(true)}
           disabled={

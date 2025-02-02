@@ -48,6 +48,7 @@ const ResetPassword: React.FC = () => {
       </View>
 
       <TouchableOpacity
+        testID="reset-password"
         className={` rounded-xl px-6 py-3 self-center `}
         onPress={handleResetPassword}
         disabled={loading}

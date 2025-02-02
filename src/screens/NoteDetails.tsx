@@ -22,7 +22,15 @@ import AlertModal from "../components/AlertModal";
 import { TouchableWithoutFeedback, Keyboard } from "react-native";
 import Toast from "react-native-toast-message";
 
-const NoteDetails: React.FC = ({ route }: any) => {
+interface NoteDetailsProps {
+  route: {
+    params: {
+      itemId: string;
+    };
+  };
+}
+
+const NoteDetails: React.FC<NoteDetailsProps> = ({ route }) => {
   const Backgrounds = [
     NoteBg.Style1,
     NoteBg.Style2,
@@ -382,6 +390,7 @@ const NoteDetails: React.FC = ({ route }: any) => {
             {isEditing ? (
               <>
                 <TextInput
+                  testID="title-edit"
                   value={editableNote?.title || ""}
                   onChangeText={(text) => validateTitle(text)}
                   className="text-boxContainer text-4xl font-senMedium mb-2 border-b border-boxContainer"
@@ -409,6 +418,7 @@ const NoteDetails: React.FC = ({ route }: any) => {
               {isEditing ? (
                 <View className="flex-1">
                   <TextInput
+                    testID="address-edit"
                     value={editableNote?.address || ""}
                     onChangeText={(text) => validateAddress(text)}
                     className="text-textBody text-base font-senRegular border-b border-textBody"
@@ -430,6 +440,7 @@ const NoteDetails: React.FC = ({ route }: any) => {
             {isEditing ? (
               <>
                 <TextInput
+                  testID="content-edit"
                   value={editableNote?.content || ""}
                   onChangeText={(text) => validateContent(text)}
                   multiline
@@ -452,6 +463,7 @@ const NoteDetails: React.FC = ({ route }: any) => {
           <View className="flex-row justify-center w-full">
             {isEditing ? (
               <TouchableOpacity
+                testID="save"
                 className={`bg-buttonAccentRed rounded-3xl items-center justify-center w-1/2 px-5 py-3 ${
                   isSaveDisabled ? "bg-textInput" : "bg-buttonAccentRed"
                 }`}

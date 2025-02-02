@@ -53,6 +53,7 @@ const Settings: React.FC = () => {
           Reset the discovered area of the Map
         </Text>
         <Button
+          testID="reset-map"
           label={loading ? "Resetting..." : "Reset"}
           onPress={handleResetMap}
           disabled={loading}
