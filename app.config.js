@@ -11,7 +11,7 @@ export default ({ config }) => {
     splash: {
       image: "./assets/splash-icon.png",
       resizeMode: "contain",
-      backgroundColor: "#ffffff",
+      backgroundColor: "#11112D",
     },
     ios: {
       supportsTablet: true,
@@ -20,7 +20,7 @@ export default ({ config }) => {
       ...config.android,
       adaptiveIcon: {
         foregroundImage: "./assets/adaptive-icon.png",
-        backgroundColor: "#ffffff",
+        backgroundColor: "#11112D",
       },
       package: "com.sebaxe07.Mapuka",
       permissions: [
@@ -52,6 +52,14 @@ export default ({ config }) => {
         },
       ],
       "expo-font",
+      [
+        "expo-splash-screen",
+        {
+          backgroundColor: "#11112D",
+          image: "./assets/splash-icon.png",
+          imageWidth: 200,
+        },
+      ],
     ],
 
     extra: {
