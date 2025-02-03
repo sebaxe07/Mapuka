@@ -7,6 +7,7 @@ import {
   Modal,
   Alert,
   FlatList,
+  KeyboardAvoidingView,
 } from "react-native";
 import Settings from "../../assets/icons/bookmarks/settings.svg";
 import Place from "../../assets/icons/bookmarks/place.svg";
@@ -14,13 +15,18 @@ import Edit from "../../assets/icons/profile/edit_clean.svg";
 import Trash from "../../assets/icons/bookmarks/trash.svg";
 import { colors } from "../../colors";
 import { useNavigation } from "@react-navigation/native";
-import { Note, setNotes } from "../contexts/slices/userDataSlice";
+import {
+  Note,
+  setAchievements,
+  setNotes,
+} from "../contexts/slices/userDataSlice";
 import { useAppDispatch, useAppSelector } from "../contexts/hooks";
 import { supabase } from "../utils/supabase";
 import * as NoteBg from "../../assets/images/bookmarks/index";
 import AlertModal from "../components/AlertModal";
 import { TouchableWithoutFeedback, Keyboard } from "react-native";
 import Toast from "react-native-toast-message";
+import { UpdateAchievements } from "../utils/UserManagement";
 
 interface NoteDetailsProps {
   route: {
@@ -152,6 +158,7 @@ const NoteDetails: React.FC<NoteDetailsProps> = ({ route }) => {
     !editableNote?.address.trim()
   );
 
+  const userData = useAppSelector((state) => state.userData);
   // Handle Save
   const handleSave = async () => {
     try {
@@ -181,6 +188,21 @@ const NoteDetails: React.FC<NoteDetailsProps> = ({ route }) => {
       text1: "Note updated",
       text2: "Your changes have been saved successfully!",
     });
+
+    // Check achievement
+    if (!userData.achievements[3].unlocked) {
+      const updatedAchievements = [...userData.achievements];
+      updatedAchievements[3] = { ...updatedAchievements[3], unlocked: true };
+      UpdateAchievements(updatedAchievements, userData.profile_id, dispatch);
+      Toast.show({
+        autoHide: true,
+        position: "bottom",
+        visibilityTime: 2000,
+        type: "success",
+        text1: "Achievement Unlocked",
+        text2: "Memo Keeper: Edit a note.",
+      });
+    }
   };
 
   const deleteNote = async () => {
@@ -349,168 +371,174 @@ const NoteDetails: React.FC<NoteDetailsProps> = ({ route }) => {
       </View>
 
       {/* Content */}
-      <View className="flex-4 h-3/4 gap-3">
-        <View className="flex-row w-full justify-between px-6 items-center">
-          <View className="flex-row gap-5">
-            {/* Image Picker */}
-            <TouchableOpacity
-              testID="change-bg"
-              onPress={() => setIsModalVisible(true)}
-            >
-              <Settings />
-            </TouchableOpacity>
-            {/* Edit / Save Button */}
-            <TouchableOpacity
-              onPress={() => {
-                // Only handle the save after user is done editing
-                if (isEditing) {
-                  setIsAlerCancelVisible(true);
-                } else {
-                  setIsEditing(true);
-                }
-              }}
-            >
-              <View className="flex-row items-center justify-center gap-2">
-                <Edit />
-                <Text className="text-textInput text-xl font-senRegular ">
-                  {isEditing ? "Cancel" : "Edit"}
-                </Text>
-              </View>
-            </TouchableOpacity>
-          </View>
-          {/* Delete Note */}
-          <View className="justify-center items-center ">
-            <TouchableOpacity
-              testID="delete"
-              onPress={() => {
-                setIsAlertDeleteVisible(true);
-              }}
-            >
-              <Trash />
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        {/* Note Details */}
-        <View className="flex-1 h-[80%] justify-around rounded-3xl bg-boxMenu px-6 py-4">
-          <View>
-            {/* Date */}
-            <Text className="text-textBody text-base mb-1">
-              {formatDate(note.created_at)}
-            </Text>
-
-            {/* Title */}
-            {isEditing ? (
-              <>
-                <TextInput
-                  testID="title-edit"
-                  value={editableNote?.title || ""}
-                  onChangeText={(text) => validateTitle(text)}
-                  className="text-boxContainer text-4xl font-senMedium mb-2 border-b border-boxContainer"
-                />
-                {titleError ? (
-                  <Text
-                    testID="title-error"
-                    className="text-buttonAccentRed font-senSemiBold text-sm"
-                  >
-                    {titleError}
+      <KeyboardAvoidingView
+        behavior="padding"
+        keyboardVerticalOffset={-150}
+        style={{ flex: 1 }}
+      >
+        <View className="flex-4 h-3/4 gap-3">
+          <View className="flex-row w-full justify-between px-6 items-center">
+            <View className="flex-row gap-5">
+              {/* Image Picker */}
+              <TouchableOpacity
+                testID="change-bg"
+                onPress={() => setIsModalVisible(true)}
+              >
+                <Settings />
+              </TouchableOpacity>
+              {/* Edit / Save Button */}
+              <TouchableOpacity
+                onPress={() => {
+                  // Only handle the save after user is done editing
+                  if (isEditing) {
+                    setIsAlerCancelVisible(true);
+                  } else {
+                    setIsEditing(true);
+                  }
+                }}
+              >
+                <View className="flex-row items-center justify-center gap-2">
+                  <Edit />
+                  <Text className="text-textInput text-xl font-senRegular ">
+                    {isEditing ? "Cancel" : "Edit"}
                   </Text>
-                ) : null}
-              </>
-            ) : (
-              <Text className="text-boxContainer text-4xl font-senMedium mb-4">
-                {note.title}
-              </Text>
-            )}
+                </View>
+              </TouchableOpacity>
+            </View>
+            {/* Delete Note */}
+            <View className="justify-center items-center ">
+              <TouchableOpacity
+                testID="delete"
+                onPress={() => {
+                  setIsAlertDeleteVisible(true);
+                }}
+              >
+                <Trash />
+              </TouchableOpacity>
+            </View>
+          </View>
 
-            {/* Address */}
-            <View className="flex-row items-center mb-2">
-              <Place
-                width={16}
-                height={16}
-                color={colors.bodyText}
-                style={{ marginRight: 8 }}
-              />
+          {/* Note Details */}
+          <View className="flex-1 h-[80%] justify-around rounded-3xl bg-boxMenu px-6 py-4">
+            <View>
+              {/* Date */}
+              <Text className="text-textBody text-base mb-1">
+                {formatDate(note.created_at)}
+              </Text>
+
+              {/* Title */}
               {isEditing ? (
-                <View className="flex-1">
+                <>
                   <TextInput
-                    testID="address-edit"
-                    value={editableNote?.address || ""}
-                    onChangeText={(text) => validateAddress(text)}
-                    className="text-textBody text-base font-senRegular border-b border-textBody"
+                    testID="title-edit"
+                    value={editableNote?.title || ""}
+                    onChangeText={(text) => validateTitle(text)}
+                    className="text-boxContainer text-4xl font-senMedium mb-2 border-b border-boxContainer"
                   />
-                  {addressError ? (
+                  {titleError ? (
                     <Text
-                      testID="address-error"
+                      testID="title-error"
                       className="text-buttonAccentRed font-senSemiBold text-sm"
                     >
-                      {addressError}
+                      {titleError}
                     </Text>
                   ) : null}
-                </View>
+                </>
               ) : (
-                <Text className="text-textBody font-senRegular text-base">
-                  {note.address}
+                <Text className="text-boxContainer text-4xl font-senMedium mb-4">
+                  {note.title}
+                </Text>
+              )}
+
+              {/* Address */}
+              <View className="flex-row items-center mb-2">
+                <Place
+                  width={16}
+                  height={16}
+                  color={colors.bodyText}
+                  style={{ marginRight: 8 }}
+                />
+                {isEditing ? (
+                  <View className="flex-1">
+                    <TextInput
+                      testID="address-edit"
+                      value={editableNote?.address || ""}
+                      onChangeText={(text) => validateAddress(text)}
+                      className="text-textBody text-base font-senRegular border-b border-textBody"
+                    />
+                    {addressError ? (
+                      <Text
+                        testID="address-error"
+                        className="text-buttonAccentRed font-senSemiBold text-sm"
+                      >
+                        {addressError}
+                      </Text>
+                    ) : null}
+                  </View>
+                ) : (
+                  <Text className="text-textBody font-senRegular text-base">
+                    {note.address}
+                  </Text>
+                )}
+              </View>
+
+              {/* Content */}
+              {isEditing ? (
+                <>
+                  <TextInput
+                    testID="content-edit"
+                    value={editableNote?.content || ""}
+                    onChangeText={(text) => validateContent(text)}
+                    multiline
+                    className="text-textBody text-wrap text-base font-senMedium border-b border-textBody mb-2"
+                  />
+                  {contentError ? (
+                    <Text
+                      testID="content-error"
+                      className="text-buttonAccentRed font-senSemiBold text-sm"
+                    >
+                      {contentError}
+                    </Text>
+                  ) : null}
+                </>
+              ) : (
+                <Text className="text-textBody font-senMedium text-base">
+                  {note.content}
                 </Text>
               )}
             </View>
 
-            {/* Content */}
-            {isEditing ? (
-              <>
-                <TextInput
-                  testID="content-edit"
-                  value={editableNote?.content || ""}
-                  onChangeText={(text) => validateContent(text)}
-                  multiline
-                  className="text-textBody text-wrap text-base font-senMedium border-b border-textBody mb-2"
-                />
-                {contentError ? (
-                  <Text
-                    testID="content-error"
-                    className="text-buttonAccentRed font-senSemiBold text-sm"
-                  >
-                    {contentError}
+            {/* Go to Note Button/Save */}
+            <View className="flex-row justify-center w-full">
+              {isEditing ? (
+                <TouchableOpacity
+                  testID="save"
+                  className={`bg-buttonAccentRed rounded-3xl items-center justify-center w-1/2 px-5 py-3 ${
+                    isSaveDisabled ? "bg-textInput" : "bg-buttonAccentRed"
+                  }`}
+                  onPress={() => setIsAlertSaveVisible(true)}
+                  disabled={isSaveDisabled}
+                >
+                  <Text className="text-textWhite text-sm font-senSemiBold">
+                    Save
                   </Text>
-                ) : null}
-              </>
-            ) : (
-              <Text className="text-textBody font-senMedium text-base">
-                {note.content}
-              </Text>
-            )}
-          </View>
-
-          {/* Go to Note Button/Save */}
-          <View className="flex-row justify-center w-full">
-            {isEditing ? (
-              <TouchableOpacity
-                testID="save"
-                className={`bg-buttonAccentRed rounded-3xl items-center justify-center w-1/2 px-5 py-3 ${
-                  isSaveDisabled ? "bg-textInput" : "bg-buttonAccentRed"
-                }`}
-                onPress={() => setIsAlertSaveVisible(true)}
-                disabled={isSaveDisabled}
-              >
-                <Text className="text-textWhite text-sm font-senSemiBold">
-                  Save
-                </Text>
-              </TouchableOpacity>
-            ) : (
-              <TouchableOpacity
-                className="bg-buttonAccentRed rounded-3xl items-center justify-center w-1/2 px-5 py-3"
-                onPress={() =>
-                  onPress(note.coordinates[0], note.coordinates[1])
-                }
-              >
-                <Text className="text-textWhite text-sm font-senSemiBold">
-                  Go to Note
-                </Text>
-              </TouchableOpacity>
-            )}
+                </TouchableOpacity>
+              ) : (
+                <TouchableOpacity
+                  className="bg-buttonAccentRed rounded-3xl items-center justify-center w-1/2 px-5 py-3"
+                  onPress={() =>
+                    onPress(note.coordinates[0], note.coordinates[1])
+                  }
+                >
+                  <Text className="text-textWhite text-sm font-senSemiBold">
+                    Go to Note
+                  </Text>
+                </TouchableOpacity>
+              )}
+            </View>
           </View>
         </View>
-      </View>
+      </KeyboardAvoidingView>
 
       {/* Render Modal */}
       {renderImagePickerModal()}
@@ -552,14 +580,7 @@ const NoteDetails: React.FC<NoteDetailsProps> = ({ route }) => {
         onBackdropPress={() => setIsAlertDeleteVisible(false)}
         message={`Are you sure you want to delete this note?`}
         onCancel={() => setIsAlertDeleteVisible(false)}
-        onConfirm={async () => {
-          try {
-            // Delete from database first
-            await deleteNote();
-          } catch (error) {
-            console.error("Error deleting note:", error);
-          }
-        }}
+        onConfirm={deleteNote}
         confirmText="Delete"
         cancelText="Cancel"
         loading={loading}

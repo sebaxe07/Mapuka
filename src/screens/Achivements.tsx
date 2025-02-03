@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 import { View, Text } from "react-native";
 import AchivementBox from "../components/AchivementBox";
 import * as Icons from "../../assets/icons/bookmarks/achivements/index";
-import { Achievement } from "../contexts/slices/userDataSlice";
-import { useAppSelector } from "../contexts/hooks";
+import { Achievement, setAchievements } from "../contexts/slices/userDataSlice";
+import { useAppSelector, useAppDispatch } from "../contexts/hooks";
 import { supabase } from "../utils/supabase";
 
 const Achievements: React.FC = () => {
@@ -26,7 +26,7 @@ const Achievements: React.FC = () => {
     },
     2: {
       title: "First Steps",
-      description: "Discover your first 1km.",
+      description: "Discover your first 1km².",
       layout: "vertical",
       unlocked: false,
     },
@@ -44,7 +44,7 @@ const Achievements: React.FC = () => {
     },
     5: {
       title: "Explorer's Habit",
-      description: "Discover a total of 5km.",
+      description: "Discover a total of 5km².",
       layout: "horizontal",
       unlocked: false,
     },
@@ -75,6 +75,7 @@ const Achievements: React.FC = () => {
   });
 
   const userData = useAppSelector((state) => state.userData);
+  const dispatch = useAppDispatch();
 
   // Simulated achievement data fetched from the database
   const [achievementData, setAchievementData] = useState<Achievement[]>(
@@ -100,6 +101,7 @@ const Achievements: React.FC = () => {
     // Update the achievement data
     const parsedAchievements = JSON.parse(data[0].achievements);
     setAchievementData(parsedAchievements);
+    dispatch(setAchievements(parsedAchievements));
   };
 
   useEffect(() => {

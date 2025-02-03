@@ -2,6 +2,7 @@ import React from "react";
 import { View, Text } from "react-native";
 import { colors } from "../../colors";
 import { SvgProps } from "react-native-svg";
+import { RFValue } from "react-native-responsive-fontsize";
 
 // Define the array of unlocked colors
 const unlockedColors = [
@@ -65,8 +66,8 @@ const AchievementBox: React.FC<ContentBoxProps> = ({
         }flex items-center justify-center`}
       >
         <Icon
-          width={layout === "horizontal" ? 50 : 70}
-          height={layout === "horizontal" ? 80 : 50}
+          width={layout === "horizontal" ? 50 : RFValue(50)} // 70
+          height={layout === "horizontal" ? 80 : RFValue(30)} // 50
         />
       </View>
 
@@ -76,7 +77,10 @@ const AchievementBox: React.FC<ContentBoxProps> = ({
           layout === "horizontal" ? "flex-1 gap-2 px-4" : "  py-2"
         } justify-center items-center`}
       >
-        <Text className={`font-senBold text-sm text-center text-bgMain`}>
+        <Text
+          className={`font-senBold text-sm text-center text-bgMain w-full `}
+          style={{ lineHeight: RFValue(12) }}
+        >
           {title}
         </Text>
         <Text

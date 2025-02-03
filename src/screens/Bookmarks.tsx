@@ -224,19 +224,25 @@ const BookmarksScreen: React.FC = () => {
               }}
               transition={{ type: "timing", duration: 500 } as any}
             >
-              <FlatList
-                data={notesData}
-                keyExtractor={(item) => item.note_id}
-                renderItem={({ item }) => (
-                  <NoteBox
-                    title={item.title}
-                    date={formatDate(item.created_at)}
-                    address={item.address}
-                    styleVariant={item.image}
-                    onPress={() => goToDetails("note", item.note_id)}
-                  />
-                )}
-              />
+              {notesData.length === 0 ? (
+                <Text className="text-textBody text-center mt-10 font-senRegular">
+                  No notes found, create your first note to see it here!
+                </Text>
+              ) : (
+                <FlatList
+                  data={notesData}
+                  keyExtractor={(item) => item.note_id}
+                  renderItem={({ item }) => (
+                    <NoteBox
+                      title={item.title}
+                      date={formatDate(item.created_at)}
+                      address={item.address}
+                      styleVariant={item.image}
+                      onPress={() => goToDetails("note", item.note_id)}
+                    />
+                  )}
+                />
+              )}
             </MotiView>
 
             <MotiView
@@ -257,20 +263,26 @@ const BookmarksScreen: React.FC = () => {
               }}
               transition={{ type: "timing", duration: 500 } as any}
             >
-              <FlatList
-                data={spotsData}
-                keyExtractor={(item) => item.spot_id}
-                renderItem={({ item }) => (
-                  <SpotBox
-                    spot_id={item.spot_id}
-                    image={require("../../assets/images/bookmarks/spotDefault.svg")}
-                    title={item.title}
-                    date={formatDate(item.created_at)}
-                    address={item.address}
-                    onPress={() => goToDetails("spot", item.spot_id)}
-                  />
-                )}
-              />
+              {spotsData.length === 0 ? (
+                <Text className="text-textBody text-center mt-10 font-senRegular">
+                  No spots found, create your first spot to see it here!
+                </Text>
+              ) : (
+                <FlatList
+                  data={spotsData}
+                  keyExtractor={(item) => item.spot_id}
+                  renderItem={({ item }) => (
+                    <SpotBox
+                      spot_id={item.spot_id}
+                      image={require("../../assets/images/bookmarks/spotDefault.svg")}
+                      title={item.title}
+                      date={formatDate(item.created_at)}
+                      address={item.address}
+                      onPress={() => goToDetails("spot", item.spot_id)}
+                    />
+                  )}
+                />
+              )}
             </MotiView>
           </>
         )}

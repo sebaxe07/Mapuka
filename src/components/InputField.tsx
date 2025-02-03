@@ -11,6 +11,7 @@ interface InputFieldProps {
   labelVisible?: boolean;
   placeholder?: string;
   placeholderClassname?: string;
+  inputClassname?: string;
   labelClassname?: string;
   className?: string;
   keyboardType?:
@@ -41,6 +42,10 @@ interface InputFieldProps {
   rowWidth?: string;
   onFocus?: () => void;
   onBlur?: () => void;
+  removeBg?: boolean;
+  inputColor?: string;
+  inputFont?: string;
+  testID?: string;
 }
 
 // InputField is a component that creates a text input field
@@ -78,7 +83,12 @@ const InputField = forwardRef(
       onFocus,
       labelClassname,
       placeholderClassname,
+      inputClassname,
       className,
+      removeBg = false,
+      inputColor,
+      inputFont,
+      testID,
     }: InputFieldProps,
     ref: React.Ref<TextInput>
   ) => {
@@ -96,9 +106,10 @@ const InputField = forwardRef(
           </Text>
         ) : null}
         <View
-          className={`flex h-12 items-center justify-center rounded-2xl bg-boxMenu`}
+          className={`flex h-12 items-center justify-center rounded-2xl ${removeBg ? "" : "bg-boxMenu"} ${className}`}
         >
           <Input
+            testID={testID}
             ref={ref}
             onChangeText={onChangeText}
             value={value}
@@ -129,11 +140,11 @@ const InputField = forwardRef(
               height: "100%",
             }}
             inputStyle={{
-              color: color.bodyText,
-              fontFamily: "SenRegular",
+              color: inputColor ? inputColor : color.bodyText,
+              fontFamily: inputFont ? inputFont : "SenRegular",
             }}
             secureTextEntry={secureEntry}
-            className="ml-3 h-full font-senRegular"
+            className={`${inputClassname ? inputClassname : "ml-3"}  h-full font-senRegular`}
             containerStyle={{
               width: "100%",
               height: "100%",

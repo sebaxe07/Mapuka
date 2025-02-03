@@ -24,9 +24,14 @@ import {
 import { searchLocation } from "../utils/DirectionsHelper";
 import { debounce } from "lodash";
 import { useAppDispatch, useAppSelector } from "../contexts/hooks";
-import { setDiscoveredPolygon as setDiscStorage } from "../contexts/slices/userDataSlice";
+import {
+  setDiscoveredPolygon as setDiscStorage,
+  setDiscoveredArea,
+} from "../contexts/slices/userDataSlice";
 import { supabase } from "../utils/supabase";
 import { colors } from "../../colors";
+import { UpdateAchievements } from "../utils/UserManagement";
+import Toast from "react-native-toast-message";
 
 MapboxGL.setAccessToken(MAPBOX_ACCESS_TOKEN);
 
@@ -45,7 +50,7 @@ interface MapProps {
 }
 
 const debouncedSaveDiscoveredAreas = debounce(
-  async (discoveredPolygons, profileId, dispatch) => {
+  async (discoveredPolygons, profileId, dispatch, achievements, Toast) => {
     try {
       // console.log("\x1b[34m Saving discovered areas: ", discoveredPolygons);
       const discoveredPolygonsJson = JSON.stringify(discoveredPolygons);
@@ -69,6 +74,38 @@ const debouncedSaveDiscoveredAreas = debounce(
       }
 
       dispatch(setDiscStorage(discoveredPolygons));
+      dispatch(setDiscoveredArea(areadiscovered));
+
+      if (areadiscovered >= 1 && !achievements[1].unlocked) {
+        const updatedAchievements = [...achievements];
+        updatedAchievements[1] = { ...updatedAchievements[1], unlocked: true };
+
+        UpdateAchievements(updatedAchievements, profileId, dispatch);
+        Toast.show({
+          autoHide: true,
+          position: "bottom",
+          visibilityTime: 2000,
+          type: "success",
+          text1: "Achievement Unlocked",
+          text2: "You have discovered your first 1km²!",
+        });
+      }
+
+      if (areadiscovered >= 5 && achievements[4].unlocked === false) {
+        const updatedAchievements = [...achievements];
+        updatedAchievements[4] = { ...updatedAchievements[4], unlocked: true };
+
+        UpdateAchievements(updatedAchievements, profileId, dispatch);
+        Toast.show({
+          autoHide: true,
+          position: "bottom",
+          visibilityTime: 2000,
+          type: "success",
+          text1: "Achievement Unlocked",
+          text2: "You have discovered 5km²!",
+        });
+      }
+
       // console.log("\x1b[33m Saved discovered areas: ", data);
     } catch (error) {
       // console.error("Error saving discovered areas: ", error);
@@ -109,11 +146,11 @@ const Map: React.FC<MapProps> = ({
   };
 
   useEffect(() => {
-    console.log(
+    /* console.log(
       "\x1b[31m",
       "SpotCoordinates location received: ",
       SpotCoordinates
-    );
+    ); */
     if (SpotCoordinates) {
       console.log("\x1b[32m", "Spot coordinates received: ", SpotCoordinates);
       setMarkerLocation(SpotCoordinates);
@@ -162,12 +199,12 @@ const Map: React.FC<MapProps> = ({
           distanceInterval: 1,
         },
         (location) => {
-          console.log("\x1b[33m", "Location received: ", location);
+          //console.log("\x1b[33m", "Location received: ", location);
           const { latitude, longitude } = location.coords;
           const coordinates: [number, number] = [longitude, latitude];
           setUserLocation(coordinates);
           onCoordinatesChange(coordinates);
-          console.log("User location: ", coordinates);
+          //console.log("User location: ", coordinates);
           // Before focusing the camera on the user's location, check if the location change is significant
 
           if (
@@ -175,19 +212,19 @@ const Map: React.FC<MapProps> = ({
             turf.distance(turf.point(userLocation), turf.point(coordinates)) <
               0.01
           ) {
-            console.log("Location change is not significant");
+            //console.log("Location change is not significant");
             return;
           }
-          console.log("\x1b[31m", "Location change is significant");
+          //console.log("\x1b[31m", "Location change is significant");
 
           discoverArea(coordinates, 0.1);
 
           setFocused((prevFocused) => {
             if (prevFocused) {
-              console.log(
+              /*  console.log(
                 "\x1b[34m",
                 "Focusing camera on user location... " + prevFocused
-              );
+              ); */
               // Focus camera on the user's location
               if (cameraRef.current) {
                 cameraRef.current.setCamera({
@@ -272,7 +309,9 @@ const Map: React.FC<MapProps> = ({
     debouncedSaveDiscoveredAreas(
       discoveredPolygons,
       userData.profile_id,
-      dispatch
+      dispatch,
+      userData.achievements,
+      Toast
     );
   }, [discoveredPolygons, userData.profile_id, dispatch]);
 

@@ -4,6 +4,7 @@ import { useAppDispatch } from "../contexts/hooks";
 import {
   setUserData,
   clearUserData,
+  setAchievements,
   Photo,
   Achievement,
 } from "../contexts/slices/userDataSlice";
@@ -202,3 +203,27 @@ export async function signUpUser({
     return;
   }
 }
+
+export const UpdateAchievements = async (
+  acvhievements: Achievement[],
+  profile_id: string,
+  dispatch: any
+) => {
+  console.log("\x1b[33m", "Updating achievements:", acvhievements);
+  const { data, error } = await supabase
+    .from("profiles")
+    .update({ achievements: JSON.stringify(acvhievements) })
+    .eq("profile_id", profile_id);
+
+  console.log("data", data);
+  if (error) {
+    console.error("Error updating achievements:", error.message);
+    return;
+  }
+
+  console.log("Achievements updated successfully:", data);
+  console.log("Dispatching achievements to Redux state");
+  dispatch(setAchievements(acvhievements));
+
+  return data;
+};

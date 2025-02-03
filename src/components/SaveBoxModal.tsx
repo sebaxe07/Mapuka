@@ -8,6 +8,10 @@ import { setSpots, setNotes } from "../contexts/slices/userDataSlice";
 import { MAPBOX_ACCESS_TOKEN } from "@env";
 import AlertModal from "./AlertModal";
 import Toast from "react-native-toast-message";
+import { UpdateAchievements } from "../utils/UserManagement";
+import { RFValue } from "react-native-responsive-fontsize";
+import InputField from "./InputField";
+import { colors } from "../../colors";
 
 interface SaveBoxProps {
   type: "note" | "spot";
@@ -96,6 +100,14 @@ const SaveBox: React.FC<SaveBoxProps> = ({ type, onClose, coordinates }) => {
       dispatch(setSpots([...currentSpots, ...data]));
 
       onClose(); // Close the modal after saving
+      Toast.show({
+        autoHide: true,
+        position: "bottom",
+        visibilityTime: 2000,
+        type: "success",
+        text1: `Spot created`,
+        text2: `Your ${type} was created successfully!`,
+      });
     } else if (type == "note") {
       // Add note to database
       console.log("\x1b[33m", "Adding note:", {
@@ -126,27 +138,59 @@ const SaveBox: React.FC<SaveBoxProps> = ({ type, onClose, coordinates }) => {
       console.log("Note added successfully:", data);
 
       dispatch(setNotes([...currentNotes, ...data]));
-
       onClose(); // Close the modal after saving
+
+      // Check if the user has unlocked the "Note Taker" achievement
+      if (!userData.achievements[7].unlocked) {
+        const updatedAchievements = [...userData.achievements];
+        updatedAchievements[7] = { ...updatedAchievements[7], unlocked: true };
+        UpdateAchievements(updatedAchievements, profileid, dispatch);
+
+        Toast.show({
+          autoHide: true,
+          position: "bottom",
+          visibilityTime: 5000,
+          type: "success",
+          text1: "Achievement Unlocked",
+          text2: "Note Taker: Create your first note.",
+        });
+      }
+
+      // Check if the user has unlocked the "Sticky Notes" achievement
+      const TotalNotes = [...currentNotes, ...data].length + 1;
+      if (TotalNotes >= 5 && !userData.achievements[2].unlocked) {
+        const updatedAchievements = [...userData.achievements];
+        updatedAchievements[2] = { ...updatedAchievements[2], unlocked: true };
+        UpdateAchievements(updatedAchievements, profileid, dispatch);
+
+        Toast.show({
+          autoHide: true,
+          position: "bottom",
+          visibilityTime: 5000,
+          type: "success",
+          text1: "Achievement Unlocked",
+          text2: "Sticky Notes: Create 5 notes.",
+        });
+      }
+
+      Toast.show({
+        autoHide: true,
+        position: "bottom",
+        visibilityTime: 2000,
+        type: "success",
+        text1: `Note created`,
+        text2: `Your ${type} was created successfully!`,
+      });
     }
 
     console.log(`${type} added successfully:`);
-
-    Toast.show({
-      autoHide: true,
-      position: "bottom",
-      visibilityTime: 2000,
-      type: "success",
-      text1: `${type} created`,
-      text2: `Your ${type} created successfully!`,
-    });
 
     setShowModal(false);
     onClose(); // Close the modal after saving
   };
 
   return (
-    <View className="absolute bottom-56 self-center w-11/12 bg-textWhite rounded-3xl shadow-lg py-5 px-10">
+    <View className="absolute bottom-96 self-center w-11/12 bg-textWhite rounded-3xl shadow-lg py-5 px-10">
       <View className="flex-row justify-between items-center mb-4 border-textBody ">
         <Text className="text-textBody text-2xl font-senSemiBold   ">
           {type === "note" ? "Make a Note" : "Save a Spot"}
@@ -157,18 +201,21 @@ const SaveBox: React.FC<SaveBoxProps> = ({ type, onClose, coordinates }) => {
       </View>
       <Divider />
       {/* Title Input */}
-      {title !== "" ? (
-        <Text className="text-textInput text-xl font-senSemiBold my-2">
-          {title}
-        </Text>
-      ) : null}
-      <TextInput
+      <InputField
         testID="title-input"
+        label="Title"
+        labelVisible={title ? true : false}
         placeholder={`Give a Title to your ${type}`}
-        className="text-bgMain text-2xl font-senSemiBold py-2 mb-2 "
         value={title}
         onChangeText={setTitle}
         maxLength={100}
+        removeBg
+        rowWidth="w-full"
+        inputClassname="-ml-2"
+        placeholderClassname="text-bgMain font-senSemiBold py-2 mb-2  "
+        labelClassname="pb-1 pt-3.5 text-xl text-textInput font-senRegular"
+        inputColor={colors.background}
+        inputFont="SenSemiBold"
       />
       {titleError ? (
         <Text testID="title-error" className="text-buttonAccentRed">

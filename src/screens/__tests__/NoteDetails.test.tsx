@@ -54,7 +54,17 @@ const initialState = {
     lastname: "",
     discovered_area: 0,
     discovered_polygon: null,
-    achievements: [],
+    achievements: [
+      { id: 1, unlocked: true },
+      { id: 2, unlocked: false },
+      { id: 3, unlocked: true },
+      { id: 4, unlocked: false },
+      { id: 5, unlocked: true },
+      { id: 6, unlocked: false },
+      { id: 7, unlocked: true },
+      { id: 8, unlocked: false },
+      { id: 9, unlocked: true },
+    ],
     created_at: "",
     pic: null,
     notes: [

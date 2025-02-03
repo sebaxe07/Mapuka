@@ -8,6 +8,9 @@ import { colors } from "../../colors";
 import { Easing } from "react-native-reanimated";
 import { MotiView } from "moti";
 import Map from "./MapFog";
+import { useAppDispatch, useAppSelector } from "../contexts/hooks";
+import Toast from "react-native-toast-message";
+import { UpdateAchievements } from "../utils/UserManagement";
 
 interface HomeProps {
   route?: {
@@ -25,6 +28,58 @@ const Home: React.FC<HomeProps> = ({ route }: any) => {
   const [externalCoords, setExternalCoords] = useState<[number, number] | null>(
     null
   ); // State to store external coordinates
+  const dispatch = useAppDispatch();
+
+  const userData = useAppSelector((state) => state.userData);
+
+  useEffect(() => {
+    CheckAchievement();
+  }, []);
+
+  const CheckAchievement = () => {
+    // Check to time to see if its between 10pm and 12am
+    const date = new Date();
+    const hour = date.getHours();
+    const minute = date.getMinutes();
+    console.log("Hour: ", hour);
+    console.log("Minute: ", minute);
+    if (
+      hour >= 22 &&
+      hour <= 23 &&
+      userData.achievements[5].unlocked === false
+    ) {
+      // Open the app after 10:00 PM
+      const updatedAchievements = [...userData.achievements];
+      updatedAchievements[5] = { ...updatedAchievements[5], unlocked: true };
+
+      UpdateAchievements(updatedAchievements, userData.profile_id, dispatch);
+      Toast.show({
+        autoHide: true,
+        position: "bottom",
+        visibilityTime: 2000,
+        type: "success",
+        text1: "Achievement Unlocked",
+        text2: "Night Owl: Open the app after 10:00 PM.",
+      });
+    }
+
+    // Check to see if the user has opened the app before 8am
+    if (hour >= 0 && hour <= 8 && userData.achievements[6].unlocked === false) {
+      // Open the app before 8:00 AM
+      const updatedAchievements = [...userData.achievements];
+      updatedAchievements[6] = { ...updatedAchievements[6], unlocked: true };
+
+      UpdateAchievements(updatedAchievements, userData.profile_id, dispatch);
+      Toast.show({
+        autoHide: true,
+        position: "bottom",
+        visibilityTime: 2000,
+        type: "success",
+        text1: "Achievement Unlocked",
+        text2: "Early Bird: Open the app for the first time before 8:00 AM.",
+      });
+    }
+  };
 
   // Check for external coordinates passed via `route`
   useEffect(() => {

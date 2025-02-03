@@ -329,7 +329,7 @@ const Profile: React.FC = () => {
             </View>
             <View className="flex-col items-start content-center justify-center ml-2  w-24">
               <Text className="text-buttonBlue text-lg  font-senSemiBold">
-                {distanceExplored} km
+                {distanceExplored} km²
               </Text>
               <Text className="text-textBody text-sm font-senRegular">
                 Explored

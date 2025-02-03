@@ -200,7 +200,7 @@ describe("Profile Screen", () => {
     await waitFor(() => {
       expect(getByText("Hello, Test User!")).toBeTruthy();
       expect(getByText("test@example.com")).toBeTruthy();
-      expect(getByText("123.45 km")).toBeTruthy();
+      expect(getByText("123.45 km²")).toBeTruthy();
       expect(getByText("55.55%")).toBeTruthy();
       expect(getByLabelText("Avatar")).toBeTruthy();
     });

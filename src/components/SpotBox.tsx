@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, TouchableOpacity, Alert } from "react-native";
+import { View, Text, Alert } from "react-native";
 import Place from "../../assets/icons/bookmarks/place.svg";
 import Trash from "../../assets/icons/bookmarks/trash.svg";
 import SpotDefault from "../../assets/images/bookmarks/spotDefault.svg";
@@ -9,6 +9,7 @@ import { useAppDispatch, useAppSelector } from "../contexts/hooks";
 import { supabase } from "../utils/supabase";
 import AlertModal from "./AlertModal";
 import Toast from "react-native-toast-message";
+import { TouchableOpacity } from "react-native-gesture-handler";
 
 const SpotBox: React.FC<{
   spot_id: string;
@@ -79,6 +80,7 @@ const SpotBox: React.FC<{
             <TouchableOpacity
               testID="delete-button"
               onPress={() => setIsAlertDeleteVisible(true)}
+              hitSlop={{ top: 10, right: 10, bottom: 10, left: 10 }}
             >
               <Trash />
             </TouchableOpacity>
@@ -101,7 +103,15 @@ const SpotBox: React.FC<{
 
         <View className="flex-row justify-between w-full">
           <TouchableOpacity
-            className="bg-buttonAccentRed rounded-3xl items-center justify-center w-2/3 px-5 py-3"
+            style={{
+              backgroundColor: colors.orange,
+              borderRadius: 24,
+              alignItems: "center",
+              justifyContent: "center",
+              width: "100%",
+              paddingHorizontal: 20,
+              paddingVertical: 12,
+            }}
             onPress={onPress}
           >
             <Text className="text-white text-sm font-senBold">View Spot</Text>
