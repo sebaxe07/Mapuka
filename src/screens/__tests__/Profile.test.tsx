@@ -9,7 +9,6 @@ import Toast from "react-native-toast-message";
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import { Provider } from "react-redux";
 import userDataReducer from "../../contexts/slices/userDataSlice";
-import ErrorBoundary from "../../components/ErrorBoundary"; // Import the ErrorBoundary
 
 jest.mock("expo-image-picker", () => ({
   ...jest.requireActual("expo-image-picker"), // Preserve any real exports
@@ -180,11 +179,7 @@ const renderWithProviders = (
     }),
   } = {}
 ) => {
-  return render(
-    <Provider store={store}>
-      <ErrorBoundary>{ui}</ErrorBoundary>
-    </Provider>
-  );
+  return render(<Provider store={store}>{ui}</Provider>);
 };
 
 const mockNavigation = { navigate: jest.fn(), setOptions: jest.fn() };
